@@ -1,0 +1,13 @@
+# Phase 0 OpenNext / Cloudflare Workers stub.
+# Full production cron + CF deploy lands Phase 10; this file enables local dry-run.
+name = "hg-aluminium"
+main = ".open-next/worker.js"
+compatibility_date = "2025-03-01"
+compatibility_flags = ["nodejs_compat"]
+
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+[vars]
+NEXT_PUBLIC_SITE_URL = "http://localhost:8787"

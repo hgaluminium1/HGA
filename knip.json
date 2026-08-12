@@ -1,0 +1,50 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema.json",
+  "entry": [
+    "src/app/**/{page,layout,route,loading,error,not-found,default,template}.{ts,tsx}",
+    "scripts/jobs-run.ts",
+    "vitest.config.ts",
+    "src/config/*.ts",
+    "src/i18n/routing.ts",
+    "src/lib/constants/revalidate-tags.ts",
+    "src/lib/query/get-query-client.ts",
+    "src/lib/db/connect.ts",
+    "src/lib/http/respond.ts",
+    "src/lib/types/api.ts",
+    "open-next.config.ts"
+  ],
+  "project": [
+    "src/**/*.{ts,tsx}",
+    "scripts/**/*.{ts,tsx}",
+    "tests/**/*.{ts,tsx}",
+    "open-next.config.ts"
+  ],
+  "ignore": [
+    "src/modules/**/di.ts",
+    "src/features/**/index.ts",
+    "src/modules/**/index.ts",
+    "src/components/ui/**",
+    "**/*.gitkeep"
+  ],
+  "ignoreDependencies": [
+    "@size-limit/file",
+    "eslint-config-next",
+    "eslint-config-prettier",
+    "eslint-import-resolver-typescript",
+    "@tailwindcss/postcss",
+    "tailwindcss",
+    "jsdom",
+    "@vitejs/plugin-react",
+    "stylelint-config-standard",
+    "prettier",
+    "husky",
+    "lint-staged",
+    "@commitlint/cli",
+    "@commitlint/config-conventional",
+    "@opennextjs/cloudflare",
+    "wrangler",
+    "shadcn",
+    "tw-animate-css",
+    "lucide-react"
+  ]
+}

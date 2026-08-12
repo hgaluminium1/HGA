@@ -1,0 +1,7 @@
+[
+  {
+    "name": "phase0-tooling-smoke",
+    "path": "package.json",
+    "limit": "50 KB"
+  }
+]

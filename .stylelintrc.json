@@ -1,0 +1,38 @@
+{
+  "extends": ["stylelint-config-standard"],
+  "rules": {
+    "color-no-hex": [
+      true,
+      {
+        "message": "Use design tokens in tokens.css — no raw hex outside token files."
+      }
+    ],
+    "declaration-property-value-disallowed-list": {
+      "/.*/": ["/\\[#[0-9a-fA-F]+\\]/"]
+    },
+    "selector-class-pattern": null,
+    "custom-property-pattern": null,
+    "import-notation": null,
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": ["theme", "tailwind", "apply", "layer", "config", "plugin"]
+      }
+    ]
+  },
+  "ignoreFiles": [
+    "src/styles/tokens.css",
+    "**/node_modules/**",
+    "**/.next/**",
+    "**/components/ui/**"
+  ],
+  "overrides": [
+    {
+      "files": ["src/app/globals.css"],
+      "rules": {
+        "at-rule-no-unknown": null,
+        "at-rule-no-deprecated": null
+      }
+    }
+  ]
+}
