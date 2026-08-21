@@ -11,13 +11,16 @@
     "src/lib/db/connect.ts",
     "src/lib/http/respond.ts",
     "src/lib/types/api.ts",
-    "open-next.config.ts"
+    "open-next.config.ts",
+    "src/stories/**/*.stories.tsx",
+    ".storybook/{main,preview}.{ts,tsx}"
   ],
   "project": [
     "src/**/*.{ts,tsx}",
     "scripts/**/*.{ts,tsx}",
     "tests/**/*.{ts,tsx}",
-    "open-next.config.ts"
+    "open-next.config.ts",
+    ".storybook/**/*.{ts,tsx}"
   ],
   "ignore": [
     "src/modules/**/di.ts",
@@ -45,6 +48,18 @@
     "wrangler",
     "shadcn",
     "tw-animate-css",
-    "lucide-react"
+    "lucide-react",
+    "storybook",
+    "@storybook/nextjs-vite",
+    "@storybook/addon-a11y",
+    "@storybook/addon-docs",
+    "@storybook/addon-vitest",
+    "@storybook/addon-mcp",
+    "@chromatic-com/storybook",
+    "eslint-plugin-storybook",
+    "vite",
+    "@vitest/browser-playwright",
+    "@vitest/coverage-v8",
+    "playwright"
   ]
 }

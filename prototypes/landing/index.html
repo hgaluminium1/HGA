@@ -1,0 +1,1617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HG Aluminium Smelters | India's Largest Aluminium &amp; Zinc Recycling Enterprise</title>
+<meta name="description" content="HG Aluminium Smelters Ltd. is India's largest producer of recycled aluminium and zinc die-casting alloys, serving the country's leading automotive and engineering manufacturers.">
+
+<!-- Favicon: inline monogram mark -->
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23241145'/%3E%3Cpath d='M18 46V18h7v11h14V18h7v28h-7V35H25v11h-7z' fill='%23fff'/%3E%3C/svg%3E">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+/* ==========================================================================
+   0. RESET & BASE
+   ========================================================================== */
+*, *::before, *::after { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; scroll-behavior: auto !important; }
+}
+body { margin: 0; }
+img, video { max-width: 100%; display: block; }
+ul { list-style: none; margin: 0; padding: 0; }
+a { text-decoration: none; color: inherit; }
+button { font: inherit; color: inherit; background: none; border: none; cursor: pointer; padding: 0; }
+input { font: inherit; }
+h1,h2,h3,h4,p { margin: 0; }
+svg { display: block; }
+
+/* ==========================================================================
+   1. DESIGN TOKENS
+   ========================================================================== */
+:root {
+  /* Brand colors */
+  --ink:            #150C29;
+  --violet-900:     #201040;
+  --violet-800:     #2B1450;
+  --violet-700:     #3A1B63;
+  --violet-600:     #4B2280;
+  --accent:         #9432A8;
+  --accent-dark:    #7A2590;
+  --accent-light:   #F1E3F4;
+  --maroon-700:     #6E1732;
+  --maroon-800:     #591127;
+  --teal-600:       #147A6C;
+  --teal-100:       #E4F5F1;
+  --gold:           #E8A93C;
+
+  --bg:             #F6F6F9;
+  --bg-alt:         #EDEDF3;
+  --surface:        #FFFFFF;
+  --line:           #E4E3EC;
+  --text:           #1B1730;
+  --text-muted:     #625D77;
+  --text-faint:     #8A8599;
+  --on-dark:        #FFFFFF;
+  --on-dark-muted:  #C9C2DC;
+
+  /* Type */
+  --font-display: 'Space Grotesk', 'Arial Narrow', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+
+  /* Fluid type scale */
+  --fs-h1: clamp(2.1rem, 1.4rem + 3.2vw, 4rem);
+  --fs-h2: clamp(1.7rem, 1.3rem + 1.8vw, 2.7rem);
+  --fs-h3: clamp(1.25rem, 1.1rem + 0.8vw, 1.6rem);
+  --fs-lead: clamp(1rem, 0.93rem + 0.3vw, 1.15rem);
+
+  /* Layout */
+  --container: 1280px;
+  --pad-inline: clamp(1.25rem, 4vw, 3rem);
+  --section-pad: clamp(3.5rem, 6vw, 6.5rem);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --shadow-sm: 0 2px 10px rgba(21, 12, 41, 0.06);
+  --shadow-md: 0 12px 32px rgba(21, 12, 41, 0.12);
+  --shadow-lg: 0 24px 60px rgba(21, 12, 41, 0.22);
+
+  --ease: cubic-bezier(.4,0,.2,1);
+  --nav-bp: 1100px;
+}
+
+/* ==========================================================================
+   2. BASE TYPOGRAPHY & LAYOUT UTILITIES
+   ========================================================================== */
+body {
+  font-family: var(--font-body);
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.55;
+}
+h1, h2, h3, h4 { font-family: var(--font-display); font-weight: 600; line-height: 1.12; letter-spacing: -0.01em; }
+.container { max-width: var(--container); margin-inline: auto; padding-inline: var(--pad-inline); }
+.section { padding-block: var(--section-pad); }
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem;
+  font-family: var(--font-body); font-weight: 700; font-size: 0.78rem;
+  letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent);
+}
+.eyebrow::before { content: ''; width: 22px; height: 2px; background: var(--accent); border-radius: 2px; }
+.section-head { max-width: 640px; margin-bottom: clamp(2rem, 4vw, 3rem); }
+.section-head.center { max-width: 680px; margin-inline: auto; text-align: center; }
+.section-head h2 { font-size: var(--fs-h2); margin-top: 0.6rem; }
+.section-head p { color: var(--text-muted); font-size: var(--fs-lead); margin-top: 0.9rem; }
+.visually-hidden {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+.skip-link {
+  position: absolute; top: -48px; left: 1rem; z-index: 2000;
+  background: var(--ink); color: #fff; padding: 0.75rem 1.25rem; border-radius: var(--radius-sm);
+  transition: top 0.2s var(--ease);
+}
+.skip-link:focus { top: 1rem; }
+:focus-visible { outline: 2.5px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.55rem;
+  font-family: var(--font-body); font-weight: 600; font-size: 0.94rem;
+  padding: 0.85rem 1.6rem; border-radius: 999px; white-space: nowrap;
+  transition: transform 0.25s var(--ease), box-shadow 0.25s var(--ease), background 0.25s var(--ease), color 0.25s var(--ease);
+  cursor: pointer;
+}
+.btn svg { width: 16px; height: 16px; }
+.btn-primary { background: linear-gradient(135deg, var(--accent), var(--accent-dark)); color: #fff; box-shadow: 0 8px 20px rgba(148, 50, 168, 0.35); }
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(148, 50, 168, 0.45); }
+.btn-ghost-light { background: rgba(255,255,255,0.12); color: #fff; border: 1.5px solid rgba(255,255,255,0.55); backdrop-filter: blur(6px); }
+.btn-ghost-light:hover { background: rgba(255,255,255,0.22); transform: translateY(-2px); }
+.btn-outline { border: 1.5px solid var(--line); color: var(--text); background: var(--surface); }
+.btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+.btn-sm { padding: 0.6rem 1.1rem; font-size: 0.85rem; }
+
+/* Reveal-on-scroll */
+.reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.7s var(--ease), transform 0.7s var(--ease); }
+.reveal.is-visible { opacity: 1; transform: translateY(0); }
+.reveal-stagger > * { transition-delay: calc(var(--i, 0) * 90ms); }
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* Icon button */
+.icon-btn {
+  width: 42px; height: 42px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 50%; transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+.icon-btn svg { width: 19px; height: 19px; }
+
+/* ==========================================================================
+   3. HEADER / NAVIGATION
+   ========================================================================== */
+.site-header {
+  position: sticky; top: 0; z-index: 900;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  transition: box-shadow 0.3s var(--ease), padding 0.3s var(--ease);
+}
+.site-header.is-scrolled { box-shadow: var(--shadow-md); }
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding-block: 1rem;
+  transition: padding 0.3s var(--ease);
+}
+.site-header.is-scrolled .header-inner { padding-block: 0.6rem; }
+
+/* Logo */
+.brand { display: inline-flex; align-items: center; gap: 0.65rem; flex-shrink: 0; }
+.brand-mark {
+  width: 42px; height: 42px; border-radius: 12px;
+  background: linear-gradient(145deg, var(--violet-700), var(--ink));
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.08);
+}
+.brand-mark svg { width: 24px; height: 24px; }
+.brand-word { font-family: var(--font-display); line-height: 1.05; }
+.brand-word strong { display: block; font-size: 1.18rem; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+.brand-word span { display: block; font-family: var(--font-body); font-size: 0.62rem; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-top: 0.15rem; }
+
+/* Primary nav (desktop) */
+.main-nav { display: none; }
+.nav-list { display: flex; align-items: center; gap: 0.2rem; }
+.nav-list > li { position: relative; }
+.nav-link {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.7rem 0.95rem; font-size: 0.92rem; font-weight: 600; color: var(--text);
+  border-radius: 999px; transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+.nav-link svg { width: 13px; height: 13px; transition: transform 0.25s var(--ease); }
+.nav-link:hover, .nav-link:focus-visible, .nav-link.is-open { background: var(--bg-alt); color: var(--accent); }
+.nav-link.is-open svg { transform: rotate(180deg); }
+.nav-link.active-link { color: var(--accent); }
+
+/* Dropdown (simple) */
+.dropdown-panel {
+  position: absolute; top: calc(100% + 10px); left: 0; min-width: 240px;
+  background: var(--surface); border-radius: var(--radius-md); box-shadow: var(--shadow-lg);
+  border: 1px solid var(--line); padding: 0.5rem;
+  opacity: 0; visibility: hidden; transform: translateY(8px);
+  transition: opacity 0.22s var(--ease), transform 0.22s var(--ease), visibility 0.22s;
+}
+.nav-list > li.is-open .dropdown-panel { opacity: 1; visibility: visible; transform: translateY(0); }
+.dropdown-panel a {
+  display: flex; align-items: center; gap: 0.6rem; padding: 0.65rem 0.75rem;
+  border-radius: var(--radius-sm); font-size: 0.9rem; font-weight: 500; color: var(--text);
+  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+}
+.dropdown-panel a:hover, .dropdown-panel a:focus-visible { background: var(--accent-light); color: var(--accent-dark); }
+
+/* Mega menu (Products) */
+.mega-panel {
+  position: absolute; top: calc(100% + 10px); left: 50%; transform: translate(-50%, 8px);
+  width: min(680px, 88vw);
+  background: var(--surface); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg);
+  border: 1px solid var(--line); padding: 1.5rem;
+  opacity: 0; visibility: hidden;
+  transition: opacity 0.22s var(--ease), transform 0.22s var(--ease), visibility 0.22s;
+  display: grid; grid-template-columns: 1.1fr 1fr; gap: 1.5rem;
+}
+.nav-list > li.is-open .mega-panel { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+.mega-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
+.mega-item { display: flex; gap: 0.75rem; padding: 0.7rem; border-radius: var(--radius-sm); transition: background 0.2s var(--ease); }
+.mega-item:hover, .mega-item:focus-visible { background: var(--bg-alt); }
+.mega-item .mi-icon {
+  width: 38px; height: 38px; border-radius: 10px; background: var(--accent-light); color: var(--accent-dark);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.mega-item .mi-icon svg { width: 18px; height: 18px; }
+.mega-item strong { display: block; font-size: 0.88rem; font-weight: 700; }
+.mega-item small { display: block; font-size: 0.78rem; color: var(--text-muted); margin-top: 0.15rem; }
+.mega-feature {
+  border-radius: var(--radius-md); overflow: hidden; position: relative; min-height: 220px;
+  background: var(--ink);
+}
+.mega-feature img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; opacity: 0.75; }
+.mega-feature-content { position: relative; z-index: 1; padding: 1.1rem; height: 100%; display: flex; flex-direction: column; justify-content: flex-end; color: #fff; background: linear-gradient(0deg, rgba(21,12,41,0.9), rgba(21,12,41,0.1)); }
+.mega-feature-content span { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+.mega-feature-content strong { font-family: var(--font-display); font-size: 1.05rem; margin-top: 0.3rem; display: block; }
+
+/* Header actions */
+.header-actions { display: flex; align-items: center; gap: 0.4rem; }
+.icon-btn:hover { background: var(--bg-alt); }
+.nav-toggle {
+  width: 44px; height: 44px; display: inline-flex; align-items: center; justify-content: center;
+  border-radius: 10px; background: var(--bg-alt);
+}
+.nav-toggle svg { width: 20px; height: 20px; }
+.header-cta { display: none; }
+
+@media (min-width: 560px) {
+  .header-cta { display: inline-flex; }
+}
+@media (min-width: 480px) {
+  .header-inner { padding-block: 1.1rem; }
+}
+
+/* Desktop nav breakpoint */
+@media (min-width: 1100px) {
+  .main-nav { display: block; }
+  .nav-toggle { display: none; }
+  .header-actions { gap: 0.5rem; }
+}
+
+/* Mobile drawer */
+.drawer-backdrop {
+  position: fixed; inset: 0; background: rgba(21, 12, 41, 0.55); backdrop-filter: blur(2px);
+  z-index: 999; opacity: 0; visibility: hidden; transition: opacity 0.3s var(--ease), visibility 0.3s;
+}
+.drawer-backdrop.is-open { opacity: 1; visibility: visible; }
+.mobile-drawer {
+  position: fixed; top: 0; right: 0; height: 100%; width: min(380px, 88vw);
+  background: var(--surface); z-index: 1000; box-shadow: var(--shadow-lg);
+  transform: translateX(100%); transition: transform 0.35s var(--ease);
+  display: flex; flex-direction: column; overflow-y: auto;
+}
+.mobile-drawer.is-open { transform: translateX(0); }
+.drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--line); }
+.drawer-body { padding: 0.75rem 1rem 1.5rem; flex: 1; }
+.drawer-group { border-bottom: 1px solid var(--line); }
+.drawer-group:last-child { border-bottom: none; }
+.drawer-toggle {
+  width: 100%; display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 0.5rem; font-weight: 600; font-size: 1rem; text-align: left;
+}
+.drawer-toggle svg { width: 15px; height: 15px; transition: transform 0.25s var(--ease); flex-shrink: 0; }
+.drawer-toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+.drawer-submenu { max-height: 0; overflow: hidden; transition: max-height 0.3s var(--ease); }
+.drawer-submenu a { display: block; padding: 0.7rem 0.5rem 0.7rem 1.1rem; color: var(--text-muted); font-size: 0.94rem; }
+.drawer-submenu a:hover { color: var(--accent); }
+.drawer-link { display: block; padding: 1rem 0.5rem; font-weight: 600; font-size: 1rem; }
+.drawer-foot { padding: 1.25rem; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 1rem; }
+.drawer-socials { display: flex; gap: 0.6rem; }
+.drawer-socials a { width: 38px; height: 38px; border-radius: 50%; background: var(--bg-alt); display: flex; align-items: center; justify-content: center; }
+.drawer-socials svg { width: 16px; height: 16px; }
+body.drawer-lock { overflow: hidden; }
+
+/* Search overlay */
+.search-overlay {
+  position: fixed; inset: 0; z-index: 1100; background: rgba(21, 12, 41, 0.92);
+  display: flex; align-items: flex-start; justify-content: center;
+  opacity: 0; visibility: hidden; transition: opacity 0.3s var(--ease), visibility 0.3s;
+  padding: 8vh 1.5rem;
+}
+.search-overlay.is-open { opacity: 1; visibility: visible; }
+.search-box { width: min(640px, 100%); }
+.search-box form { display: flex; align-items: center; gap: 0.75rem; border-bottom: 2px solid rgba(255,255,255,0.35); padding-bottom: 0.75rem; }
+.search-box input {
+  flex: 1; background: transparent; border: none; color: #fff; font-size: clamp(1.1rem, 3vw, 1.6rem);
+  font-family: var(--font-display);
+}
+.search-box input::placeholder { color: rgba(255,255,255,0.45); }
+.search-box input:focus { outline: none; }
+.search-box svg { width: 22px; height: 22px; color: rgba(255,255,255,0.7); }
+.search-close { position: absolute; top: 1.5rem; right: 1.5rem; color: #fff; }
+.search-hint { color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-top: 1rem; }
+
+/* ==========================================================================
+   4. HERO
+   ========================================================================== */
+.hero { position: relative; overflow: hidden; background: var(--ink); }
+.hero-slider { position: relative; height: clamp(420px, 82vh, 720px); min-height: 420px; }
+.hero-slide {
+  position: absolute; inset: 0; opacity: 0; visibility: hidden;
+  transition: opacity 1s var(--ease), visibility 1s;
+}
+.hero-slide.is-active { opacity: 1; visibility: visible; z-index: 1; }
+.hero-slide img { width: 100%; height: 100%; object-fit: cover; }
+.hero-slide::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(0deg, rgba(15,8,30,0.86) 0%, rgba(15,8,30,0.45) 48%, rgba(15,8,30,0.55) 100%);
+}
+.hero-content {
+  position: absolute; inset: 0; z-index: 5; display: flex; flex-direction: column;
+  align-items: flex-start; justify-content: center; text-align: left;
+  padding-inline: var(--pad-inline); max-width: var(--container); margin-inline: auto;
+}
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 0.5rem; color: var(--gold);
+  font-weight: 700; font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase;
+  background: rgba(232, 169, 60, 0.14); border: 1px solid rgba(232, 169, 60, 0.4);
+  padding: 0.4rem 0.9rem; border-radius: 999px; margin-bottom: 1.3rem;
+}
+.hero-title {
+  color: #fff; font-size: var(--fs-h1); max-width: 16ch;
+  text-shadow: 0 4px 30px rgba(0,0,0,0.35);
+}
+.hero-sub { color: var(--on-dark-muted); font-size: var(--fs-lead); max-width: 46ch; margin-top: 1.25rem; }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 0.9rem; margin-top: 2.1rem; }
+
+.hero-arrow {
+  position: absolute; top: 50%; transform: translateY(-50%); z-index: 6;
+  width: 46px; height: 46px; border-radius: 50%;
+  background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.3); color: #fff;
+  display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+  transition: background 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.hero-arrow:hover { background: rgba(255,255,255,0.28); }
+.hero-arrow svg { width: 18px; height: 18px; }
+.hero-arrow.prev { left: clamp(0.75rem, 3vw, 2.5rem); }
+.hero-arrow.next { right: clamp(0.75rem, 3vw, 2.5rem); }
+
+.hero-dots { position: absolute; bottom: clamp(1.25rem, 4vw, 2.25rem); left: 0; right: 0; z-index: 6; display: flex; justify-content: center; gap: 0.55rem; }
+.hero-dot { width: 9px; height: 9px; border-radius: 50%; background: rgba(255,255,255,0.4); transition: all 0.3s var(--ease); }
+.hero-dot.is-active { width: 26px; border-radius: 6px; background: var(--gold); }
+
+@media (max-width: 599px) {
+  .hero-arrow { display: none; }
+}
+
+/* ==========================================================================
+   5. CAPABILITY / "THE HEAT IS ON" + STATS
+   ========================================================================== */
+.capability {
+  background: linear-gradient(135deg, var(--violet-800), var(--ink));
+  color: #fff; position: relative; overflow: hidden;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 96%);
+  padding-top: clamp(4rem, 7vw, 7rem);
+}
+.capability::before {
+  content: ''; position: absolute; top: 0; right: 0; width: 45%; height: 100%;
+  background: repeating-linear-gradient(115deg, rgba(255,255,255,0.035) 0 2px, transparent 2px 14px);
+  pointer-events: none;
+}
+.capability-grid { display: grid; gap: 2rem; position: relative; z-index: 1; }
+.capability-copy p { color: var(--on-dark-muted); font-size: var(--fs-lead); margin-top: 1rem; max-width: 60ch; }
+.capability-copy .eyebrow { color: var(--gold); }
+.capability-copy .eyebrow::before { background: var(--gold); }
+.capability-copy h2 { font-size: var(--fs-h2); margin-top: 0.6rem; }
+.hl { color: #fff; font-weight: 700; border-bottom: 2px solid var(--gold); }
+
+.stat-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.25rem; margin-top: clamp(2.5rem, 5vw, 3.5rem); }
+.stat-card {
+  background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14);
+  border-radius: var(--radius-md); padding: 1.4rem 1.2rem; backdrop-filter: blur(6px);
+}
+.stat-num { font-family: var(--font-display); font-size: clamp(1.6rem, 3vw, 2.4rem); font-weight: 700; color: #fff; display: flex; align-items: baseline; gap: 0.15rem; }
+.stat-label { font-size: 0.82rem; color: var(--on-dark-muted); margin-top: 0.35rem; }
+
+@media (min-width: 700px) {
+  .stat-grid { grid-template-columns: repeat(4, 1fr); }
+}
+@media (min-width: 900px) {
+  .capability-grid { grid-template-columns: 1.1fr 1fr; align-items: center; }
+}
+
+/* ==========================================================================
+   6. PRODUCTS
+   ========================================================================== */
+.products-grid { display: grid; gap: 1.4rem; }
+.product-card {
+  position: relative; border-radius: var(--radius-lg); overflow: hidden;
+  box-shadow: var(--shadow-sm); transition: box-shadow 0.35s var(--ease), transform 0.35s var(--ease);
+  min-height: 300px; display: flex; align-items: flex-end;
+}
+.product-card:hover, .product-card:focus-within { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
+.product-card .pc-media { position: absolute; inset: 0; }
+.product-card .pc-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s var(--ease); }
+.product-card:hover .pc-media img { transform: scale(1.08); }
+.product-card .pc-media::after { content:''; position:absolute; inset:0; background: linear-gradient(0deg, rgba(15,8,30,0.75) 0%, rgba(15,8,30,0) 55%); }
+.pc-body { position: relative; z-index: 1; padding: 1.4rem; color: #fff; width: 100%; display: flex; align-items: flex-end; justify-content: space-between; gap: 0.75rem; }
+.pc-body .pc-text span { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gold); }
+.pc-body .pc-text strong { display: block; font-family: var(--font-display); font-size: 1.18rem; margin-top: 0.3rem; }
+.pc-arrow {
+  width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.16); border: 1px solid rgba(255,255,255,0.4);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.25s var(--ease), transform 0.25s var(--ease);
+}
+.pc-arrow svg { width: 16px; height: 16px; color: #fff; }
+.product-card:hover .pc-arrow { background: var(--accent); transform: rotate(45deg); }
+
+@media (min-width: 720px) {
+  .products-grid { grid-template-columns: repeat(2, 1fr); }
+  .product-card.is-wide { grid-column: 1 / -1; min-height: 220px; }
+}
+
+/* ==========================================================================
+   7. MISSION / VIDEO
+   ========================================================================== */
+.mission { position: relative; color: #fff; overflow: hidden; }
+.mission-media { position: relative; min-height: clamp(380px, 60vw, 560px); }
+.mission-media img { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+.mission-media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, rgba(20,11,40,0.75), rgba(20,11,40,0.55)); }
+.mission-content {
+  position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; text-align: center; padding: 2rem;
+}
+.mission-content p { font-family: var(--font-display); font-size: clamp(1.2rem, 3vw, 2rem); max-width: 22ch; line-height: 1.35; }
+.play-btn {
+  margin-top: 2rem; width: 66px; height: 66px; border-radius: 50%; background: rgba(255,255,255,0.95); color: var(--ink);
+  display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 0 rgba(255,255,255,0.5);
+  animation: pulse-ring 2.4s ease-out infinite;
+}
+.play-btn svg { width: 22px; height: 22px; margin-left: 3px; }
+@keyframes pulse-ring {
+  0% { box-shadow: 0 0 0 0 rgba(255,255,255,0.45); }
+  70% { box-shadow: 0 0 0 22px rgba(255,255,255,0); }
+  100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+}
+@media (prefers-reduced-motion: reduce) { .play-btn { animation: none; } }
+
+/* Video modal */
+.video-modal {
+  position: fixed; inset: 0; z-index: 1200; background: rgba(10,6,20,0.92);
+  display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+  opacity: 0; visibility: hidden; transition: opacity 0.3s var(--ease), visibility 0.3s;
+}
+.video-modal.is-open { opacity: 1; visibility: visible; }
+.video-modal-inner { width: min(920px, 100%); aspect-ratio: 16/9; background: #000; border-radius: var(--radius-md); overflow: hidden; position: relative; box-shadow: var(--shadow-lg); }
+.video-modal-inner video { width: 100%; height: 100%; }
+.video-modal-close { position: absolute; top: -50px; right: 0; color: #fff; }
+
+/* ==========================================================================
+   8. CTA BANNER
+   ========================================================================== */
+.cta-banner { background: linear-gradient(120deg, var(--maroon-800), var(--maroon-700)); }
+.cta-inner { display: flex; flex-direction: column; gap: 1.5rem; align-items: flex-start; justify-content: space-between; padding-block: 2.6rem; }
+.cta-inner h3 { color: #fff; font-size: clamp(1.25rem, 2.4vw, 1.7rem); max-width: 24ch; }
+@media (min-width: 760px) {
+  .cta-inner { flex-direction: row; align-items: center; }
+}
+
+/* ==========================================================================
+   9. TESTIMONIALS
+   ========================================================================== */
+.testimonial-wrap { position: relative; }
+.testimonial-track-outer { overflow: hidden; }
+.testimonial-track { display: flex; transition: transform 0.5s var(--ease); }
+.testimonial-slide { flex: 0 0 100%; padding: 0.4rem; }
+.testimonial-card {
+  background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-lg);
+  padding: 2rem 1.75rem; height: 100%; text-align: center; box-shadow: var(--shadow-sm);
+}
+.avatar-ring {
+  width: 68px; height: 68px; border-radius: 50%; margin-inline: auto; padding: 3px;
+  background: linear-gradient(135deg, var(--accent), var(--gold));
+}
+.avatar-ring .avatar {
+  width: 100%; height: 100%; border-radius: 50%; background: var(--violet-700); color: #fff;
+  display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-weight: 700; font-size: 1.1rem;
+}
+.testimonial-card h4 { margin-top: 1rem; font-size: 1rem; }
+.testimonial-card .role { font-size: 0.8rem; color: var(--text-muted); margin-top: 0.15rem; }
+.stars { display: flex; justify-content: center; gap: 0.15rem; margin-top: 0.7rem; color: var(--gold); }
+.stars svg { width: 15px; height: 15px; }
+.testimonial-card blockquote { margin: 0.9rem 0 0; font-size: 0.94rem; color: var(--text-muted); }
+
+.carousel-controls { display: flex; align-items: center; justify-content: center; gap: 1.2rem; margin-top: 2rem; }
+.carousel-controls .icon-btn { border: 1px solid var(--line); background: var(--surface); }
+.carousel-dots { display: flex; gap: 0.5rem; }
+.carousel-dots button { width: 8px; height: 8px; border-radius: 50%; background: var(--line); transition: all 0.25s var(--ease); }
+.carousel-dots button.is-active { background: var(--accent); width: 22px; border-radius: 5px; }
+
+@media (min-width: 720px) {
+  .testimonial-slide { flex: 0 0 50%; }
+}
+@media (min-width: 1000px) {
+  .testimonial-slide { flex: 0 0 33.3333%; }
+}
+
+/* ==========================================================================
+   10. CUSTOMERS
+   ========================================================================== */
+.customers-copy { max-width: 800px; margin-inline: auto; text-align: center; color: var(--text-muted); }
+.logo-strip {
+  margin-top: clamp(2rem, 4vw, 3rem); display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;
+}
+.logo-chip {
+  display: flex; align-items: center; justify-content: center; height: 84px;
+  border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface);
+  filter: grayscale(1); opacity: 0.6; transition: filter 0.3s var(--ease), opacity 0.3s var(--ease), transform 0.3s var(--ease);
+}
+.logo-chip:hover { filter: grayscale(0); opacity: 1; transform: translateY(-3px); }
+.logo-chip span { font-family: var(--font-display); font-weight: 700; font-size: 1.05rem; color: var(--ink); letter-spacing: -0.01em; }
+
+@media (min-width: 560px) { .logo-strip { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 900px) { .logo-strip { grid-template-columns: repeat(6, 1fr); } }
+
+/* ==========================================================================
+   11. JOINT VENTURES
+   ========================================================================== */
+.jv { position: relative; color: #fff; }
+.jv-media { position: relative; min-height: 420px; }
+.jv-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.jv-media::after { content: ''; position: absolute; inset: 0; background: linear-gradient(100deg, rgba(20,11,40,0.9) 10%, rgba(20,11,40,0.55) 60%); }
+.jv-content { position: absolute; inset: 0; z-index: 1; display: flex; align-items: center; padding-inline: var(--pad-inline); }
+.jv-inner { max-width: var(--container); margin-inline: auto; width: 100%; }
+.jv-content h2 { font-size: var(--fs-h2); }
+.jv-content .eyebrow { color: var(--gold); }
+.jv-content .eyebrow::before { background: var(--gold); }
+.jv-panel {
+  margin-top: 1.75rem; background: rgba(255,255,255,0.96); color: var(--ink);
+  border-radius: var(--radius-lg); padding: 1.5rem; display: grid; gap: 1rem;
+  max-width: 620px; box-shadow: var(--shadow-lg);
+}
+.jv-panel-item { display: flex; align-items: center; gap: 0.9rem; padding: 0.6rem; border-radius: var(--radius-sm); }
+.jv-panel-item .jv-icon {
+  width: 44px; height: 44px; border-radius: 10px; background: var(--accent-light); color: var(--accent-dark);
+  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+}
+.jv-panel-item .jv-icon svg { width: 20px; height: 20px; }
+.jv-panel-item strong { display: block; font-size: 0.95rem; }
+.jv-panel-item small { color: var(--text-muted); font-size: 0.8rem; }
+
+@media (min-width: 640px) {
+  .jv-panel { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* ==========================================================================
+   12. CAREERS
+   ========================================================================== */
+.careers-copy { text-align: center; max-width: 700px; margin: 0 auto 2.5rem; }
+.careers-gallery {
+  display: grid; grid-template-columns: 1fr; gap: 1rem; border-radius: var(--radius-lg); overflow: hidden;
+}
+.careers-gallery img { width: 100%; height: 260px; object-fit: cover; border-radius: var(--radius-md); }
+@media (min-width: 720px) {
+  .careers-gallery { grid-template-columns: 1fr 1.6fr; }
+  .careers-gallery img { height: 100%; min-height: 320px; }
+}
+
+/* ==========================================================================
+   13. FAQ
+   ========================================================================== */
+.faq-list { max-width: 820px; margin-inline: auto; display: flex; flex-direction: column; gap: 0.75rem; }
+.faq-item { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-md); overflow: hidden; }
+.faq-q {
+  width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 1.15rem 1.4rem; text-align: left; font-weight: 600; font-size: 0.98rem;
+}
+.faq-q .faq-icon {
+  width: 30px; height: 30px; border-radius: 50%; background: var(--bg-alt); flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center; transition: transform 0.3s var(--ease), background 0.3s var(--ease), color 0.3s var(--ease);
+}
+.faq-q .faq-icon svg { width: 13px; height: 13px; }
+.faq-item.is-open .faq-q .faq-icon { transform: rotate(45deg); background: var(--accent); color: #fff; }
+.faq-a { max-height: 0; overflow: hidden; transition: max-height 0.35s var(--ease); }
+.faq-a p { padding: 0 1.4rem 1.3rem; color: var(--text-muted); font-size: 0.94rem; max-width: 68ch; }
+
+/* ==========================================================================
+   14. FOOTER
+   ========================================================================== */
+.site-footer { background: linear-gradient(160deg, var(--maroon-800), var(--maroon-700) 70%); color: rgba(255,255,255,0.85); }
+.footer-grid { display: grid; gap: 2.5rem; padding-block: clamp(3rem, 6vw, 4.5rem); }
+.footer-brand .brand-word strong { color: #fff; }
+.footer-brand p { margin-top: 1rem; color: rgba(255,255,255,0.65); font-size: 0.9rem; max-width: 34ch; }
+.footer-socials { display: flex; gap: 0.6rem; margin-top: 1.4rem; }
+.footer-socials a { width: 38px; height: 38px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; transition: background 0.25s var(--ease); }
+.footer-socials a:hover { background: rgba(255,255,255,0.24); }
+.footer-socials svg { width: 16px; height: 16px; }
+.footer-col h5 { color: #fff; font-family: var(--font-display); font-size: 0.95rem; letter-spacing: 0.02em; margin-bottom: 1.1rem; }
+.footer-col ul { display: flex; flex-direction: column; gap: 0.7rem; }
+.footer-col a { color: rgba(255,255,255,0.68); font-size: 0.9rem; transition: color 0.2s var(--ease); }
+.footer-col a:hover { color: #fff; }
+.footer-contact li { display: flex; gap: 0.65rem; align-items: flex-start; font-size: 0.88rem; color: rgba(255,255,255,0.72); }
+.footer-contact svg { width: 16px; height: 16px; margin-top: 3px; flex-shrink: 0; color: var(--gold); }
+.footer-map {
+  border-radius: var(--radius-md); overflow: hidden; height: 170px; position: relative;
+  background: linear-gradient(135deg, #2b1420, #421828);
+  border: 1px solid rgba(255,255,255,0.14);
+}
+.footer-map svg.map-pattern { position: absolute; inset: 0; width: 100%; height: 100%; opacity: 0.35; }
+.footer-map-pin { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-60%); text-align: center; }
+.footer-map-pin svg { width: 26px; height: 26px; color: var(--gold); margin-inline: auto; }
+.footer-map-link {
+  position: absolute; bottom: 0.6rem; right: 0.6rem; background: rgba(255,255,255,0.95); color: var(--ink);
+  font-size: 0.72rem; font-weight: 700; padding: 0.4rem 0.7rem; border-radius: 999px;
+}
+.footer-bottom { border-top: 1px solid rgba(255,255,255,0.14); padding-block: 1.4rem; font-size: 0.8rem; color: rgba(255,255,255,0.55); text-align: center; }
+
+@media (min-width: 640px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 980px) { .footer-grid { grid-template-columns: 1.3fr 0.8fr 1fr 1fr; } }
+
+/* ==========================================================================
+   15. BACK TO TOP
+   ========================================================================== */
+.back-to-top {
+  position: fixed; right: 1.25rem; bottom: 1.25rem; z-index: 500;
+  width: 48px; height: 48px; border-radius: 50%; background: var(--ink); color: #fff;
+  display: flex; align-items: center; justify-content: center; box-shadow: var(--shadow-md);
+  opacity: 0; visibility: hidden; transform: translateY(12px);
+  transition: opacity 0.3s var(--ease), visibility 0.3s, transform 0.3s var(--ease), background 0.3s var(--ease);
+}
+.back-to-top.is-visible { opacity: 1; visibility: visible; transform: translateY(0); }
+.back-to-top:hover { background: var(--accent); }
+.back-to-top svg { width: 18px; height: 18px; }
+
+/* ==========================================================================
+   16. RESPONSIVE TYPE / CONTAINER TWEAKS
+   ========================================================================== */
+@media (min-width: 1440px) {
+  :root { --container: 1320px; }
+}
+</style>
+</head>
+<body>
+<a href="#main" class="skip-link">Skip to main content</a>
+
+<!-- ============================== ICON SPRITE ============================== -->
+<svg xmlns="http://www.w3.org/2000/svg" class="visually-hidden">
+  <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></symbol>
+  <symbol id="i-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></symbol>
+  <symbol id="i-arrow-left" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-arrow-up-right" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M8 7h9v9"/></symbol>
+  <symbol id="i-arrow-up" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87L18.18 21 12 17.77 5.82 21 7 14.14 2 9.27l6.91-1.01z"/></symbol>
+  <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.8 19.8 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.68 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.9.32 1.85.55 2.81.68A2 2 0 0 1 22 16.92z"/></symbol>
+  <symbol id="i-mail" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16v16H4z"/><path d="M22 6l-10 7L2 6"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></symbol>
+  <symbol id="i-ingot" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="9" rx="1.5"/><path d="M6 9l2-4h8l2 4"/></symbol>
+  <symbol id="i-billet" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="12" r="4"/><circle cx="16" cy="12" r="4"/></symbol>
+  <symbol id="i-drop" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2s7 8 7 13a7 7 0 0 1-14 0c0-5 7-13 7-13z"/></symbol>
+  <symbol id="i-recycle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 19H4.8a2 2 0 0 1-1.7-3l1.5-2.4M14 19h4.9a2 2 0 0 0 1.7-3l-4.6-8M7 19l2-2m-2 2 2 2M12 4l3 3-3 3M4.6 13l3-3M17.6 8l3 5-1.7 2.8"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/></symbol>
+  <symbol id="i-factory" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V10l6 4v-4l6 4V6l6 4v11H3z"/></symbol>
+  <symbol id="i-leaf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 4 13c0-6 8-11 15-11 0 8-5 15-11 15a7 7 0 0 1-7-7"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+  <symbol id="i-handshake" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 12l3 3 8-8"/><path d="M2 12l4-4 4 2 4-2 4 4"/><path d="M2 12v5l4 3M22 12v5l-4 3"/></symbol>
+  <symbol id="i-facebook" viewBox="0 0 24 24" fill="currentColor"><path d="M13.5 21v-8h2.7l.4-3.1h-3.1V8c0-.9.25-1.5 1.55-1.5H17V3.6C16.6 3.5 15.6 3.4 14.4 3.4c-2.4 0-4 1.5-4 4.2v2.3H7.7V13h2.7v8z"/></symbol>
+  <symbol id="i-linkedin" viewBox="0 0 24 24" fill="currentColor"><path d="M4.98 3.5a2.5 2.5 0 1 1 0 5 2.5 2.5 0 0 1 0-5zM3 9h4v12H3zM9.5 9H13v1.7h.05c.5-.95 1.7-1.95 3.5-1.95 3.75 0 4.45 2.5 4.45 5.7V21h-4v-5.9c0-1.4 0-3.2-2-3.2s-2.3 1.5-2.3 3.1V21h-4z"/></symbol>
+  <symbol id="i-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 3H21l-6.7 7.7L22 21h-6.4l-4.6-6-5.3 6H3l7.2-8.2L2 3h6.6l4.2 5.6zM17.8 19h1.4L6.3 4.9H4.8z"/></symbol>
+</svg>
+
+<!-- ============================== HEADER ============================== -->
+<header class="site-header" id="siteHeader">
+  <div class="header-inner container">
+    <a href="#top" class="brand" aria-label="HG Aluminium Smelters home">
+      <span class="brand-mark">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V6l4 3V6l4 3V6l4 3V6l4 3v10z"/></svg>
+      </span>
+      <span class="brand-word">
+        <strong>HG Aluminium</strong>
+        <span>Smelters Ltd.</span>
+      </span>
+    </a>
+
+    <nav class="main-nav" id="mainNav" aria-label="Primary navigation">
+      <ul class="nav-list">
+        <li>
+          <button class="nav-link" aria-expanded="false" aria-haspopup="true" data-dropdown="products">
+            Products <svg><use href="#i-chevron-down"/></svg>
+          </button>
+          <div class="mega-panel" id="dd-products" role="menu">
+            <div class="mega-grid">
+              <a class="mega-item" href="#products" role="menuitem">
+                <span class="mi-icon"><svg><use href="#i-drop"/></svg></span>
+                <span><strong>Aluminium Alloy (Liquid)</strong><small>Molten alloy, direct furnace-to-furnace supply</small></span>
+              </a>
+              <a class="mega-item" href="#products" role="menuitem">
+                <span class="mi-icon"><svg><use href="#i-ingot"/></svg></span>
+                <span><strong>Aluminium Alloy (Ingot)</strong><small>Solid ingots cast to LME-grade spec</small></span>
+              </a>
+              <a class="mega-item" href="#products" role="menuitem">
+                <span class="mi-icon"><svg><use href="#i-billet"/></svg></span>
+                <span><strong>Aluminium Billets</strong><small>Extrusion-ready billets, custom diameters</small></span>
+              </a>
+              <a class="mega-item" href="#products" role="menuitem">
+                <span class="mi-icon"><svg><use href="#i-recycle"/></svg></span>
+                <span><strong>Zinc &amp; Steel Recycling</strong><small>Zinc ingots and stainless steel recovery</small></span>
+              </a>
+            </div>
+            <a href="#products" class="mega-feature" role="menuitem">
+              <img src="https://picsum.photos/seed/hg-ingots-stack/460/440" alt="Stacked aluminium ingots" loading="lazy">
+              <span class="mega-feature-content">
+                <span>Full Catalogue</span>
+                <strong>Explore every alloy grade &amp; spec sheet →</strong>
+              </span>
+            </a>
+          </div>
+        </li>
+        <li><a class="nav-link" href="#customers">Our Customers</a></li>
+        <li>
+          <button class="nav-link" aria-expanded="false" aria-haspopup="true" data-dropdown="company">
+            Company <svg><use href="#i-chevron-down"/></svg>
+          </button>
+          <div class="dropdown-panel" id="dd-company" role="menu">
+            <a href="#about" role="menuitem">About Us</a>
+            <a href="#quality" role="menuitem">Quality</a>
+            <a href="#infrastructure" role="menuitem">Infrastructure</a>
+            <a href="#sustainability" role="menuitem">Sustainability</a>
+            <a href="#careers" role="menuitem">Careers</a>
+          </div>
+        </li>
+        <li><a class="nav-link" href="#investors">Investor Relations</a></li>
+        <li><a class="nav-link" href="#footer">Contact Us</a></li>
+      </ul>
+    </nav>
+
+    <div class="header-actions">
+      <button class="icon-btn" id="searchToggle" aria-label="Open search"><svg><use href="#i-search"/></svg></button>
+      <a href="#footer" class="btn btn-primary header-cta">Inquire Now</a>
+      <button class="nav-toggle" id="navToggle" aria-label="Open menu" aria-expanded="false" aria-controls="mobileDrawer">
+        <svg><use href="#i-menu"/></svg>
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Mobile drawer -->
+<div class="drawer-backdrop" id="drawerBackdrop"></div>
+<nav class="mobile-drawer" id="mobileDrawer" aria-label="Mobile navigation" aria-hidden="true">
+  <div class="drawer-head">
+    <span class="brand-word"><strong>HG Aluminium</strong><span>Smelters Ltd.</span></span>
+    <button class="icon-btn" id="drawerClose" aria-label="Close menu"><svg><use href="#i-close"/></svg></button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-group">
+      <button class="drawer-toggle" aria-expanded="false">Products <svg><use href="#i-chevron-down"/></svg></button>
+      <div class="drawer-submenu">
+        <a href="#products">Aluminium Alloy (Liquid)</a>
+        <a href="#products">Aluminium Alloy (Ingot)</a>
+        <a href="#products">Aluminium Billets</a>
+        <a href="#products">Zinc Alloy (Solid Ingots)</a>
+        <a href="#products">Stainless Steel Recycling</a>
+      </div>
+    </div>
+    <div class="drawer-group"><a class="drawer-link" href="#customers">Our Customers</a></div>
+    <div class="drawer-group">
+      <button class="drawer-toggle" aria-expanded="false">Company <svg><use href="#i-chevron-down"/></svg></button>
+      <div class="drawer-submenu">
+        <a href="#about">About Us</a>
+        <a href="#quality">Quality</a>
+        <a href="#infrastructure">Infrastructure</a>
+        <a href="#sustainability">Sustainability</a>
+        <a href="#careers">Careers</a>
+      </div>
+    </div>
+    <div class="drawer-group"><a class="drawer-link" href="#investors">Investor Relations</a></div>
+    <div class="drawer-group"><a class="drawer-link" href="#footer">Contact Us</a></div>
+  </div>
+  <div class="drawer-foot">
+    <a href="#footer" class="btn btn-primary">Inquire Now</a>
+    <div class="drawer-socials">
+      <a href="#" aria-label="Facebook"><svg><use href="#i-facebook"/></svg></a>
+      <a href="#" aria-label="LinkedIn"><svg><use href="#i-linkedin"/></svg></a>
+      <a href="#" aria-label="Instagram"><svg><use href="#i-instagram"/></svg></a>
+      <a href="#" aria-label="X"><svg><use href="#i-x"/></svg></a>
+    </div>
+  </div>
+</nav>
+
+<!-- Search overlay -->
+<div class="search-overlay" id="searchOverlay">
+  <button class="icon-btn search-close" id="searchClose" aria-label="Close search"><svg><use href="#i-close"/></svg></button>
+  <div class="search-box">
+    <form id="searchForm" role="search">
+      <svg><use href="#i-search"/></svg>
+      <input type="search" id="searchInput" placeholder="Search products, plants, careers…" aria-label="Search">
+    </form>
+    <p class="search-hint">Press Esc to close</p>
+  </div>
+</div>
+
+<main id="main">
+
+<!-- ============================== HERO ============================== -->
+<section class="hero" id="top" aria-roledescription="carousel" aria-label="Featured highlights">
+  <div class="hero-slider" id="heroSlider">
+
+    <div class="hero-slide is-active" data-slide="0">
+      <img src="https://picsum.photos/seed/hg-plant-wide/1600/900" alt="Aerial view of an aluminium smelting plant floor" loading="eager">
+    </div>
+    <div class="hero-slide" data-slide="1">
+      <img src="https://picsum.photos/seed/hg-molten-pour/1600/901" alt="Molten aluminium being poured in the foundry" loading="lazy">
+    </div>
+    <div class="hero-slide" data-slide="2">
+      <img src="https://picsum.photos/seed/hg-ingot-line/1600/902" alt="Rows of finished aluminium ingots ready for dispatch" loading="lazy">
+    </div>
+
+    <div class="hero-content">
+      <span class="hero-eyebrow" id="heroEyebrow">Est. 1998 · Faridabad, Haryana</span>
+      <h1 class="hero-title" id="heroTitle">India's Largest Aluminium &amp; Zinc Recycling Enterprise</h1>
+      <p class="hero-sub" id="heroSub">From scrap to spec-grade alloy — let us provide the support your production line deserves.</p>
+      <div class="hero-actions">
+        <a href="#footer" class="btn btn-primary">Inquire Now</a>
+        <button class="btn btn-ghost-light" id="heroVideoBtn">
+          <svg><use href="#i-play"/></svg> Watch Our Story
+        </button>
+      </div>
+    </div>
+
+    <button class="hero-arrow prev" id="heroPrev" aria-label="Previous slide"><svg><use href="#i-arrow-left"/></svg></button>
+    <button class="hero-arrow next" id="heroNext" aria-label="Next slide"><svg><use href="#i-arrow-right"/></svg></button>
+    <div class="hero-dots" id="heroDots"></div>
+  </div>
+</section>
+
+<!-- ============================== CAPABILITY / STATS ============================== -->
+<section class="capability section" id="about">
+  <div class="container capability-grid">
+    <div class="capability-copy reveal">
+      <span class="eyebrow">HG Aluminium Smelters Ltd.</span>
+      <h2>The Heat Is On</h2>
+      <p>HG Group is India's largest producer of recycled <span class="hl">Aluminium</span> and <span class="hl">Zinc</span> die-casting alloys, with a combined annual capacity of over 620,000 MT. Since inception, the company has sustained fast-paced growth by pairing modern smelting technology with continuous process improvement.</p>
+    </div>
+    <div class="stat-grid reveal reveal-stagger" id="statGrid">
+      <div class="stat-card" style="--i:0">
+        <div class="stat-num"><span class="count" data-target="620">0</span>K+</div>
+        <div class="stat-label">MT Annual Capacity</div>
+      </div>
+      <div class="stat-card" style="--i:1">
+        <div class="stat-num"><span class="count" data-target="4">0</span></div>
+        <div class="stat-label">Manufacturing Plants</div>
+      </div>
+      <div class="stat-card" style="--i:2">
+        <div class="stat-num"><span class="count" data-target="25">0</span>+</div>
+        <div class="stat-label">Years of Operation</div>
+      </div>
+      <div class="stat-card" style="--i:3">
+        <div class="stat-num"><span class="count" data-target="150">0</span>+</div>
+        <div class="stat-label">OEM Partners Served</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PRODUCTS ============================== -->
+<section class="section" id="products">
+  <div class="container">
+    <div class="section-head reveal">
+      <span class="eyebrow">Our Products</span>
+      <h2>From molten metal to market-ready alloy</h2>
+      <p>Five product lines, one continuous loop — every batch tracked from scrap intake to certified output.</p>
+    </div>
+    <div class="products-grid reveal reveal-stagger">
+      <a href="#" class="product-card" style="--i:0">
+        <span class="pc-media"><img src="https://picsum.photos/seed/hg-liquid-alloy/700/560" alt="Molten aluminium alloy being poured" loading="lazy"></span>
+        <span class="pc-body">
+          <span class="pc-text"><span>Our Product</span><strong>Aluminium Alloy (Liquid)</strong></span>
+          <span class="pc-arrow"><svg><use href="#i-arrow-up-right"/></svg></span>
+        </span>
+      </a>
+      <a href="#" class="product-card" style="--i:1">
+        <span class="pc-media"><img src="https://picsum.photos/seed/hg-solid-ingot/700/561" alt="Stacked solid aluminium alloy ingots" loading="lazy"></span>
+        <span class="pc-body">
+          <span class="pc-text"><span>Our Product</span><strong>Aluminium Alloy (Solid Ingot)</strong></span>
+          <span class="pc-arrow"><svg><use href="#i-arrow-up-right"/></svg></span>
+        </span>
+      </a>
+      <a href="#" class="product-card" style="--i:2">
+        <span class="pc-media"><img src="https://picsum.photos/seed/hg-billets/700/562" alt="Cylindrical aluminium billets" loading="lazy"></span>
+        <span class="pc-body">
+          <span class="pc-text"><span>Our Product</span><strong>Aluminium Billets</strong></span>
+          <span class="pc-arrow"><svg><use href="#i-arrow-up-right"/></svg></span>
+        </span>
+      </a>
+      <a href="#" class="product-card" style="--i:3">
+        <span class="pc-media"><img src="https://picsum.photos/seed/hg-zinc-ingots/700/563" alt="Worker inspecting solid zinc alloy ingots" loading="lazy"></span>
+        <span class="pc-body">
+          <span class="pc-text"><span>Our Product</span><strong>Zinc Alloy (Solid Ingots)</strong></span>
+          <span class="pc-arrow"><svg><use href="#i-arrow-up-right"/></svg></span>
+        </span>
+      </a>
+      <a href="#" class="product-card is-wide" style="--i:4">
+        <span class="pc-media"><img src="https://picsum.photos/seed/hg-steel-scrap/1400/500" alt="Sorted stainless steel scrap ready for recycling" loading="lazy"></span>
+        <span class="pc-body">
+          <span class="pc-text"><span>Our Product</span><strong>Stainless Steel Recycling</strong></span>
+          <span class="pc-arrow"><svg><use href="#i-arrow-up-right"/></svg></span>
+        </span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== MISSION / VIDEO ============================== -->
+<section class="mission" id="sustainability">
+  <div class="mission-media">
+    <img src="https://picsum.photos/seed/hg-city-glass/1600/900" alt="Team looking out over the city skyline through an office window" loading="lazy">
+  </div>
+  <div class="mission-content reveal">
+    <p>To be Asia's most trusted name in metal recycling, delivering sustainable value to every stakeholder we serve.</p>
+    <button class="play-btn" id="heroVideoBtn2" aria-label="Play company story video">
+      <svg><use href="#i-play"/></svg>
+    </button>
+  </div>
+</section>
+
+<div class="video-modal" id="videoModal" role="dialog" aria-modal="true" aria-label="Company story video">
+  <div class="video-modal-inner">
+    <button class="icon-btn video-modal-close" id="videoModalClose" aria-label="Close video">
+      <svg style="color:#fff"><use href="#i-close"/></svg>
+    </button>
+    <video id="storyVideo" controls poster="https://picsum.photos/seed/hg-video-poster/960/540" playsinline>
+      <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4">
+      Your browser does not support embedded video.
+    </video>
+  </div>
+</div>
+
+<!-- ============================== CTA BANNER ============================== -->
+<section class="cta-banner">
+  <div class="container cta-inner reveal">
+    <h3>Scrap your expenses, not your goals — we'll help you get there.</h3>
+    <a href="#footer" class="btn btn-primary">Inquire Now</a>
+  </div>
+</section>
+
+<!-- ============================== TESTIMONIALS ============================== -->
+<section class="section" id="testimonials">
+  <div class="container">
+    <div class="section-head center reveal">
+      <span class="eyebrow">Testimonials</span>
+      <h2>What our partners say</h2>
+    </div>
+    <div class="testimonial-wrap reveal">
+      <div class="testimonial-track-outer">
+        <div class="testimonial-track" id="testiTrack">
+          <div class="testimonial-slide">
+            <div class="testimonial-card">
+              <div class="avatar-ring"><div class="avatar">AS</div></div>
+              <h4>Ankur Singh</h4>
+              <div class="role">Procurement Head, Velocity Auto Components</div>
+              <div class="stars">
+                <svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg>
+              </div>
+              <blockquote>Consistent alloy quality and reliable turnaround for our production lines, batch after batch.</blockquote>
+            </div>
+          </div>
+          <div class="testimonial-slide">
+            <div class="testimonial-card">
+              <div class="avatar-ring"><div class="avatar">BN</div></div>
+              <h4>Bhaliya Nitin</h4>
+              <div class="role">Plant Manager, Apex Cast Works</div>
+              <div class="stars">
+                <svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg>
+              </div>
+              <blockquote>Their zinc ingots meet spec every single time, which keeps our line running without surprises.</blockquote>
+            </div>
+          </div>
+          <div class="testimonial-slide">
+            <div class="testimonial-card">
+              <div class="avatar-ring"><div class="avatar">KC</div></div>
+              <h4>Kishore Chettiar</h4>
+              <div class="role">Supply Chain Lead, Nordic Auto Forge</div>
+              <div class="stars">
+                <svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg>
+              </div>
+              <blockquote>Responsive team, transparent sourcing — exactly what we need from a recycling partner.</blockquote>
+            </div>
+          </div>
+          <div class="testimonial-slide">
+            <div class="testimonial-card">
+              <div class="avatar-ring"><div class="avatar">RM</div></div>
+              <h4>Riya Mehta</h4>
+              <div class="role">Quality Lead, Meridian Engineering</div>
+              <div class="stars">
+                <svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg><svg><use href="#i-star"/></svg>
+              </div>
+              <blockquote>Documentation and traceability on every consignment make our audits painless.</blockquote>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="carousel-controls">
+        <button class="icon-btn" id="testiPrev" aria-label="Previous testimonial"><svg><use href="#i-arrow-left"/></svg></button>
+        <div class="carousel-dots" id="testiDots"></div>
+        <button class="icon-btn" id="testiNext" aria-label="Next testimonial"><svg><use href="#i-arrow-right"/></svg></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CUSTOMERS ============================== -->
+<section class="section" id="customers" style="background:var(--bg-alt)">
+  <div class="container">
+    <div class="section-head center reveal">
+      <span class="eyebrow">Our Customers</span>
+      <h2>Trusted across India's engineering supply chain</h2>
+      <p class="customers-copy">Our client lineup reads like a who's-who of the automotive and engineering industries. We've earned repeat business by staying fully compliant on every front our partners care about — quality, capacity, and delivery.</p>
+    </div>
+    <div class="logo-strip reveal reveal-stagger">
+      <div class="logo-chip" style="--i:0"><span>Velocity Motors</span></div>
+      <div class="logo-chip" style="--i:1"><span>Apex Auto</span></div>
+      <div class="logo-chip" style="--i:2"><span>Nordic Forge</span></div>
+      <div class="logo-chip" style="--i:3"><span>Meridian Eng.</span></div>
+      <div class="logo-chip" style="--i:4"><span>Orbit Motors</span></div>
+      <div class="logo-chip" style="--i:5"><span>Cascade Alloys</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== JOINT VENTURES ============================== -->
+<section class="jv" id="infrastructure">
+  <div class="jv-media">
+    <img src="https://picsum.photos/seed/hg-handshake-deal/1600/900" alt="Two business partners shaking hands over a signed agreement" loading="lazy">
+  </div>
+  <div class="jv-content">
+    <div class="jv-inner reveal">
+      <span class="eyebrow">Joint Ventures</span>
+      <h2>HG Aluminium Smelters Ltd.</h2>
+      <div class="jv-panel">
+        <div class="jv-panel-item">
+          <span class="jv-icon"><svg><use href="#i-handshake"/></svg></span>
+          <span><strong>HG–Meridian Alloys</strong><small>Precision die-casting alloys</small></span>
+        </div>
+        <div class="jv-panel-item">
+          <span class="jv-icon"><svg><use href="#i-factory"/></svg></span>
+          <span><strong>HG–Cascade Metals</strong><small>Secondary smelting technology</small></span>
+        </div>
+        <div class="jv-panel-item">
+          <span class="jv-icon"><svg><use href="#i-leaf"/></svg></span>
+          <span><strong>HG–Vantage Recycling</strong><small>Closed-loop scrap recovery</small></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== CAREERS ============================== -->
+<section class="section" id="careers">
+  <div class="container">
+    <div class="careers-copy reveal">
+      <span class="eyebrow">Careers &amp; Life at HG</span>
+      <h2>Built by people who care about the craft</h2>
+      <p style="color:var(--text-muted); margin-top:0.9rem;">Our people are our core asset and the reason behind HG's growth. We invest in a safe, dynamic work environment, competitive compensation, and real opportunities to learn.</p>
+      <a href="#footer" class="btn btn-primary btn-sm" style="margin-top:1.5rem;">Apply Now</a>
+    </div>
+    <div class="careers-gallery reveal">
+      <img src="https://picsum.photos/seed/hg-engineer-point/700/650" alt="Engineer in a hard hat reviewing the plant floor" loading="lazy">
+      <img src="https://picsum.photos/seed/hg-team-lineup/1100/650" alt="Production team lined up in safety uniforms at the plant" loading="lazy">
+    </div>
+  </div>
+</section>
+
+<!-- ============================== FAQ ============================== -->
+<section class="section" id="quality" style="background:var(--bg-alt)">
+  <div class="container">
+    <div class="section-head center reveal">
+      <span class="eyebrow">FAQ</span>
+      <h2>Frequently asked questions</h2>
+    </div>
+    <div class="faq-list reveal" id="faqList">
+      <div class="faq-item is-open">
+        <button class="faq-q" aria-expanded="true">
+          Which is the largest metal recycling company in India?
+          <span class="faq-icon"><svg><use href="#i-close"/></svg></span>
+        </button>
+        <div class="faq-a" style="max-height: 200px;"><p>HG Aluminium Smelters Ltd. is one of India's largest producers of recycled aluminium and zinc die-casting alloys, operating multiple plants across North India.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          What is scrap metal recycling?
+          <span class="faq-icon"><svg><use href="#i-close"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Scrap metal recycling is the process of collecting discarded or leftover metal, sorting it by grade, and reprocessing it into raw material that can be used again in manufacturing — instead of extracting virgin ore.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          How does aluminium recycling work?
+          <span class="faq-icon"><svg><use href="#i-close"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Collected scrap is sorted, cleaned, and melted in a furnace. The molten metal is alloyed to the required specification, then cast into ingots, billets, or supplied directly in liquid form to a casting partner.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          What kind of scrap metal is worth money?
+          <span class="faq-icon"><svg><use href="#i-close"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Non-ferrous metals such as aluminium, zinc, copper, and brass typically fetch higher value than ferrous scrap, with pricing driven by purity, grade, and current commodity rates.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          What can be done with recycled aluminium?
+          <span class="faq-icon"><svg><use href="#i-close"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Recycled aluminium is used across the automotive, construction, packaging, and consumer-durables industries — commonly recast into die-casting alloy for engine and transmission components.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          How is recycling cost determined in India?
+          <span class="faq-icon"><svg><use href="#i-close"/></svg></span>
+        </button>
+        <div class="faq-a"><p>Cost depends on scrap grade, processing complexity, transportation, and prevailing commodity benchmarks. Buyback rates are typically quoted per kilogram and revised frequently.</p></div>
+      </div>
+      <div class="faq-item">
+        <button class="faq-q" aria-expanded="false">
+          What is the scope of the recycling industry in India?
+          <span class="faq-icon"><svg><use href="#i-close"/></svg></span>
+        </button>
+        <div class="faq-a"><p>India's metal recycling sector continues to expand alongside automotive and infrastructure growth, supported by rising demand for lower-carbon, secondary-sourced metal.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ============================== FOOTER ============================== -->
+<footer class="site-footer" id="footer">
+  <div class="container footer-grid">
+    <div class="footer-brand">
+      <a href="#top" class="brand" aria-label="HG Aluminium Smelters home">
+        <span class="brand-mark" style="background:rgba(255,255,255,0.12)">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V6l4 3V6l4 3V6l4 3V6l4 3v10z"/></svg>
+        </span>
+        <span class="brand-word"><strong>HG Aluminium</strong><span style="color:var(--gold)">Smelters Ltd.</span></span>
+      </a>
+      <p>India's largest producer of aluminium and zinc die-casting alloys, with a combined annual capacity of over 620,000 MT.</p>
+      <div class="footer-socials">
+        <a href="#" aria-label="Facebook"><svg><use href="#i-facebook"/></svg></a>
+        <a href="#" aria-label="LinkedIn"><svg><use href="#i-linkedin"/></svg></a>
+        <a href="#" aria-label="Instagram"><svg><use href="#i-instagram"/></svg></a>
+        <a href="#" aria-label="X"><svg><use href="#i-x"/></svg></a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <h5>Quick Links</h5>
+      <ul>
+        <li><a href="#products">Aluminium Alloy (Ingot)</a></li>
+        <li><a href="#products">Aluminium Alloy (Liquid)</a></li>
+        <li><a href="#products">Aluminium Billets</a></li>
+        <li><a href="#products">Zinc Alloy</a></li>
+        <li><a href="#careers">Careers</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Sitemap</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-col" id="investors">
+      <h5>Contact Us</h5>
+      <ul class="footer-contact">
+        <li><svg><use href="#i-pin"/></svg> HG Aluminium Smelters Ltd., 7th Floor, Tower 2, Business Park, Faridabad, Haryana – 121003, India</li>
+        <li><svg><use href="#i-mail"/></svg> info@hgaluminiumsmelters.example</li>
+        <li><svg><use href="#i-phone"/></svg> +91 (000) 000-0000</li>
+      </ul>
+    </div>
+
+    <div class="footer-col">
+      <h5>Find Us</h5>
+      <div class="footer-map">
+        <svg class="map-pattern" viewBox="0 0 300 170" preserveAspectRatio="none">
+          <defs><pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse"><path d="M20 0H0V20" fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="1"/></pattern></defs>
+          <rect width="300" height="170" fill="url(#grid)"/>
+        </svg>
+        <div class="footer-map-pin"><svg><use href="#i-pin"/></svg></div>
+        <a class="footer-map-link" href="https://www.google.com/maps/search/?api=1&amp;query=Faridabad+Haryana" target="_blank" rel="noopener">Open in Maps</a>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">Copyright © 2026 HG Aluminium Smelters Ltd. All rights reserved.</div>
+</footer>
+
+<button class="back-to-top" id="backToTop" aria-label="Back to top"><svg><use href="#i-arrow-up"/></svg></button>
+
+<script>
+(function () {
+  "use strict";
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------------------------------------------------------
+     Sticky header shadow on scroll
+  --------------------------------------------------------- */
+  var header = document.getElementById('siteHeader');
+  var lastScrollState = false;
+  function onScrollHeader() {
+    var scrolled = window.scrollY > 12;
+    if (scrolled !== lastScrollState) {
+      header.classList.toggle('is-scrolled', scrolled);
+      lastScrollState = scrolled;
+    }
+  }
+  document.addEventListener('scroll', function () {
+    window.requestAnimationFrame(onScrollHeader);
+  }, { passive: true });
+  onScrollHeader();
+
+  /* ---------------------------------------------------------
+     Desktop dropdown / mega menu
+  --------------------------------------------------------- */
+  var navItems = Array.prototype.slice.call(document.querySelectorAll('.nav-list > li'));
+  var pointerHover = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+  function closeAllDropdowns(except) {
+    navItems.forEach(function (li) {
+      if (li === except) return;
+      li.classList.remove('is-open');
+      var btn = li.querySelector('.nav-link');
+      if (btn) btn.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  navItems.forEach(function (li) {
+    var btn = li.querySelector('button.nav-link');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var isOpen = li.classList.contains('is-open');
+      closeAllDropdowns(null);
+      li.classList.toggle('is-open', !isOpen);
+      btn.setAttribute('aria-expanded', String(!isOpen));
+    });
+    if (pointerHover) {
+      var closeTimer;
+      li.addEventListener('mouseenter', function () {
+        clearTimeout(closeTimer);
+        closeAllDropdowns(li);
+        li.classList.add('is-open');
+        btn.setAttribute('aria-expanded', 'true');
+      });
+      li.addEventListener('mouseleave', function () {
+        closeTimer = setTimeout(function () {
+          li.classList.remove('is-open');
+          btn.setAttribute('aria-expanded', 'false');
+        }, 150);
+      });
+    }
+  });
+
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.nav-list > li')) closeAllDropdowns(null);
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeAllDropdowns(null);
+  });
+
+  /* ---------------------------------------------------------
+     Mobile drawer
+  --------------------------------------------------------- */
+  var navToggle = document.getElementById('navToggle');
+  var drawer = document.getElementById('mobileDrawer');
+  var backdrop = document.getElementById('drawerBackdrop');
+  var drawerClose = document.getElementById('drawerClose');
+  var body = document.body;
+
+  function openDrawer() {
+    drawer.classList.add('is-open');
+    backdrop.classList.add('is-open');
+    drawer.setAttribute('aria-hidden', 'false');
+    navToggle.setAttribute('aria-expanded', 'true');
+    body.classList.add('drawer-lock');
+  }
+  function closeDrawer() {
+    drawer.classList.remove('is-open');
+    backdrop.classList.remove('is-open');
+    drawer.setAttribute('aria-hidden', 'true');
+    navToggle.setAttribute('aria-expanded', 'false');
+    body.classList.remove('drawer-lock');
+  }
+  navToggle.addEventListener('click', function () {
+    drawer.classList.contains('is-open') ? closeDrawer() : openDrawer();
+  });
+  drawerClose.addEventListener('click', closeDrawer);
+  backdrop.addEventListener('click', closeDrawer);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && drawer.classList.contains('is-open')) closeDrawer();
+  });
+  drawer.querySelectorAll('.drawer-link, .drawer-submenu a').forEach(function (a) {
+    a.addEventListener('click', closeDrawer);
+  });
+
+  /* Drawer accordion submenus */
+  drawer.querySelectorAll('.drawer-toggle').forEach(function (btn) {
+    var submenu = btn.nextElementSibling;
+    btn.addEventListener('click', function () {
+      var isOpen = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', String(!isOpen));
+      submenu.style.maxHeight = isOpen ? '0px' : submenu.scrollHeight + 'px';
+    });
+  });
+
+  /* ---------------------------------------------------------
+     Search overlay
+  --------------------------------------------------------- */
+  var searchToggle = document.getElementById('searchToggle');
+  var searchOverlay = document.getElementById('searchOverlay');
+  var searchClose = document.getElementById('searchClose');
+  var searchInput = document.getElementById('searchInput');
+  var searchForm = document.getElementById('searchForm');
+
+  function openSearch() {
+    searchOverlay.classList.add('is-open');
+    setTimeout(function () { searchInput.focus(); }, 250);
+  }
+  function closeSearch() {
+    searchOverlay.classList.remove('is-open');
+    searchInput.value = '';
+  }
+  searchToggle.addEventListener('click', openSearch);
+  searchClose.addEventListener('click', closeSearch);
+  searchOverlay.addEventListener('click', function (e) {
+    if (e.target === searchOverlay) closeSearch();
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && searchOverlay.classList.contains('is-open')) closeSearch();
+  });
+  searchForm.addEventListener('submit', function (e) { e.preventDefault(); closeSearch(); });
+
+  /* ---------------------------------------------------------
+     Hero carousel
+  --------------------------------------------------------- */
+  var slidesData = [
+    { eyebrow: "Est. 1998 · Faridabad, Haryana", title: "India's Largest Aluminium &amp; Zinc Recycling Enterprise", sub: "From scrap to spec-grade alloy — let us provide the support your production line deserves." },
+    { eyebrow: "620,000+ MT Annual Capacity", title: "Precision Alloys, Poured at Scale", sub: "Four plants, one continuous quality standard — liquid metal delivered on your schedule." },
+    { eyebrow: "150+ OEM Partners", title: "Trusted by India's Leading Manufacturers", sub: "Automotive, engineering, and industrial clients rely on HG for consistent, certified supply." }
+  ];
+  var heroSlides = Array.prototype.slice.call(document.querySelectorAll('.hero-slide'));
+  var heroDotsWrap = document.getElementById('heroDots');
+  var heroEyebrow = document.getElementById('heroEyebrow');
+  var heroTitle = document.getElementById('heroTitle');
+  var heroSub = document.getElementById('heroSub');
+  var heroSlider = document.getElementById('heroSlider');
+  var heroIndex = 0;
+  var heroTimer;
+
+  heroSlides.forEach(function (_, i) {
+    var dot = document.createElement('button');
+    dot.className = 'hero-dot' + (i === 0 ? ' is-active' : '');
+    dot.setAttribute('aria-label', 'Go to slide ' + (i + 1));
+    dot.addEventListener('click', function () { goToHeroSlide(i); resetHeroTimer(); });
+    heroDotsWrap.appendChild(dot);
+  });
+  var heroDots = Array.prototype.slice.call(heroDotsWrap.children);
+
+  function goToHeroSlide(i) {
+    heroSlides[heroIndex].classList.remove('is-active');
+    heroDots[heroIndex].classList.remove('is-active');
+    heroIndex = (i + heroSlides.length) % heroSlides.length;
+    heroSlides[heroIndex].classList.add('is-active');
+    heroDots[heroIndex].classList.add('is-active');
+    var data = slidesData[heroIndex];
+    if (data) {
+      heroEyebrow.textContent = data.eyebrow;
+      heroTitle.innerHTML = data.title;
+      heroSub.textContent = data.sub;
+    }
+  }
+  function resetHeroTimer() {
+    clearInterval(heroTimer);
+    if (!reduceMotion) heroTimer = setInterval(function () { goToHeroSlide(heroIndex + 1); }, 6000);
+  }
+  document.getElementById('heroPrev').addEventListener('click', function () { goToHeroSlide(heroIndex - 1); resetHeroTimer(); });
+  document.getElementById('heroNext').addEventListener('click', function () { goToHeroSlide(heroIndex + 1); resetHeroTimer(); });
+  heroSlider.addEventListener('mouseenter', function () { clearInterval(heroTimer); });
+  heroSlider.addEventListener('mouseleave', resetHeroTimer);
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) clearInterval(heroTimer); else resetHeroTimer();
+  });
+  resetHeroTimer();
+
+  /* Touch swipe for hero */
+  (function () {
+    var startX = null;
+    heroSlider.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; }, { passive: true });
+    heroSlider.addEventListener('touchend', function (e) {
+      if (startX === null) return;
+      var dx = e.changedTouches[0].clientX - startX;
+      if (Math.abs(dx) > 40) {
+        goToHeroSlide(dx < 0 ? heroIndex + 1 : heroIndex - 1);
+        resetHeroTimer();
+      }
+      startX = null;
+    }, { passive: true });
+  })();
+
+  /* Keyboard arrows when hero is focused/hovered */
+  heroSlider.setAttribute('tabindex', '0');
+  heroSlider.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowLeft') { goToHeroSlide(heroIndex - 1); resetHeroTimer(); }
+    if (e.key === 'ArrowRight') { goToHeroSlide(heroIndex + 1); resetHeroTimer(); }
+  });
+
+  /* ---------------------------------------------------------
+     Video modal (mission section + hero CTA)
+  --------------------------------------------------------- */
+  var videoModal = document.getElementById('videoModal');
+  var videoEl = document.getElementById('storyVideo');
+  var videoModalClose = document.getElementById('videoModalClose');
+
+  function openVideo() {
+    videoModal.classList.add('is-open');
+    videoEl.play().catch(function () {});
+  }
+  function closeVideo() {
+    videoModal.classList.remove('is-open');
+    videoEl.pause();
+  }
+  document.getElementById('heroVideoBtn').addEventListener('click', openVideo);
+  document.getElementById('heroVideoBtn2').addEventListener('click', openVideo);
+  videoModalClose.addEventListener('click', closeVideo);
+  videoModal.addEventListener('click', function (e) { if (e.target === videoModal) closeVideo(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && videoModal.classList.contains('is-open')) closeVideo();
+  });
+
+  /* ---------------------------------------------------------
+     Testimonial carousel
+  --------------------------------------------------------- */
+  var testiTrack = document.getElementById('testiTrack');
+  var testiSlides = Array.prototype.slice.call(testiTrack.children);
+  var testiDotsWrap = document.getElementById('testiDots');
+  var testiIndex = 0;
+
+  function testiPerView() {
+    var w = window.innerWidth;
+    if (w >= 1000) return 3;
+    if (w >= 720) return 2;
+    return 1;
+  }
+  function testiMaxIndex() { return Math.max(0, testiSlides.length - testiPerView()); }
+
+  function buildTestiDots() {
+    testiDotsWrap.innerHTML = '';
+    var count = testiMaxIndex() + 1;
+    for (var i = 0; i < count; i++) {
+      var dot = document.createElement('button');
+      dot.className = i === testiIndex ? 'is-active' : '';
+      dot.setAttribute('aria-label', 'Go to testimonial group ' + (i + 1));
+      (function (idx) { dot.addEventListener('click', function () { goToTesti(idx); }); })(i);
+      testiDotsWrap.appendChild(dot);
+    }
+  }
+  function goToTesti(i) {
+    testiIndex = Math.min(Math.max(i, 0), testiMaxIndex());
+    var pct = (100 / testiPerView()) * testiIndex;
+    testiTrack.style.transform = 'translateX(-' + pct + '%)';
+    Array.prototype.slice.call(testiDotsWrap.children).forEach(function (d, idx) {
+      d.classList.toggle('is-active', idx === testiIndex);
+    });
+  }
+  document.getElementById('testiPrev').addEventListener('click', function () { goToTesti(testiIndex - 1); });
+  document.getElementById('testiNext').addEventListener('click', function () { goToTesti(testiIndex + 1); });
+  buildTestiDots();
+  goToTesti(0);
+  window.addEventListener('resize', debounce(function () { buildTestiDots(); goToTesti(0); }, 200));
+
+  /* ---------------------------------------------------------
+     FAQ accordion
+  --------------------------------------------------------- */
+  var faqItems = Array.prototype.slice.call(document.querySelectorAll('.faq-item'));
+  faqItems.forEach(function (item) {
+    var q = item.querySelector('.faq-q');
+    var a = item.querySelector('.faq-a');
+    q.addEventListener('click', function () {
+      var isOpen = item.classList.contains('is-open');
+      faqItems.forEach(function (other) {
+        other.classList.remove('is-open');
+        other.querySelector('.faq-q').setAttribute('aria-expanded', 'false');
+        other.querySelector('.faq-a').style.maxHeight = '0px';
+      });
+      if (!isOpen) {
+        item.classList.add('is-open');
+        q.setAttribute('aria-expanded', 'true');
+        a.style.maxHeight = a.scrollHeight + 'px';
+      }
+    });
+  });
+
+  /* ---------------------------------------------------------
+     Scroll reveal (IntersectionObserver)
+  --------------------------------------------------------- */
+  if ('IntersectionObserver' in window && !reduceMotion) {
+    var revealObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    document.querySelectorAll('.reveal').forEach(function (el) { revealObserver.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function (el) { el.classList.add('is-visible'); });
+  }
+
+  /* ---------------------------------------------------------
+     Stat counters
+  --------------------------------------------------------- */
+  var counters = Array.prototype.slice.call(document.querySelectorAll('.count'));
+  function animateCount(el) {
+    var target = parseInt(el.getAttribute('data-target'), 10) || 0;
+    if (reduceMotion) { el.textContent = target; return; }
+    var start = 0;
+    var duration = 1400;
+    var startTime = null;
+    function step(ts) {
+      if (!startTime) startTime = ts;
+      var progress = Math.min((ts - startTime) / duration, 1);
+      var eased = 1 - Math.pow(1 - progress, 3);
+      el.textContent = Math.round(eased * target);
+      if (progress < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+  if ('IntersectionObserver' in window) {
+    var statObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          animateCount(entry.target);
+          statObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.4 });
+    counters.forEach(function (c) { statObserver.observe(c); });
+  } else {
+    counters.forEach(animateCount);
+  }
+
+  /* ---------------------------------------------------------
+     Active nav link highlight on scroll
+  --------------------------------------------------------- */
+  var sectionIds = ['about', 'products', 'sustainability', 'testimonials', 'customers', 'careers'];
+  var navAnchors = Array.prototype.slice.call(document.querySelectorAll('.nav-link[href^="#"]'));
+  if ('IntersectionObserver' in window) {
+    var navObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          var id = entry.target.id;
+          navAnchors.forEach(function (a) {
+            a.classList.toggle('active-link', a.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { threshold: 0, rootMargin: '-45% 0px -50% 0px' });
+    sectionIds.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) navObserver.observe(el);
+    });
+  }
+
+  /* ---------------------------------------------------------
+     Back to top
+  --------------------------------------------------------- */
+  var backToTop = document.getElementById('backToTop');
+  document.addEventListener('scroll', function () {
+    window.requestAnimationFrame(function () {
+      backToTop.classList.toggle('is-visible', window.scrollY > 600);
+    });
+  }, { passive: true });
+  backToTop.addEventListener('click', function () {
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
+
+  /* ---------------------------------------------------------
+     Utility: debounce
+  --------------------------------------------------------- */
+  function debounce(fn, wait) {
+    var t;
+    return function () {
+      clearTimeout(t);
+      var args = arguments;
+      t = setTimeout(function () { fn.apply(null, args); }, wait);
+    };
+  }
+})();
+</script>
+</body>
+</html>
