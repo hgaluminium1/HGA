@@ -1,13 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { ArrowLeft, ArrowRight, Star } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 
 import { Container } from "@/components/atoms/container";
 import { Reveal } from "@/components/atoms/reveal";
 import { Section } from "@/components/atoms/section";
 import { SectionHeader } from "@/components/molecules/section-header";
-import { Button } from "@/components/ui/button";
 import type { HomeContent } from "@/features/public-home/content/home.en";
 import { cn } from "@/lib/utils";
 
@@ -16,8 +15,8 @@ type TestimonialsCarouselProps = {
 };
 
 function perViewForWidth(width: number) {
-  if (width >= 1000) return 3;
-  if (width >= 720) return 2;
+  if (width >= 1024) return 3;
+  if (width >= 640) return 2;
   return 1;
 }
 
@@ -29,7 +28,7 @@ export function TestimonialsCarousel({ content }: TestimonialsCarouselProps) {
   useEffect(() => {
     const update = () => setPerView(perViewForWidth(window.innerWidth));
     update();
-    window.addEventListener("resize", update);
+    window.addEventListener("resize", update, { passive: true });
     return () => window.removeEventListener("resize", update);
   }, []);
 
@@ -73,31 +72,22 @@ export function TestimonialsCarousel({ content }: TestimonialsCarouselProps) {
                     className="shrink-0 p-1.5"
                     style={{ flexBasis: slideBasis, maxWidth: slideBasis }}
                   >
-                    <article className="shadow-brand-sm border-line bg-surface flex h-full flex-col items-center rounded-[var(--radius-lg)] border px-7 py-8 text-center">
-                      <div className="mx-auto size-[68px] rounded-full bg-[linear-gradient(135deg,var(--brand-accent),var(--gold))] p-[3px]">
-                        <div className="font-display bg-violet-700 flex size-full items-center justify-center rounded-full text-[1.1rem] font-bold text-white">
+                    <article className="border-line bg-surface flex h-full flex-col rounded-[var(--radius-lg)] border p-5 min-[480px]:p-6">
+                      <div className="flex items-center gap-3">
+                        <div className="font-display flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-white">
                           {item.initials}
                         </div>
+                        <div className="min-w-0">
+                          <h4 className="truncate text-base font-semibold">
+                            {item.name}
+                          </h4>
+                          <p className="text-muted-foreground truncate text-[0.8rem]">
+                            {item.role}
+                          </p>
+                        </div>
                       </div>
-                      <h4 className="mt-4 text-base font-semibold">
-                        {item.name}
-                      </h4>
-                      <p className="text-muted-foreground mt-0.5 text-[0.8rem]">
-                        {item.role}
-                      </p>
-                      <div
-                        className="mt-3 flex justify-center gap-0.5 text-gold"
-                        aria-label="5 out of 5 stars"
-                      >
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <Star
-                            key={i}
-                            className="size-[15px] fill-current"
-                          />
-                        ))}
-                      </div>
-                      <blockquote className="text-muted-foreground mt-3.5 text-[0.94rem]">
-                        {item.quote}
+                      <blockquote className="text-muted-foreground mt-4 flex-1 text-[clamp(0.9rem,0.86rem+0.2vw,0.98rem)] leading-relaxed">
+                        “{item.quote}”
                       </blockquote>
                     </article>
                   </div>
@@ -106,17 +96,16 @@ export function TestimonialsCarousel({ content }: TestimonialsCarouselProps) {
             </div>
 
             {pageCount > 1 ? (
-              <div className="mt-8 flex items-center justify-center gap-5">
-                <Button
+              <div className="mt-6 flex items-center justify-center gap-3 min-[480px]:mt-8 min-[480px]:gap-5">
+                <button
                   type="button"
-                  variant="outline"
-                  size="icon"
                   aria-label="Previous testimonial"
                   disabled={index <= 0}
+                  className="border-line inline-flex size-10 items-center justify-center rounded-full border disabled:opacity-40"
                   onClick={() => setIndex((i) => Math.max(0, i - 1))}
                 >
                   <ArrowLeft className="size-4" />
-                </Button>
+                </button>
                 <div className="flex gap-2">
                   {dots.map((dot) => (
                     <button
@@ -125,25 +114,24 @@ export function TestimonialsCarousel({ content }: TestimonialsCarouselProps) {
                       aria-label={`Go to testimonials page ${dot + 1}`}
                       aria-current={dot === index}
                       className={cn(
-                        "h-2 rounded-full bg-line transition-all duration-300 ease-[var(--ease)]",
+                        "h-2 rounded-full transition-all duration-300",
                         dot === index
-                          ? "w-[22px] rounded-[5px] bg-brand-accent"
-                          : "w-2",
+                          ? "w-5 bg-brand-blue"
+                          : "bg-line w-2",
                       )}
                       onClick={() => setIndex(dot)}
                     />
                   ))}
                 </div>
-                <Button
+                <button
                   type="button"
-                  variant="outline"
-                  size="icon"
                   aria-label="Next testimonial"
                   disabled={index >= maxIndex}
+                  className="border-line inline-flex size-10 items-center justify-center rounded-full border disabled:opacity-40"
                   onClick={() => setIndex((i) => Math.min(maxIndex, i + 1))}
                 >
                   <ArrowRight className="size-4" />
-                </Button>
+                </button>
               </div>
             ) : null}
           </div>

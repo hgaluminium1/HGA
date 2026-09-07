@@ -1,23 +1,15 @@
 import type { Metadata } from "next";
 
-import { PageShell } from "@/components/templates/page-shell";
+import { CareersPage } from "@/features/public-site/components/content-pages";
 
-type PageProps = {
-  params: Promise<{ locale: string }>;
-};
+type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
   title: "Careers",
-  description: "Life at HG and open opportunities.",
+  description: "Join HG Aluminium — contact HR for openings.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return (
-    <PageShell
-      locale={locale}
-      title="Careers"
-      description="Life at HG and open opportunities."
-    />
-  );
+  return <CareersPage locale={locale} />;
 }

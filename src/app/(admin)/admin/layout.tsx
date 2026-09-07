@@ -1,11 +1,9 @@
-export default function AdminLayout({
+import { AdminClientProviders } from "@/features/admin-shell/components/admin-client-providers";
+
+export default function AdminRootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <div className="min-h-screen bg-[var(--color-surface-muted,#f8fafc)]">
-      {children}
-    </div>
-  );
+  return <AdminClientProviders>{children}</AdminClientProviders>;
 }

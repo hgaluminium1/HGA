@@ -21,7 +21,7 @@ export function CareersTeaserSection({
   return (
     <Section data-block="careers-teaser" id="careers">
       <Container>
-        <Reveal className="mx-auto mb-10 max-w-[700px] text-center">
+        <Reveal className="mx-auto mb-8 max-w-[40rem] text-center min-[768px]:mb-10">
           <SectionHeader
             center
             eyebrow={content.eyebrow}
@@ -38,11 +38,11 @@ export function CareersTeaserSection({
         </Reveal>
 
         <Reveal>
-          <div className="grid grid-cols-1 gap-4 overflow-hidden rounded-[var(--radius-lg)] min-[720px]:grid-cols-[1fr_1.6fr]">
+          <div className="grid grid-cols-1 gap-3 overflow-hidden rounded-[var(--radius-lg)] min-[720px]:grid-cols-[1fr_1.55fr] min-[720px]:gap-4">
             {content.images.map((image) => (
               <div
                 key={image.src}
-                className="relative min-h-[260px] overflow-hidden rounded-[var(--radius-md)] min-[720px]:min-h-[320px]"
+                className="relative aspect-[16/10] overflow-hidden rounded-[var(--radius-md)] min-[720px]:aspect-auto min-[720px]:min-h-[18rem]"
               >
                 <Image
                   src={image.src}

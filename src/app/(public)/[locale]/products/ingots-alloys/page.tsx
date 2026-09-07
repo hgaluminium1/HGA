@@ -1,23 +1,23 @@
 import type { Metadata } from "next";
 
-import { PageShell } from "@/components/templates/page-shell";
+import { CategoryLandingPage } from "@/features/public-site/components/content-pages";
 
-type PageProps = {
-  params: Promise<{ locale: string }>;
-};
+type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
-  title: "Aluminium Ingots / Alloys",
-  description: "Liquid and solid alloy products to LME-grade specs.",
+  title: "Ingots & alloys",
+  description: "Remelt aluminium ingots and upcoming cubes, shots and deoxidizer.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
   return (
-    <PageShell
+    <CategoryLandingPage
       locale={locale}
-      title="Aluminium Ingots / Alloys"
-      description="Liquid and solid alloy products to LME-grade specs."
+      slug="ingots-alloys"
+      title="Ingots & alloys"
+      description="Secondary remelt ingots today — cubes, shots and deoxidizer in the pipeline."
+      categorySlugs={["remelt-ingots", "ingots-alloys"]}
     />
   );
 }

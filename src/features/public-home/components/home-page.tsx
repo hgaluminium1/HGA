@@ -9,19 +9,35 @@ import { MissionVideoSection } from "@/features/public-home/components/mission-v
 import { ProductsSection } from "@/features/public-home/components/products-section";
 import { TestimonialsCarousel } from "@/features/public-home/components/testimonials-carousel";
 import { homeContentEn } from "@/features/public-home/content/home.en";
+import { getCachedPublishedProducts } from "@/features/public-site/lib/public-cache";
 
 type HomePageProps = {
   locale: string;
 };
 
-export function HomePage({ locale }: HomePageProps) {
+export async function HomePage({ locale }: HomePageProps) {
   const content = homeContentEn;
+  const { items } = await getCachedPublishedProducts({
+    limit: 8,
+    upcoming: false,
+  });
+  const products = {
+    ...content.products,
+    items: items.map((p, index) => ({
+      title: p.name.en,
+      href: `products/${p.slug}`,
+      imageSrc:
+        p.imageUrl || `https://picsum.photos/seed/hg-${p.slug}/700/562`,
+      imageAlt: p.name.en,
+      wide: index === items.length - 1 && items.length % 2 === 1,
+    })),
+  };
 
   return (
     <>
       <HeroCarousel locale={locale} content={content.hero} />
       <CapabilitySection content={content.capability} />
-      <ProductsSection locale={locale} content={content.products} />
+      <ProductsSection locale={locale} content={products} />
       <MissionVideoSection
         content={content.mission}
         videoSrc={content.hero.videoSrc}

@@ -1,23 +1,15 @@
 import type { Metadata } from "next";
 
-import { PageShell } from "@/components/templates/page-shell";
+import { ManufacturingPage } from "@/features/public-site/components/content-pages";
 
-type PageProps = {
-  params: Promise<{ locale: string }>;
-};
+type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
-  title: "Manufacturing & Infrastructure",
-  description: "Plants, capacity, and production infrastructure.",
+  title: "Manufacturing",
+  description: "Plant, process, and production infrastructure.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return (
-    <PageShell
-      locale={locale}
-      title="Manufacturing & Infrastructure"
-      description="Plants, capacity, and production infrastructure."
-    />
-  );
+  return <ManufacturingPage locale={locale} />;
 }

@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Play } from "lucide-react";
+import { ArrowLeft, ArrowRight, Pause, Play } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -21,17 +21,25 @@ type HeroCarouselProps = {
   content: HomeContent["hero"];
 };
 
-const AUTOPLAY_MS = 6000;
+const AUTOPLAY_MS = 7000;
 
+/**
+ * Billboard carousel — reliable autoplay:
+ * - Interval advances slides (not hover-gated on the whole hero — that blocked play).
+ * - Progress bar uses inline CSS animation (Tailwind arbitrary + CSS var was unreliable).
+ * - Explicit pause + reduced-motion + video modal stop the timer.
+ */
 export function HeroCarousel({ locale, content }: HeroCarouselProps) {
   const { slides, primaryCta, secondaryCta, videoSrc, videoPoster } = content;
   const [index, setIndex] = useState(0);
   const [videoOpen, setVideoOpen] = useState(false);
+  const [paused, setPaused] = useState(false);
+  const [reduceMotion, setReduceMotion] = useState(false);
   const touchStartX = useRef<number | null>(null);
-  const reduceMotion = useRef(false);
 
   const count = slides.length;
   const active = slides[index] ?? slides[0];
+  const playing = count > 1 && !paused && !videoOpen && !reduceMotion;
 
   const go = useCallback(
     (next: number) => {
@@ -42,27 +50,30 @@ export function HeroCarousel({ locale, content }: HeroCarouselProps) {
   );
 
   useEffect(() => {
-    reduceMotion.current = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const apply = () => {
+      setReduceMotion(mq.matches);
+      if (mq.matches) setPaused(true);
+    };
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
   }, []);
 
   useEffect(() => {
-    if (count < 2 || videoOpen) return;
-    if (reduceMotion.current) return;
-
+    if (!playing) return;
     const id = window.setInterval(() => {
       setIndex((i) => (i + 1) % count);
     }, AUTOPLAY_MS);
     return () => window.clearInterval(id);
-  }, [count, videoOpen, index]);
+  }, [playing, count, index]);
 
   if (!active) return null;
 
   return (
     <section
       data-block="hero"
-      className="bg-ink relative overflow-hidden"
+      className="bg-ink relative isolate overflow-hidden"
       aria-roledescription="carousel"
       aria-label="Featured highlights"
       onTouchStart={(e) => {
@@ -79,110 +90,163 @@ export function HeroCarousel({ locale, content }: HeroCarouselProps) {
       }}
     >
       <div
-        className="relative min-h-[26.25rem]"
-        style={{ height: "var(--hero-height)" }}
+        className="relative flex w-full flex-col"
+        style={{
+          minHeight: "clamp(28rem, calc(100svh - 4rem), 52rem)",
+        }}
       >
         {slides.map((slide, i) => (
           <div
             key={`${slide.imageSrc}-${i}`}
             className={cn(
-              "absolute inset-0 transition-[opacity,visibility] duration-1000 ease-[var(--ease)]",
-              i === index
-                ? "z-[1] visible opacity-100"
-                : "invisible opacity-0",
+              "absolute inset-0 transition-opacity duration-700 ease-[var(--ease)] motion-reduce:duration-0",
+              i === index ? "z-[1] opacity-100" : "z-0 opacity-0",
             )}
             aria-hidden={i !== index}
           >
             <Image
               src={slide.imageSrc}
-              alt={slide.imageAlt}
+              alt={i === index ? slide.imageAlt : ""}
               fill
               priority={i === 0}
               sizes="100vw"
-              className="object-cover"
+              className="object-cover object-[center_30%] sm:object-center"
             />
             <div
-              className="absolute inset-0 bg-[linear-gradient(0deg,rgba(15,8,30,0.86)_0%,rgba(15,8,30,0.45)_48%,rgba(15,8,30,0.55)_100%)]"
+              className="absolute inset-0 bg-[linear-gradient(180deg,rgb(0_18_47_/_0.55)_0%,rgb(0_18_47_/_0.72)_42%,rgb(0_18_47_/_0.92)_100%),linear-gradient(90deg,rgb(0_18_47_/_0.78)_0%,rgb(0_18_47_/_0.35)_55%,rgb(0_18_47_/_0.2)_100%)]"
               aria-hidden
             />
           </div>
         ))}
 
-        <div className="absolute inset-0 z-[5] mx-auto flex max-w-[var(--container)] flex-col items-start justify-center px-[var(--pad-inline)] text-left">
-          <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-[rgb(232_169_60_/_0.4)] bg-[rgb(232_169_60_/_0.14)] px-3.5 py-1.5 text-[0.78rem] font-bold tracking-[0.14em] text-gold uppercase">
-            {active.eyebrow}
-          </span>
-          <h1 className="text-fs-h1 max-w-[16ch] text-white [text-shadow:0_4px_30px_rgb(0_0_0_/_0.35)]">
-            {active.title}
-          </h1>
-          <p className="text-fs-lead text-on-dark-muted mt-5 max-w-[46ch]">
-            {active.subtitle}
-          </p>
-          <div className="mt-8 flex flex-wrap gap-3.5">
-            <Button
-              render={
-                <Link href={localePath(locale, primaryCta.href)} />
-              }
-            >
-              {primaryCta.label}
-            </Button>
-            <Button
-              type="button"
-              variant="ghost-light"
-              onClick={() => setVideoOpen(true)}
-            >
-              <Play className="size-4" />
-              {secondaryCta.label}
-            </Button>
+        <div className="relative z-[5] mx-auto flex w-full max-w-[var(--container)] flex-1 flex-col justify-end px-[var(--pad-inline)] pt-[clamp(1.25rem,4vw,2.5rem)] min-[768px]:justify-center">
+          <div className="max-w-[min(100%,36rem)] min-[900px]:max-w-[40rem]">
+            <p className="mb-3 inline-flex max-w-full items-center gap-2 text-[clamp(0.65rem,0.58rem+0.3vw,0.75rem)] font-bold tracking-[0.14em] text-brand-red uppercase">
+              <span
+                className="bg-brand-red hidden h-px w-5 shrink-0 min-[400px]:inline-block"
+                aria-hidden
+              />
+              <span className="min-w-0 break-words">{active.eyebrow}</span>
+            </p>
+            <h1 className="font-display text-balance text-[clamp(1.75rem,1.15rem+2.8vw,3.75rem)] font-semibold leading-[1.08] tracking-[-0.02em] text-white">
+              {active.title}
+            </h1>
+            <p className="text-on-dark-muted mt-3 max-w-[min(100%,38ch)] text-[clamp(0.9375rem,0.88rem+0.28vw,1.125rem)] leading-relaxed min-[480px]:mt-4">
+              {active.subtitle}
+            </p>
+            <div className="mt-5 flex w-full flex-col gap-2.5 min-[420px]:mt-7 min-[420px]:flex-row min-[420px]:flex-wrap min-[420px]:items-center min-[420px]:gap-3">
+              <Button
+                className="w-full min-[420px]:w-auto"
+                render={<Link href={localePath(locale, primaryCta.href)} />}
+              >
+                {primaryCta.label}
+              </Button>
+              {videoSrc ? (
+                <Button
+                  type="button"
+                  variant="ghost-light"
+                  className="w-full min-[420px]:w-auto"
+                  onClick={() => {
+                    setPaused(true);
+                    setVideoOpen(true);
+                  }}
+                >
+                  <Play className="size-4" />
+                  {secondaryCta.label}
+                </Button>
+              ) : null}
+            </div>
           </div>
         </div>
 
         {count > 1 ? (
-          <>
-            <Button
-              type="button"
-              variant="ghost-light"
-              size="icon"
-              className="absolute top-1/2 left-[clamp(0.75rem,3vw,2.5rem)] z-[6] hidden -translate-y-1/2 min-[600px]:inline-flex"
-              aria-label="Previous slide"
-              onClick={() => go(index - 1)}
-            >
-              <ArrowLeft className="size-[18px]" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost-light"
-              size="icon"
-              className="absolute top-1/2 right-[clamp(0.75rem,3vw,2.5rem)] z-[6] hidden -translate-y-1/2 min-[600px]:inline-flex"
-              aria-label="Next slide"
-              onClick={() => go(index + 1)}
-            >
-              <ArrowRight className="size-[18px]" />
-            </Button>
-            <div className="absolute inset-x-0 bottom-[clamp(1.25rem,4vw,2.25rem)] z-[6] flex justify-center gap-2.5">
-              {slides.map((_, i) => (
+          <div className="relative z-[6] mx-auto w-full max-w-[var(--container)] px-[var(--pad-inline)] pt-5 pb-[max(0.85rem,env(safe-area-inset-bottom))] min-[768px]:pt-8">
+            <div className="flex items-center gap-3">
+              <div
+                className="flex min-w-0 flex-1 items-center gap-1"
+                role="tablist"
+                aria-label="Slides"
+              >
+                {slides.map((slide, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    role="tab"
+                    aria-selected={i === index}
+                    aria-label={`Slide ${i + 1}: ${slide.title}`}
+                    className="relative h-10 min-w-0 flex-1"
+                    onClick={() => go(i)}
+                  >
+                    <span className="bg-white/25 absolute inset-x-0 top-1/2 block h-0.5 -translate-y-1/2 overflow-hidden rounded-full min-[480px]:h-1">
+                      {i === index ? (
+                        <span
+                          key={`bar-${index}-${playing ? "run" : "stop"}`}
+                          className="bg-brand-red absolute inset-y-0 left-0 block h-full rounded-full"
+                          style={{
+                            width: playing ? undefined : "0%",
+                            animation: playing
+                              ? `hero-progress ${AUTOPLAY_MS}ms linear forwards`
+                              : undefined,
+                            animationPlayState: playing ? "running" : "paused",
+                          }}
+                        />
+                      ) : (
+                        <span
+                          className={cn(
+                            "bg-brand-red absolute inset-y-0 left-0 block h-full rounded-full",
+                            i < index ? "w-full" : "w-0",
+                          )}
+                        />
+                      )}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              <div className="flex shrink-0 items-center gap-1.5">
                 <button
-                  key={i}
                   type="button"
-                  aria-label={`Go to slide ${i + 1}`}
-                  aria-current={i === index}
-                  className={cn(
-                    "h-2.5 rounded-full bg-white/40 transition-all duration-300 ease-[var(--ease)]",
-                    i === index
-                      ? "w-[26px] rounded-md bg-gold"
-                      : "w-2.5",
+                  className="inline-flex size-9 items-center justify-center rounded-full border border-white/35 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 min-[480px]:size-10"
+                  aria-label={paused ? "Play slideshow" : "Pause slideshow"}
+                  onClick={() => setPaused((p) => !p)}
+                >
+                  {paused || reduceMotion ? (
+                    <Play className="size-3.5 min-[480px]:size-4" />
+                  ) : (
+                    <Pause className="size-3.5 min-[480px]:size-4" />
                   )}
-                  onClick={() => setIndex(i)}
-                />
-              ))}
+                </button>
+                <button
+                  type="button"
+                  className="hidden size-10 items-center justify-center rounded-full border border-white/35 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 min-[720px]:inline-flex"
+                  aria-label="Previous slide"
+                  onClick={() => go(index - 1)}
+                >
+                  <ArrowLeft className="size-4" />
+                </button>
+                <button
+                  type="button"
+                  className="hidden size-10 items-center justify-center rounded-full border border-white/35 bg-white/10 text-white backdrop-blur-sm hover:bg-white/20 min-[720px]:inline-flex"
+                  aria-label="Next slide"
+                  onClick={() => go(index + 1)}
+                >
+                  <ArrowRight className="size-4" />
+                </button>
+              </div>
             </div>
-          </>
-        ) : null}
+          </div>
+        ) : (
+          <div className="pb-[max(0.85rem,env(safe-area-inset-bottom))]" />
+        )}
+      </div>
+
+      <div className="sr-only" aria-live="polite" aria-atomic="true">
+        Slide {index + 1} of {count}: {active.title}
       </div>
 
       <Dialog open={videoOpen} onOpenChange={setVideoOpen}>
         <DialogContent
-          className="w-full max-w-[min(920px,calc(100%-2rem))] overflow-hidden bg-black p-0 sm:max-w-[920px]"
+          className="w-full max-w-[min(920px,calc(100%-1rem))] overflow-hidden bg-black p-0 sm:max-w-[920px]"
           showCloseButton
         >
           <DialogHeader className="sr-only">

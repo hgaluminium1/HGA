@@ -1,5 +1,6 @@
 /**
- * Config-driven public navigation (§23.11).
+ * Config-driven public navigation — allowlists of **built** public routes only.
+ * Runtime filters by published CMS pages / catalog so unpublished links hide.
  * Locale prefix is applied by helpers — paths are locale-relative.
  */
 
@@ -10,10 +11,18 @@ export type NavLink = {
   icon?: "drop" | "ingot" | "billet" | "recycle" | "factory" | "leaf" | "handshake";
 };
 
+export type NavSection = {
+  title: string;
+  href?: string;
+  items: NavLink[];
+};
+
 export type NavGroup = {
   id: string;
   label: string;
   items: NavLink[];
+  /** Column groups for scaled mega menus (Apple/Stripe pattern). */
+  sections?: NavSection[];
   feature?: {
     href: string;
     imageSrc: string;
@@ -25,6 +34,7 @@ export type NavGroup = {
 
 export const localeDefault = "en" as const;
 
+/** Every built public page slug (no invented routes). */
 export const publicPages = [
   { slug: "", title: "Home", description: "HG Aluminium Smelters home" },
   { slug: "about", title: "About HG", description: "About HG Aluminium Smelters" },
@@ -34,13 +44,33 @@ export const publicPages = [
     description: "Company profile and journey",
   },
   {
+    slug: "leadership",
+    title: "Leadership",
+    description: "Board and leadership",
+  },
+  {
+    slug: "capacity",
+    title: "Capacity",
+    description: "Production capacity",
+  },
+  {
+    slug: "customers",
+    title: "Customers",
+    description: "Customer proof",
+  },
+  {
+    slug: "expansion",
+    title: "Expansion",
+    description: "Expansion roadmap",
+  },
+  {
     slug: "products",
     title: "Products",
-    description: "Product overview",
+    description: "Product catalogue",
   },
   {
     slug: "products/extrusion-profiles",
-    title: "Aluminium Extrusion Profiles",
+    title: "Extrusion Profiles",
     description: "Extrusion profiles",
   },
   {
@@ -50,7 +80,7 @@ export const publicPages = [
   },
   {
     slug: "products/ingots-alloys",
-    title: "Aluminium Ingots / Alloys",
+    title: "Ingots & Alloys",
     description: "Ingots and alloys",
   },
   {
@@ -96,78 +126,99 @@ export function localePath(locale: string, slug = "") {
   return clean ? `/${locale}/${clean}` : `/${locale}`;
 }
 
+/**
+ * Product mega-menu allowlist — must match built routes under products/*.
+ * Runtime may replace labels with catalog product names when hydrating.
+ */
+export const productNavAllowlist: NavLink[] = [
+  {
+    label: "Ingots & Alloys",
+    href: "products/ingots-alloys",
+    description: "Remelt ingots and casting alloys",
+    icon: "ingot",
+  },
+  {
+    label: "Aluminium Billets",
+    href: "products/billets",
+    description: "Homogenised extrusion-ready billets",
+    icon: "billet",
+  },
+  {
+    label: "Extrusion Profiles",
+    href: "products/extrusion-profiles",
+    description: "Architectural, industrial and solar profiles",
+    icon: "recycle",
+  },
+];
+
+export const productNavFeatureDefault = {
+  href: "products",
+  imageSrc: "https://picsum.photos/seed/hg-ingots-stack/460/440",
+  imageAlt: "Stacked aluminium ingots",
+  eyebrow: "Full Catalogue",
+  title: "Explore every alloy grade & spec sheet →",
+} as const;
+
+/** @deprecated use resolvePublicNav — kept for Storybook fallbacks */
 export const productNav: NavGroup = {
   id: "products",
   label: "Products",
-  items: [
-    {
-      label: "Aluminium Alloy (Liquid)",
-      href: "products/ingots-alloys",
-      description: "Molten alloy, direct furnace-to-furnace supply",
-      icon: "drop",
-    },
-    {
-      label: "Aluminium Alloy (Ingot)",
-      href: "products/ingots-alloys",
-      description: "Solid ingots cast to LME-grade spec",
-      icon: "ingot",
-    },
-    {
-      label: "Aluminium Billets",
-      href: "products/billets",
-      description: "Extrusion-ready billets, custom diameters",
-      icon: "billet",
-    },
-    {
-      label: "Extrusion Profiles",
-      href: "products/extrusion-profiles",
-      description: "Profiles for industrial applications",
-      icon: "recycle",
-    },
-  ],
-  feature: {
-    href: "products",
-    imageSrc: "https://picsum.photos/seed/hg-ingots-stack/460/440",
-    imageAlt: "Stacked aluminium ingots",
-    eyebrow: "Full Catalogue",
-    title: "Explore every alloy grade & spec sheet →",
-  },
+  items: productNavAllowlist,
+  feature: { ...productNavFeatureDefault },
 };
 
+/** Company mega-menu allowlist — built company routes only. */
+export const companyNavAllowlist: NavLink[] = [
+  { label: "About Us", href: "about" },
+  { label: "Our Journey", href: "journey" },
+  { label: "Leadership", href: "leadership" },
+  { label: "Capacity", href: "capacity" },
+  { label: "Customers", href: "customers" },
+  { label: "Expansion", href: "expansion" },
+  { label: "Quality", href: "quality" },
+  { label: "Infrastructure", href: "manufacturing" },
+  { label: "Sustainability", href: "sustainability" },
+  { label: "Procurement & Export", href: "procurement" },
+  { label: "Careers", href: "careers" },
+  { label: "Resources", href: "resources" },
+];
+
+/** @deprecated use resolvePublicNav */
 export const companyNav: NavGroup = {
   id: "company",
   label: "Company",
-  items: [
-    { label: "About Us", href: "about" },
-    { label: "Our Journey", href: "journey" },
-    { label: "Quality", href: "quality" },
-    { label: "Infrastructure", href: "manufacturing" },
-    { label: "Sustainability", href: "sustainability" },
-    { label: "Procurement & Export", href: "procurement" },
-    { label: "Careers", href: "careers" },
-    { label: "Resources", href: "resources" },
-  ],
+  items: companyNavAllowlist,
 };
 
-export const primaryNavLinks: NavLink[] = [
+export const primaryNavAllowlist: NavLink[] = [
   { label: "Industries", href: "industries" },
   { label: "Contact Us", href: "contact" },
 ];
 
-export const footerQuickLinks: NavLink[] = [
-  { label: "Aluminium Alloy (Ingot)", href: "products/ingots-alloys" },
-  { label: "Aluminium Alloy (Liquid)", href: "products/ingots-alloys" },
-  { label: "Aluminium Billets", href: "products/billets" },
-  { label: "Extrusion Profiles", href: "products/extrusion-profiles" },
+/** @deprecated use resolvePublicNav */
+export const primaryNavLinks: NavLink[] = primaryNavAllowlist;
+
+/** Footer product + utility links share the same allowlists as header. */
+export const footerUtilityAllowlist: NavLink[] = [
   { label: "Careers", href: "careers" },
   { label: "Resources", href: "resources" },
   { label: "Contact / RFQ", href: "contact" },
 ];
 
-export const footerContact = {
+/** @deprecated use resolvePublicNav */
+export const footerQuickLinks: NavLink[] = [
+  ...productNavAllowlist.map(({ label, href }) => ({ label, href })),
+  ...footerUtilityAllowlist,
+];
+
+export const footerContactFallback = {
   address:
-    "HG Aluminium Smelters Ltd., 7th Floor, Tower 2, Business Park, Faridabad, Haryana – 121003, India",
-  email: "info@hgaluminiumsmelters.example",
-  phone: "+91 (000) 000-0000",
-  mapsUrl: "https://www.google.com/maps/search/?api=1&query=Faridabad+Haryana",
+    "Survey No. 671/3, Laxmipura Nandasan, Rajpur, Kadi, Mahesana, Gujarat – 384450, India",
+  email: "sales@hgaluminium.com",
+  phone: "+91 2764 000000",
+  mapsUrl:
+    "https://www.google.com/maps/search/?api=1&query=Laxmipura+Nandasan+Kadi+Mahesana",
 } as const;
+
+/** @deprecated */
+export const footerContact = footerContactFallback;

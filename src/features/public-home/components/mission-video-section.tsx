@@ -32,7 +32,7 @@ export function MissionVideoSection({
       id="home-sustainability"
       className="relative overflow-hidden text-white"
     >
-      <div className="relative min-h-[clamp(380px,60vw,560px)]">
+      <div className="relative min-h-[clamp(20rem,55vw,34rem)]">
         <Image
           src={content.imageSrc}
           alt={content.imageAlt}
@@ -41,30 +41,32 @@ export function MissionVideoSection({
           className="object-cover"
         />
         <div
-          className="absolute inset-0 bg-[linear-gradient(180deg,rgba(20,11,40,0.75),rgba(20,11,40,0.55))]"
+          className="absolute inset-0 bg-[linear-gradient(180deg,rgb(0_18_47_/_0.78),rgb(0_18_47_/_0.58))]"
           aria-hidden
         />
 
-        <div className="absolute inset-0 z-[2] flex flex-col items-center justify-center px-8 text-center">
-          <Reveal className="flex flex-col items-center">
-            <p className="font-display max-w-[22ch] text-[clamp(1.2rem,3vw,2rem)] leading-[1.35]">
+        <div className="absolute inset-0 z-[2] flex flex-col items-center justify-center px-[var(--pad-inline)] text-center">
+          <Reveal className="flex max-w-[40rem] flex-col items-center">
+            <p className="font-display text-balance text-[clamp(1.15rem,0.95rem+1.4vw,1.85rem)] leading-[1.35]">
               {content.statement}
             </p>
-            <button
-              type="button"
-              aria-label="Play company story video"
-              className="animate-pulse-ring mt-8 flex size-[66px] items-center justify-center rounded-full bg-white/95 text-ink transition-transform hover:scale-105"
-              onClick={() => setOpen(true)}
-            >
-              <Play className="ml-0.5 size-[22px] fill-current" />
-            </button>
+            {videoSrc ? (
+              <button
+                type="button"
+                aria-label="Play company story video"
+                className="mt-7 flex size-14 items-center justify-center rounded-full bg-white text-ink shadow-[0_8px_28px_rgb(0_0_0_/_0.35)] transition-transform hover:scale-105 min-[480px]:size-[66px]"
+                onClick={() => setOpen(true)}
+              >
+                <Play className="ml-0.5 size-5 fill-current min-[480px]:size-[22px]" />
+              </button>
+            ) : null}
           </Reveal>
         </div>
       </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent
-          className="w-full max-w-[min(920px,calc(100%-2rem))] overflow-hidden bg-black p-0 sm:max-w-[920px]"
+          className="w-full max-w-[min(920px,calc(100%-1rem))] overflow-hidden bg-black p-0 sm:max-w-[920px]"
           showCloseButton
         >
           <DialogHeader className="sr-only">

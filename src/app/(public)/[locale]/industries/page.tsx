@@ -1,24 +1,15 @@
 import type { Metadata } from "next";
 
-import { PageShell } from "@/components/templates/page-shell";
+import { IndustriesPage } from "@/features/public-site/components/content-pages";
 
-type PageProps = {
-  params: Promise<{ locale: string }>;
-};
+type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
-  title: "Industries & Applications",
-  description:
-    "Where HG alloys power automotive and engineering supply chains.",
+  title: "Industries",
+  description: "Markets and applications we serve with aluminium.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return (
-    <PageShell
-      locale={locale}
-      title="Industries & Applications"
-      description="Where HG alloys power automotive and engineering supply chains."
-    />
-  );
+  return <IndustriesPage locale={locale} />;
 }

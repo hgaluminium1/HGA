@@ -1,3 +1,65 @@
-// Public API for modules/catalog — Phase 0 stub
-export {};
-
+export type {
+  CategoryDTO,
+  DictionaryDTO,
+  DictionaryItemDTO,
+  ProductDTO,
+} from "./types";
+export {
+  DICTIONARY_KEYS,
+  addDictionaryItemSchema,
+  createCategorySchema,
+  createProductSchema,
+  dictionaryKeySchema,
+  moveCategorySchema,
+  reorderCategoriesSchema,
+  updateCategorySchema,
+  updateProductSchema,
+  upsertDictionarySchema,
+  type DictionaryKey,
+} from "./validators/catalog.validators";
+export {
+  IMPORT_MAX_ROWS,
+  capacityMetricRowSchema,
+  categoryRowSchema,
+  dictionaryItemRowSchema,
+  importEntitySchema,
+  productRowSchema,
+  schemaForEntity,
+  type ImportEntity,
+} from "./validators/import.validators";
+export {
+  createCategory,
+  getCategoryById,
+  listCategoriesFlat,
+  listCategoriesTree,
+  moveCategory,
+  purgeCategory,
+  reorderCategories,
+  restoreCategory,
+  softDeleteCategory,
+  updateCategory,
+} from "./services/category.service";
+export {
+  applyScheduledProductPublish,
+  createProduct,
+  duplicateProduct,
+  getProductById,
+  getPublishedProductBySlug,
+  listDueScheduledProducts,
+  listProducts,
+  listPublishedProducts,
+  listUpcomingProducts,
+  publishProduct,
+  purgeProduct,
+  restoreProduct,
+  softDeleteProduct,
+  unpublishProduct,
+  updateProduct,
+} from "./services/product.service";
+export {
+  addDictionaryItem,
+  deactivateDictionaryItem,
+  getDictionary,
+  listDictionaries,
+  upsertDictionary,
+} from "./services/dictionary.service";

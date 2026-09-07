@@ -1,23 +1,15 @@
 import type { Metadata } from "next";
 
-import { PageShell } from "@/components/templates/page-shell";
+import { QualityPage } from "@/features/public-site/components/content-pages";
 
-type PageProps = {
-  params: Promise<{ locale: string }>;
-};
+type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
-  title: "Quality & Certifications",
-  description: "Quality systems, labs, and certifications.",
+  title: "Quality",
+  description: "Quality systems, certifications, and process control.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return (
-    <PageShell
-      locale={locale}
-      title="Quality & Certifications"
-      description="Quality systems, labs, and certifications."
-    />
-  );
+  return <QualityPage locale={locale} />;
 }

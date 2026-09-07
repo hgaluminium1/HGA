@@ -1,0 +1,58 @@
+[
+  {
+    "key": "solar",
+    "label": "Solar",
+    "description": "Module frames, mounting structures, rails and sections for solar parks.",
+    "productFocus": ["aluminium-extrusion-profiles"],
+    "applications": ["Solar module frames", "Mounting structures", "Aluminium rails"]
+  },
+  {
+    "key": "infrastructure",
+    "label": "Infrastructure & construction",
+    "description": "Architectural façades, industrial sections and scaffolding systems.",
+    "productFocus": ["aluminium-extrusion-profiles"],
+    "applications": ["Façade profiles", "Window & door sections", "Metro & infra"]
+  },
+  {
+    "key": "automotive_ev",
+    "label": "Automotive & EV",
+    "description": "Lightweight profiles and foundry alloys for vehicles and battery systems.",
+    "productFocus": ["aluminium-extrusion-profiles", "aluminium-ingots"],
+    "applications": ["Structural profiles", "EV housing sections", "Casting alloys"]
+  },
+  {
+    "key": "industrial",
+    "label": "Industrial & engineering",
+    "description": "Equipment frames, modular systems, panels and heat-sink profiles.",
+    "productFocus": ["aluminium-extrusion-profiles"],
+    "applications": ["Machine frames", "Electrical panels", "Heat sinks"]
+  },
+  {
+    "key": "railways",
+    "label": "Railways & transport",
+    "description": "Extrusion sections for metro and railway applications.",
+    "productFocus": ["aluminium-extrusion-profiles"],
+    "applications": ["Railway profiles", "Transport sections"]
+  },
+  {
+    "key": "cable_electrical",
+    "label": "Cable & electrical",
+    "description": "Alloy and remelt feed for conductors and cable manufacturers.",
+    "productFocus": ["aluminium-ingots"],
+    "applications": ["Conductor alloys", "Transmission-related aluminium"]
+  },
+  {
+    "key": "steel_deox",
+    "label": "Steel & deoxidizer",
+    "description": "Upcoming deox, shots and cubes for steelmaking applications.",
+    "productFocus": ["aluminium-deoxidizer", "aluminium-shots", "aluminium-cubes"],
+    "applications": ["Deoxidizer", "Aluminium shots", "Steel melt additions"]
+  },
+  {
+    "key": "aerospace",
+    "label": "Aerospace & defence",
+    "description": "High-grade alloy pathways for specialised engineering demand.",
+    "productFocus": ["aluminium-ingots"],
+    "applications": ["High-grade alloys", "Specialised castings"]
+  }
+]

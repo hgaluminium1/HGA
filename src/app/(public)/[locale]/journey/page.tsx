@@ -1,23 +1,15 @@
 import type { Metadata } from "next";
 
-import { PageShell } from "@/components/templates/page-shell";
+import { JourneyPage } from "@/features/public-site/components/content-pages";
 
-type PageProps = {
-  params: Promise<{ locale: string }>;
-};
+type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
-  title: "Our Journey / Company Profile",
-  description: "The HG story — milestones, growth, and company profile.",
+  title: "Our journey",
+  description: "Milestones in HG Aluminium’s growth story.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return (
-    <PageShell
-      locale={locale}
-      title="Our Journey / Company Profile"
-      description="The HG story — milestones, growth, and company profile."
-    />
-  );
+  return <JourneyPage locale={locale} />;
 }

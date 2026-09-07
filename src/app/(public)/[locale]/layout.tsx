@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { BackToTop } from "@/components/organisms/back-to-top";
 import { SiteFooter } from "@/components/organisms/site-footer";
 import { SiteHeader } from "@/components/organisms/site-header";
+import { resolvePublicNav } from "@/features/public-site/lib/resolve-public-nav";
 
 type PublicLocaleLayoutProps = {
   children: React.ReactNode;
@@ -18,6 +19,8 @@ export default async function PublicLocaleLayout({
     notFound();
   }
 
+  const nav = await resolvePublicNav(locale);
+
   return (
     <>
       <a
@@ -26,9 +29,18 @@ export default async function PublicLocaleLayout({
       >
         Skip to main content
       </a>
-      <SiteHeader locale={locale} />
+      <SiteHeader
+        locale={locale}
+        productNav={nav.productNav}
+        companyNav={nav.companyNav}
+        primaryNavLinks={nav.primaryNavLinks}
+      />
       <main id="main">{children}</main>
-      <SiteFooter locale={locale} />
+      <SiteFooter
+        locale={locale}
+        quickLinks={nav.footerQuickLinks}
+        contact={nav.footerContact}
+      />
       <BackToTop />
     </>
   );

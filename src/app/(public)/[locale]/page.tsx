@@ -1,4 +1,4 @@
-import { HomePage } from "@/features/public-home";
+import { CmsPageView } from "@/features/public-site";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
@@ -6,5 +6,5 @@ type PageProps = {
 
 export default async function PublicHomeRoute({ params }: PageProps) {
   const { locale } = await params;
-  return <HomePage locale={locale} />;
+  return <CmsPageView locale={locale} slug="home" />;
 }

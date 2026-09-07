@@ -1,23 +1,15 @@
 import type { Metadata } from "next";
 
-import { PageShell } from "@/components/templates/page-shell";
+import { SustainabilityPage } from "@/features/public-site/components/content-pages";
 
-type PageProps = {
-  params: Promise<{ locale: string }>;
-};
+type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
-  title: "Sustainability / ESG",
-  description: "Recycling impact, ESG commitments, and responsible growth.",
+  title: "Sustainability",
+  description: "Recycling, environment, and responsible operations.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return (
-    <PageShell
-      locale={locale}
-      title="Sustainability / ESG"
-      description="Recycling impact, ESG commitments, and responsible growth."
-    />
-  );
+  return <SustainabilityPage locale={locale} />;
 }

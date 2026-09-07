@@ -1,23 +1,19 @@
 import type { Metadata } from "next";
 
-import { PageShell } from "@/components/templates/page-shell";
+import { ContactPage } from "@/features/public-site/components/content-pages";
 
 type PageProps = {
   params: Promise<{ locale: string }>;
+  searchParams: Promise<{ product?: string }>;
 };
 
 export const metadata: Metadata = {
-  title: "Contact Us / RFQ",
-  description: "Reach HG Aluminium or submit an RFQ.",
+  title: "Contact / RFQ",
+  description: "Enquire about alloys, capacity, or partnerships.",
 };
 
-export default async function Page({ params }: PageProps) {
+export default async function Page({ params, searchParams }: PageProps) {
   const { locale } = await params;
-  return (
-    <PageShell
-      locale={locale}
-      title="Contact Us / RFQ"
-      description="Reach HG Aluminium or submit an RFQ."
-    />
-  );
+  const { product } = await searchParams;
+  return <ContactPage locale={locale} defaultProduct={product} />;
 }

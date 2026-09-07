@@ -52,6 +52,14 @@
   --color-brand-accent: var(--brand-accent);
   --color-brand-accent-dark: var(--brand-accent-dark);
   --color-brand-accent-light: var(--brand-accent-light);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-blue-dark: var(--brand-blue-dark);
+  --color-brand-blue-darker: var(--brand-blue-darker);
+  --color-brand-blue-light: var(--brand-blue-light);
+  --color-brand-red: var(--brand-red);
+  --color-brand-red-dark: var(--brand-red-dark);
+  --color-brand-red-light: var(--brand-red-light);
+  --color-brand-cta: var(--brand-cta);
   --color-gold: var(--gold);
   --color-violet-700: var(--violet-700);
   --color-violet-800: var(--violet-800);
@@ -155,6 +163,15 @@
   }
 }
 
+@keyframes hero-progress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
 .animate-pulse-ring {
   animation: pulse-ring 2.4s ease-out infinite;
 }
@@ -162,5 +179,14 @@
 @media (prefers-reduced-motion: reduce) {
   .animate-pulse-ring {
     animation: none;
+  }
+
+  @keyframes hero-progress {
+    from {
+      width: 0%;
+    }
+    to {
+      width: 0%;
+    }
   }
 }

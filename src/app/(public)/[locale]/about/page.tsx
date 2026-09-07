@@ -1,24 +1,16 @@
 import type { Metadata } from "next";
 
-import { PageShell } from "@/components/templates/page-shell";
+import { AboutPage } from "@/features/public-site/components/content-pages";
 
-type PageProps = {
-  params: Promise<{ locale: string }>;
-};
+type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
   title: "About HG",
   description:
-    "Company overview, leadership, and what HG Aluminium stands for.",
+    "Company overview, identity, and what HG Aluminium stands for.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return (
-    <PageShell
-      locale={locale}
-      title="About HG"
-      description="Company overview, leadership, and what HG Aluminium stands for."
-    />
-  );
+  return <AboutPage locale={locale} />;
 }

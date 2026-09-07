@@ -1,0 +1,107 @@
+import { z } from "zod";
+
+export const localizedStringSchema = z.object({
+  en: z.string().min(1),
+});
+
+export const catalogStatusSchema = z.enum(["draft", "published"]);
+export const productStatusSchema = z.enum(["draft", "scheduled", "published"]);
+
+export const DICTIONARY_KEYS = [
+  "alloy_grade",
+  "temper",
+  "surface_finish",
+  "anodizing_color",
+  "ral_color",
+  "tolerance_standard",
+  "packaging",
+] as const;
+
+export type DictionaryKey = (typeof DICTIONARY_KEYS)[number];
+
+export const dictionaryKeySchema = z.enum(DICTIONARY_KEYS);
+
+export const dictionaryItemSchema = z.object({
+  value: z.string().min(1),
+  label: localizedStringSchema,
+  sortOrder: z.number().int().default(0),
+  active: z.boolean().default(true),
+});
+
+export const createCategorySchema = z.object({
+  name: localizedStringSchema,
+  slug: z.string().min(1),
+  parentId: z.string().nullable().optional(),
+  description: localizedStringSchema.partial().optional(),
+  imageUrl: z.string().optional(),
+  order: z.number().int().optional(),
+  status: catalogStatusSchema.optional(),
+});
+
+export const updateCategorySchema = z.object({
+  name: localizedStringSchema.optional(),
+  slug: z.string().min(1).optional(),
+  description: localizedStringSchema.partial().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
+  order: z.number().int().optional(),
+  status: catalogStatusSchema.optional(),
+  version: z.number().int(),
+});
+
+export const reorderCategoriesSchema = z.object({
+  parentId: z.string().nullable(),
+  orderedIds: z.array(z.string().min(1)).min(1),
+});
+
+export const moveCategorySchema = z.object({
+  parentId: z.string().nullable(),
+  version: z.number().int(),
+});
+
+export const createProductSchema = z.object({
+  sku: z.string().min(1),
+  name: localizedStringSchema,
+  slug: z.string().min(1),
+  categoryIds: z.array(z.string()).default([]),
+  alloyGrades: z.array(z.string()).default([]),
+  tempers: z.array(z.string()).default([]),
+  surfaceFinishes: z.array(z.string()).default([]),
+  anodizingColors: z.array(z.string()).default([]),
+  ralColors: z.array(z.string()).default([]),
+  toleranceStandards: z.array(z.string()).default([]),
+  packaging: z.array(z.string()).default([]),
+  maxLengthMm: z.number().optional(),
+  minLengthMm: z.number().optional(),
+  maxWidthMm: z.number().optional(),
+  weightPerMeterKg: z.number().optional(),
+  description: z.string().optional(),
+  imageUrl: z.string().optional(),
+  imageMediaId: z.string().nullable().optional(),
+  drawingMediaIds: z.array(z.string()).optional(),
+  blocks: z.array(z.unknown()).optional(),
+  seo: z
+    .object({ title: z.string().optional(), description: z.string().optional() })
+    .optional(),
+  status: productStatusSchema.optional(),
+  scheduledPublishAt: z.string().datetime().nullable().optional(),
+  isUpcoming: z.boolean().optional(),
+  createRedirectOnSlugChange: z.boolean().optional(),
+});
+
+export const updateProductSchema = createProductSchema
+  .partial()
+  .extend({
+    version: z.number().int(),
+  });
+
+export const upsertDictionarySchema = z.object({
+  key: dictionaryKeySchema,
+  items: z.array(dictionaryItemSchema),
+  version: z.number().int().optional(),
+});
+
+export const addDictionaryItemSchema = z.object({
+  key: dictionaryKeySchema,
+  item: dictionaryItemSchema,
+  version: z.number().int(),
+});

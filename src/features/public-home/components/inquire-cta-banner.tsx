@@ -15,14 +15,17 @@ export function InquireCtaBanner({ locale, content }: InquireCtaBannerProps) {
   return (
     <section
       data-block="cta-banner"
-      className="bg-[linear-gradient(120deg,var(--maroon-800),var(--maroon-700))]"
+      className="bg-[linear-gradient(120deg,var(--brand-red-dark),var(--brand-red))]"
     >
       <Container>
-        <Reveal className="flex flex-col items-start justify-between gap-6 py-[2.6rem] min-[760px]:flex-row min-[760px]:items-center">
-          <h3 className="font-display max-w-[24ch] text-[clamp(1.25rem,2.4vw,1.7rem)] font-semibold text-white">
+        <Reveal className="flex flex-col items-stretch gap-5 py-[clamp(2rem,4vw,2.75rem)] min-[720px]:flex-row min-[720px]:items-center min-[720px]:justify-between">
+          <h3 className="font-display max-w-[28ch] text-[clamp(1.2rem,1rem+1vw,1.65rem)] font-semibold text-balance text-white">
             {content.title}
           </h3>
-          <Button render={<Link href={localePath(locale, content.ctaHref)} />}>
+          <Button
+            className="w-full shrink-0 bg-white text-brand-red-dark hover:bg-white/95 min-[420px]:w-auto"
+            render={<Link href={localePath(locale, content.ctaHref)} />}
+          >
             {content.ctaLabel}
           </Button>
         </Reveal>

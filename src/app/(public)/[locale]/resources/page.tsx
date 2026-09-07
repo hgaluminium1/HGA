@@ -1,23 +1,15 @@
 import type { Metadata } from "next";
 
-import { PageShell } from "@/components/templates/page-shell";
+import { ResourcesPage } from "@/features/public-site/components/content-pages";
 
-type PageProps = {
-  params: Promise<{ locale: string }>;
-};
+type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
-  title: "Resources / Downloads",
-  description: "Spec sheets, brochures, and downloadable resources.",
+  title: "Resources",
+  description: "Request datasheets, certificates, and technical packs.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return (
-    <PageShell
-      locale={locale}
-      title="Resources / Downloads"
-      description="Spec sheets, brochures, and downloadable resources."
-    />
-  );
+  return <ResourcesPage locale={locale} />;
 }

@@ -1,23 +1,15 @@
 import type { Metadata } from "next";
 
-import { PageShell } from "@/components/templates/page-shell";
+import { ProcurementPage } from "@/features/public-site/components/content-pages";
 
-type PageProps = {
-  params: Promise<{ locale: string }>;
-};
+type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
-  title: "Global Procurement & Export",
-  description: "Procurement partnerships and export capability.",
+  title: "Procurement",
+  description: "Buyer path for domestic and export aluminium programmes.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return (
-    <PageShell
-      locale={locale}
-      title="Global Procurement & Export"
-      description="Procurement partnerships and export capability."
-    />
-  );
+  return <ProcurementPage locale={locale} />;
 }
