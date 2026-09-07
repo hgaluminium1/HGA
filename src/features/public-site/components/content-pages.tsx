@@ -1,7 +1,9 @@
+import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/atoms/container";
 import { Section } from "@/components/atoms/section";
+import { buttonVariants } from "@/components/ui/button";
 import {
   CertGridBlock,
   CompanyFactsBlock,
@@ -9,6 +11,8 @@ import {
   StatsBlock,
   SustainabilityMetricsBlock,
 } from "@/features/public-corporate";
+import { CatalogueBreadcrumbs } from "@/features/public-catalog/components/catalogue-breadcrumbs";
+import { categoryImageUrl } from "@/features/public-catalog/lib/product-media";
 import { EnquiryForm } from "@/features/public-site/components/enquiry-form";
 import { InquireBand } from "@/features/public-site/components/inquire-band";
 import {
@@ -23,6 +27,7 @@ import {
 import { getCachedCompanyProfile } from "@/features/public-corporate/lib/public-cache";
 import { localePath } from "@/config/nav.config";
 import { listCategoriesFlat } from "@/modules/catalog";
+import { cn } from "@/lib/utils";
 
 export async function AboutPage({ locale }: { locale: string }) {
   return (
@@ -460,20 +465,76 @@ export async function CategoryLandingPage({
   categorySlugs: string[];
 }) {
   const cats = await listCategoriesFlat();
-  const matchIds = cats
-    .filter((c) => categorySlugs.includes(c.slug))
-    .map((c) => c.id);
+  const matched = cats.filter((c) => categorySlugs.includes(c.slug));
+  const matchIds = matched.map((c) => c.id);
+  const heroImage = categoryImageUrl(
+    slug.startsWith("products/") ? slug : `products/${slug}`,
+  );
+
   return (
     <>
-      <PageHero
-        locale={locale}
-        title={title}
-        description={description}
-        secondaryLabel="All products"
-        secondaryHref="products"
-      />
+      <section className="relative overflow-hidden bg-[linear-gradient(125deg,var(--brand-blue-darker)_0%,var(--ink)_50%,var(--brand-blue-dark)_100%)] text-white">
+        <Container className="relative grid gap-8 py-[clamp(2.5rem,6vw,4.25rem)] min-[900px]:grid-cols-[1.15fr_0.85fr] min-[900px]:items-end">
+          <div>
+            <CatalogueBreadcrumbs
+              locale={locale}
+              items={[
+                { label: "Catalogue", href: "products" },
+                { label: title },
+              ]}
+              tone="dark"
+              className="mb-5"
+            />
+            <p className="text-[0.72rem] font-bold tracking-[0.14em] text-brand-red uppercase">
+              Category
+            </p>
+            <h1 className="font-display mt-2.5 max-w-[16ch] text-[clamp(1.85rem,1.3rem+2.2vw,3.25rem)] font-semibold leading-[1.08]">
+              {title}
+            </h1>
+            <p className="text-on-dark-muted mt-3.5 max-w-[40rem] text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] leading-relaxed">
+              {description}
+            </p>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <Link
+                href={localePath(locale, "contact")}
+                className={cn(buttonVariants({ variant: "default" }), "min-h-11")}
+              >
+                Inquire
+              </Link>
+              <Link
+                href={localePath(locale, "products")}
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "min-h-11 border-white/35 bg-transparent text-white hover:bg-white/10",
+                )}
+              >
+                All products
+              </Link>
+            </div>
+          </div>
+          <div className="relative hidden aspect-[16/11] overflow-hidden rounded-[var(--radius-lg)] min-[900px]:block">
+            <Image
+              src={heroImage}
+              alt={title}
+              fill
+              sizes="28rem"
+              className="object-cover"
+              priority
+            />
+          </div>
+        </Container>
+      </section>
+
       <Section>
         <Container>
+          <div className="mb-8">
+            <p className="text-[0.7rem] font-bold tracking-[0.12em] text-brand-blue uppercase">
+              Present lines
+            </p>
+            <h2 className="font-display mt-1.5 text-xl font-semibold text-ink">
+              Published in this category
+            </h2>
+          </div>
           <PresentProductsGrid
             locale={locale}
             categoryIds={matchIds}
@@ -487,7 +548,7 @@ export async function CategoryLandingPage({
           <p className="mt-8 text-sm">
             <Link
               href={localePath(locale, "products")}
-              className="text-brand-accent font-semibold hover:underline"
+              className="text-brand-blue font-semibold hover:underline"
             >
               Browse full catalogue →
             </Link>

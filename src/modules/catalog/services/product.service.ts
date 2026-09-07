@@ -218,6 +218,19 @@ export async function updateProduct(
   }
 
   if (data.status === "published") {
+    const upcoming = Boolean(existing.isUpcoming);
+    const hasImage = Boolean(
+      (typeof existing.imageUrl === "string" && existing.imageUrl.trim()) ||
+        (typeof existing.imageMediaId === "string" &&
+          existing.imageMediaId.trim()),
+    );
+    if (!upcoming && !hasImage) {
+      return {
+        error: "IMAGE_REQUIRED" as const,
+        message:
+          "Present catalogue products need a photo before publish. Upload in Media and attach it on the Basic tab.",
+      };
+    }
     existing.publishedAt = new Date();
     existing.publishedVersion = {
       name: existing.name,

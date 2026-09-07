@@ -56,7 +56,7 @@ export function EnquiryForm({
   }
 
   const field =
-    "border-line bg-surface mt-1.5 min-h-11 w-full rounded-[var(--radius-md)] border px-3 text-sm outline-none focus:border-brand-accent";
+    "border-line bg-surface mt-1.5 min-h-11 w-full rounded-[var(--radius-md)] border px-3 text-sm outline-none focus:border-brand-blue";
 
   return (
     <form onSubmit={onSubmit} className={className}>

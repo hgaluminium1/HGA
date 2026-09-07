@@ -1,5 +1,6 @@
 import {
   companyNavAllowlist,
+  footerCompanyAllowlist,
   footerContactFallback,
   footerUtilityAllowlist,
   primaryNavAllowlist,
@@ -13,17 +14,27 @@ import { getCachedPublishedPage } from "@/features/public-site/lib/public-cache"
 import { getCachedCompanyProfile } from "@/features/public-corporate/lib/public-cache";
 import { getCachedPublishedProducts } from "@/features/public-site/lib/public-cache";
 
-export type PublicNavResolved = {
-  productNav: NavGroup;
-  companyNav: NavGroup;
-  primaryNavLinks: NavLink[];
-  footerQuickLinks: NavLink[];
-  footerContact: {
+export type PublicNavFooter = {
+  /** Category landings + View full catalogue — never individual SKUs. */
+  products: NavLink[];
+  company: NavLink[];
+  support: NavLink[];
+  contact: {
     address: string;
     email: string;
     phone: string;
     mapsUrl: string;
   };
+};
+
+export type PublicNavResolved = {
+  productNav: NavGroup;
+  companyNav: NavGroup;
+  primaryNavLinks: NavLink[];
+  footer: PublicNavFooter;
+  /** @deprecated Prefer `footer` columns — flat list for legacy callers. */
+  footerQuickLinks: NavLink[];
+  footerContact: PublicNavFooter["contact"];
 };
 
 async function publishedSlugs(slugs: string[], locale: string) {
@@ -80,8 +91,11 @@ const COMPANY_SECTIONS: { title: string; hrefs: string[] }[] = [
 
 /**
  * Resolve header + footer nav from allowlists ∩ published content.
- * Product mega-menu uses category columns + capped featured lines
- * (not an unbounded product dump — scales like Apple/Stripe mega menus).
+ *
+ * IA rules (category-first, FAANG/industrial chrome):
+ * - Categories are the browse spine in mega + footer.
+ * - Present / upcoming SKUs are capped in the mega only (not footer).
+ * - Footer = durable Products (categories) + Company + Support.
  */
 export async function resolvePublicNav(
   locale = "en",
@@ -89,6 +103,7 @@ export async function resolvePublicNav(
   const companySlugs = companyNavAllowlist.map((i) => i.href);
   const productPageSlugs = productNavAllowlist.map((i) => i.href);
   const primarySlugs = primaryNavAllowlist.map((i) => i.href);
+  const footerCompanySlugs = footerCompanyAllowlist.map((i) => i.href);
   const utilitySlugs = footerUtilityAllowlist.map((i) => i.href);
 
   const [live, present, upcoming, company] = await Promise.all([
@@ -98,6 +113,7 @@ export async function resolvePublicNav(
           ...companySlugs,
           ...productPageSlugs,
           ...primarySlugs,
+          ...footerCompanySlugs,
           ...utilitySlugs,
           "products",
         ]),
@@ -113,6 +129,9 @@ export async function resolvePublicNav(
   const primaryNavLinks = primaryNavAllowlist.filter((i) => live.has(i.href));
 
   const categoryItems = productNavAllowlist.filter((i) => live.has(i.href));
+  const categoriesForNav = categoryItems.length
+    ? categoryItems
+    : productNavAllowlist.slice(0, 3);
 
   const presentLinks: NavLink[] = present.items.slice(0, 4).map((p) => ({
     label: p.name.en,
@@ -130,9 +149,7 @@ export async function resolvePublicNav(
     {
       title: "Shop by category",
       href: live.has("products") ? "products" : undefined,
-      items: categoryItems.length
-        ? categoryItems
-        : productNavAllowlist.slice(0, 3),
+      items: categoriesForNav,
     },
   ];
 
@@ -157,11 +174,19 @@ export async function resolvePublicNav(
     items: companyItems.filter((i) => sec.hrefs.includes(i.href)),
   })).filter((sec) => sec.items.length > 0);
 
-  const footerProductLinks = presentLinks.length
-    ? presentLinks.slice(0, 3).map(({ label, href }) => ({ label, href }))
-    : categoryItems.map(({ label, href }) => ({ label, href }));
+  const footerProducts: NavLink[] = [
+    ...categoriesForNav.map(({ label, href, description }) => ({
+      label,
+      href,
+      description,
+    })),
+    ...(live.has("products")
+      ? [{ label: "View full catalogue", href: "products" }]
+      : []),
+  ];
 
-  const footerUtility = footerUtilityAllowlist.filter((i) => live.has(i.href));
+  const footerCompany = footerCompanyAllowlist.filter((i) => live.has(i.href));
+  const footerSupport = footerUtilityAllowlist.filter((i) => live.has(i.href));
 
   const office = company?.registeredOffice ?? company?.factoryAddress;
   const phone = company?.phones?.[0]?.number ?? footerContactFallback.phone;
@@ -171,11 +196,25 @@ export async function resolvePublicNav(
     : footerContactFallback.address;
   const mapsQuery = encodeURIComponent(address);
 
+  const footerContact = {
+    address,
+    email,
+    phone,
+    mapsUrl: `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`,
+  };
+
+  const footer: PublicNavFooter = {
+    products: footerProducts,
+    company: footerCompany,
+    support: footerSupport,
+    contact: footerContact,
+  };
+
   return {
     productNav: {
       id: "products",
       label: "Products",
-      items: categoryItems.length ? categoryItems : presentLinks,
+      items: categoriesForNav,
       sections: productSections,
       feature: {
         ...productNavFeatureDefault,
@@ -191,12 +230,12 @@ export async function resolvePublicNav(
       sections: companySections,
     },
     primaryNavLinks,
-    footerQuickLinks: [...footerProductLinks, ...footerUtility],
-    footerContact: {
-      address,
-      email,
-      phone,
-      mapsUrl: `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`,
-    },
+    footer,
+    footerQuickLinks: [
+      ...footer.products,
+      ...footer.company,
+      ...footer.support,
+    ],
+    footerContact,
   };
 }

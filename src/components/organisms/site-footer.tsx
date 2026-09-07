@@ -4,31 +4,84 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import { Container } from "@/components/atoms/container";
 import { BrandLockup } from "@/components/molecules/brand-lockup";
 import {
+  footerCompanyAllowlist,
   footerContactFallback,
-  footerQuickLinks as defaultFooterQuickLinks,
+  footerUtilityAllowlist,
   localePath,
+  productNavAllowlist,
   type NavLink,
 } from "@/config/nav.config";
 
+type FooterContact = {
+  address: string;
+  email: string;
+  phone: string;
+  mapsUrl: string;
+};
+
 type SiteFooterProps = {
   locale: string;
+  products?: NavLink[];
+  company?: NavLink[];
+  support?: NavLink[];
+  contact?: FooterContact;
+  /** @deprecated Prefer products/company/support columns. */
   quickLinks?: NavLink[];
-  contact?: {
-    address: string;
-    email: string;
-    phone: string;
-    mapsUrl: string;
-  };
   blurb?: string;
 };
 
+function FooterColumn({
+  title,
+  links,
+  locale,
+}: {
+  title: string;
+  links: NavLink[];
+  locale: string;
+}) {
+  if (!links.length) return null;
+  return (
+    <div>
+      <h5 className="font-display mb-4 text-sm font-semibold tracking-wide text-white uppercase">
+        {title}
+      </h5>
+      <ul className="space-y-2">
+        {links.map((link) => (
+          <li key={link.href + link.label}>
+            <Link
+              href={localePath(locale, link.href)}
+              className="text-on-dark-muted hover:text-white text-sm transition-colors"
+            >
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+const defaultProducts: NavLink[] = [
+  ...productNavAllowlist.map(({ label, href }) => ({ label, href })),
+  { label: "View full catalogue", href: "products" },
+];
+
 export function SiteFooter({
   locale,
-  quickLinks = defaultFooterQuickLinks,
+  products = defaultProducts,
+  company = footerCompanyAllowlist,
+  support = footerUtilityAllowlist,
   contact = footerContactFallback,
+  quickLinks,
   blurb = "Aluminium extrusion, billets and remelt alloys from Kadi, Gujarat — serving architectural, industrial and solar markets across India.",
 }: SiteFooterProps) {
   const year = new Date().getFullYear();
+
+  /** Legacy flat quickLinks: put them under Products if structured columns omitted. */
+  const productLinks =
+    products.length > 0
+      ? products
+      : (quickLinks?.length ? quickLinks : defaultProducts);
 
   return (
     <footer id="site-footer" className="bg-ink text-on-dark">
@@ -38,77 +91,68 @@ export function SiteFooter({
           <p className="text-on-dark-muted text-sm leading-relaxed">{blurb}</p>
         </div>
 
-        <div>
-          <h5 className="font-display mb-4 text-sm font-semibold tracking-wide text-white uppercase">
-            Quick Links
-          </h5>
-          <ul className="space-y-2">
-            {quickLinks.map((link) => (
-              <li key={link.href + link.label}>
-                <Link
-                  href={localePath(locale, link.href)}
-                  className="text-on-dark-muted hover:text-white text-sm transition-colors"
-                >
-                  {link.label}
-                </Link>
+        <FooterColumn title="Products" links={productLinks} locale={locale} />
+
+        <div className="space-y-8">
+          <FooterColumn title="Company" links={company} locale={locale} />
+          <FooterColumn title="Support" links={support} locale={locale} />
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <h5 className="font-display mb-4 text-sm font-semibold tracking-wide text-white uppercase">
+              Contact Us
+            </h5>
+            <ul className="text-on-dark-muted space-y-3 text-sm">
+              <li className="flex gap-2">
+                <MapPin className="mt-0.5 size-4 shrink-0 text-brand-red" />
+                <span>{contact.address}</span>
               </li>
-            ))}
-          </ul>
-        </div>
+              <li className="flex gap-2">
+                <Mail className="mt-0.5 size-4 shrink-0 text-brand-red" />
+                <a
+                  href={`mailto:${contact.email}`}
+                  className="hover:text-white"
+                >
+                  {contact.email}
+                </a>
+              </li>
+              <li className="flex gap-2">
+                <Phone className="mt-0.5 size-4 shrink-0 text-brand-red" />
+                <a
+                  href={`tel:${contact.phone.replace(/\s/g, "")}`}
+                  className="hover:text-white"
+                >
+                  {contact.phone}
+                </a>
+              </li>
+            </ul>
+          </div>
 
-        <div>
-          <h5 className="font-display mb-4 text-sm font-semibold tracking-wide text-white uppercase">
-            Contact Us
-          </h5>
-          <ul className="text-on-dark-muted space-y-3 text-sm">
-            <li className="flex gap-2">
-              <MapPin className="mt-0.5 size-4 shrink-0 text-brand-red" />
-              <span>{contact.address}</span>
-            </li>
-            <li className="flex gap-2">
-              <Mail className="mt-0.5 size-4 shrink-0 text-brand-red" />
+          <div>
+            <h5 className="font-display mb-3 text-sm font-semibold tracking-wide text-white uppercase">
+              Find Us
+            </h5>
+            <div className="relative flex h-36 items-end overflow-hidden rounded-[var(--radius-md)] bg-brand-blue-darker p-3">
+              <div
+                className="pointer-events-none absolute inset-0 opacity-35"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(to right, rgb(255 255 255 / 20%) 1px, transparent 1px), linear-gradient(to bottom, rgb(255 255 255 / 20%) 1px, transparent 1px)",
+                  backgroundSize: "20px 20px",
+                }}
+                aria-hidden
+              />
+              <MapPin className="absolute top-1/2 left-1/2 size-6 -translate-x-1/2 -translate-y-1/2 text-brand-red" />
               <a
-                href={`mailto:${contact.email}`}
-                className="hover:text-white"
+                href={contact.mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative z-10 rounded-full bg-brand-red px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-red-dark"
               >
-                {contact.email}
+                Open in Maps
               </a>
-            </li>
-            <li className="flex gap-2">
-              <Phone className="mt-0.5 size-4 shrink-0 text-brand-red" />
-              <a
-                href={`tel:${contact.phone.replace(/\s/g, "")}`}
-                className="hover:text-white"
-              >
-                {contact.phone}
-              </a>
-            </li>
-          </ul>
-        </div>
-
-        <div>
-          <h5 className="font-display mb-4 text-sm font-semibold tracking-wide text-white uppercase">
-            Find Us
-          </h5>
-          <div className="relative flex h-40 items-end overflow-hidden rounded-[var(--radius-md)] bg-brand-blue-darker p-3">
-            <div
-              className="pointer-events-none absolute inset-0 opacity-35"
-              style={{
-                backgroundImage:
-                  "linear-gradient(to right, rgb(255 255 255 / 20%) 1px, transparent 1px), linear-gradient(to bottom, rgb(255 255 255 / 20%) 1px, transparent 1px)",
-                backgroundSize: "20px 20px",
-              }}
-              aria-hidden
-            />
-            <MapPin className="absolute top-1/2 left-1/2 size-6 -translate-x-1/2 -translate-y-1/2 text-brand-red" />
-            <a
-              href={contact.mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="relative z-10 rounded-full bg-brand-red px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-red-dark"
-            >
-              Open in Maps
-            </a>
+            </div>
           </div>
         </div>
       </Container>

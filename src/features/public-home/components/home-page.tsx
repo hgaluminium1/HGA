@@ -9,6 +9,7 @@ import { MissionVideoSection } from "@/features/public-home/components/mission-v
 import { ProductsSection } from "@/features/public-home/components/products-section";
 import { TestimonialsCarousel } from "@/features/public-home/components/testimonials-carousel";
 import { homeContentEn } from "@/features/public-home/content/home.en";
+import { productImageUrl } from "@/features/public-catalog/lib/product-media";
 import { getCachedPublishedProducts } from "@/features/public-site/lib/public-cache";
 
 type HomePageProps = {
@@ -26,8 +27,7 @@ export async function HomePage({ locale }: HomePageProps) {
     items: items.map((p, index) => ({
       title: p.name.en,
       href: `products/${p.slug}`,
-      imageSrc:
-        p.imageUrl || `https://picsum.photos/seed/hg-${p.slug}/700/562`,
+      imageSrc: productImageUrl(p),
       imageAlt: p.name.en,
       wide: index === items.length - 1 && items.length % 2 === 1,
     })),

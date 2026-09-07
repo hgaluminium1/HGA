@@ -882,10 +882,45 @@ async function seedProducts() {
 
   for (const p of products) {
     const found = existing.items.find((x) => x.slug === p.slug);
+    const imageUrl =
+      p.slug === "aluminium-ingots"
+        ? "/products/aluminium-ingots.jpg"
+        : p.slug === "aluminium-homogenized-billets"
+          ? "/products/aluminium-billets.jpg"
+          : p.slug === "aluminium-extrusion-profiles"
+            ? "/products/extrusion-profiles.jpg"
+            : p.slug === "aluminium-cubes"
+              ? "/products/aluminium-cubes.jpg"
+              : p.slug === "aluminium-shots"
+                ? "/products/aluminium-shots.jpg"
+                : p.slug === "aluminium-deoxidizer"
+                  ? "/products/aluminium-deoxidizer.jpg"
+                  : undefined;
     if (found) {
+      const categoryIds = p.categorySlugs
+        .map(bySlug)
+        .filter((id): id is string => Boolean(id));
       const updated = await updateProduct(found.id, {
         isUpcoming: p.isUpcoming,
         description: p.description,
+        alloyGrades: p.alloyGrades,
+        tempers: p.tempers,
+        surfaceFinishes: p.surfaceFinishes,
+        anodizingColors: p.anodizingColors,
+        ralColors: p.ralColors,
+        toleranceStandards: p.toleranceStandards,
+        packaging: p.packaging,
+        ...(p.maxLengthMm != null ? { maxLengthMm: p.maxLengthMm } : {}),
+        ...(p.maxWidthMm != null ? { maxWidthMm: p.maxWidthMm } : {}),
+        ...(p.weightPerMeterKg != null
+          ? { weightPerMeterKg: p.weightPerMeterKg }
+          : {}),
+        categoryIds,
+        imageUrl: imageUrl ?? found.imageUrl ?? undefined,
+        seo: {
+          title: p.name.en,
+          description: p.description,
+        },
         version: found.version,
       });
       if ("product" in updated && updated.product) {
@@ -922,6 +957,11 @@ async function seedProducts() {
       weightPerMeterKg: p.weightPerMeterKg,
       description: p.description,
       isUpcoming: p.isUpcoming,
+      imageUrl,
+      seo: {
+        title: p.name.en,
+        description: p.description,
+      },
       status: "draft",
     });
     const published = await publishProduct(created.id, created.version);

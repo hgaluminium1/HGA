@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 
 import { ProductDetail } from "@/features/public-catalog";
+import { getCachedPublishedProductBySlug } from "@/features/public-site/lib/public-cache";
 
 type PageProps = {
   params: Promise<{ locale: string; slug: string }>;
@@ -10,9 +11,30 @@ export async function generateMetadata({
   params,
 }: PageProps): Promise<Metadata> {
   const { slug } = await params;
+  const product = await getCachedPublishedProductBySlug(slug);
+  if (!product) {
+    return {
+      title: "Product",
+      description: "Product details from the HG catalogue.",
+    };
+  }
+
+  const title = product.seo?.title?.trim() || product.name.en;
+  const description =
+    product.seo?.description?.trim() ||
+    product.description?.trim() ||
+    `${product.name.en} (${product.sku}) — HG Aluminium catalogue.`;
+
   return {
-    title: slug,
-    description: "Product details from the HG catalogue.",
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      ...(product.imageUrl
+        ? { images: [{ url: product.imageUrl, alt: product.name.en }] }
+        : {}),
+    },
   };
 }
 

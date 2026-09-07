@@ -19,13 +19,16 @@ export function InquireBand({
   ctaHref = "contact",
 }: InquireBandProps) {
   return (
-    <section className="bg-[linear-gradient(120deg,var(--maroon-800),var(--maroon-700))]">
+    <section className="bg-[linear-gradient(120deg,var(--brand-red-dark),var(--brand-red))]">
       <Container>
-        <Reveal className="flex flex-col items-start justify-between gap-6 py-[2.4rem] min-[760px]:flex-row min-[760px]:items-center">
-          <h2 className="font-display max-w-[28ch] text-[clamp(1.2rem,2.2vw,1.65rem)] font-semibold text-white">
+        <Reveal className="flex flex-col items-stretch gap-5 py-[clamp(1.75rem,3.5vw,2.4rem)] min-[720px]:flex-row min-[720px]:items-center min-[720px]:justify-between">
+          <h2 className="font-display max-w-[28ch] text-[clamp(1.2rem,1rem+1vw,1.65rem)] font-semibold text-balance text-white">
             {title}
           </h2>
-          <Button render={<Link href={localePath(locale, ctaHref)} />}>
+          <Button
+            className="w-full shrink-0 bg-white text-brand-red-dark hover:bg-white/95 min-[420px]:w-auto"
+            render={<Link href={localePath(locale, ctaHref)} />}
+          >
             {ctaLabel}
           </Button>
         </Reveal>

@@ -24,6 +24,15 @@ export async function POST(req: Request, ctx: Ctx) {
         ? await unpublishProduct(id, body.version)
         : await publishProduct(id, body.version);
     if ("error" in result) {
+      if (result.error === "IMAGE_REQUIRED") {
+        return respondError(
+          "IMAGE_REQUIRED",
+          "message" in result && typeof result.message === "string"
+            ? result.message
+            : "Present products require an image before publish. Upload in Media and attach it on the Basic tab.",
+          400,
+        );
+      }
       return respondError("NOT_FOUND", "Product not found", 404);
     }
     revalidateProducts();

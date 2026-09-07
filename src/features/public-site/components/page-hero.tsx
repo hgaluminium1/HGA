@@ -15,8 +15,13 @@ type PageHeroProps = {
   secondaryLabel?: string;
   secondaryHref?: string;
   tone?: "brand" | "ink";
+  /** Hide primary CTA when page has its own action pattern. */
+  showCta?: boolean;
 };
 
+/**
+ * Shared inner-page hero — logo blue/red family (synced with site chrome).
+ */
 export function PageHero({
   locale,
   eyebrow = "HG Aluminium",
@@ -27,55 +32,60 @@ export function PageHero({
   secondaryLabel,
   secondaryHref,
   tone = "brand",
+  showCta = true,
 }: PageHeroProps) {
   return (
     <section
       className={cn(
-        "relative overflow-hidden",
+        "relative overflow-hidden text-white",
         tone === "brand"
-          ? "bg-[linear-gradient(135deg,var(--violet-900)_0%,var(--maroon-800)_55%,var(--violet-800)_100%)]"
+          ? "bg-[linear-gradient(125deg,var(--brand-blue-darker)_0%,var(--ink)_48%,var(--brand-red-dark)_120%)]"
           : "bg-ink",
       )}
     >
       <div
-        className="pointer-events-none absolute inset-0 opacity-40"
+        className="pointer-events-none absolute inset-0 opacity-30"
         style={{
           backgroundImage:
-            "radial-gradient(ellipse at 20% 20%, rgba(148,50,168,0.35), transparent 50%), radial-gradient(ellipse at 80% 80%, rgba(232,169,60,0.12), transparent 45%)",
+            "radial-gradient(ellipse at 15% 20%, rgba(3,66,171,0.45), transparent 50%), radial-gradient(ellipse at 85% 80%, rgba(232,1,21,0.18), transparent 45%)",
         }}
         aria-hidden
       />
-      <Container className="relative py-[clamp(3.5rem,8vw,5.5rem)]">
-        <p className="text-[0.72rem] font-bold tracking-[0.14em] text-gold uppercase">
+      <Container className="relative py-[clamp(2.5rem,6vw,4.25rem)]">
+        <p className="text-[0.72rem] font-bold tracking-[0.14em] text-brand-red uppercase">
           {eyebrow}
         </p>
-        <h1 className="font-display mt-3 max-w-[18ch] text-[clamp(2rem,4vw,3.4rem)] font-semibold leading-[1.1] text-white">
+        <h1 className="font-display mt-2.5 max-w-[20ch] text-[clamp(1.85rem,1.3rem+2.2vw,3.25rem)] font-semibold leading-[1.08] text-balance">
           {title}
         </h1>
         {description ? (
-          <p className="mt-4 max-w-[40rem] text-[clamp(1rem,0.95rem+0.25vw,1.125rem)] text-on-dark-muted">
+          <p className="text-on-dark-muted mt-3.5 max-w-[40rem] text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] leading-relaxed">
             {description}
           </p>
         ) : null}
-        <div className="mt-8 flex flex-wrap gap-3">
-          <Link
-            href={localePath(locale, ctaHref)}
-            className={cn(buttonVariants({ variant: "default" }), "min-h-11")}
-          >
-            {ctaLabel}
-          </Link>
-          {secondaryLabel && secondaryHref ? (
-            <Link
-              href={localePath(locale, secondaryHref)}
-              className={cn(
-                buttonVariants({ variant: "outline" }),
-                "min-h-11 border-white/35 bg-transparent text-white hover:bg-white/10",
-              )}
-            >
-              {secondaryLabel}
-            </Link>
-          ) : null}
-        </div>
+        {showCta || (secondaryLabel && secondaryHref) ? (
+          <div className="mt-7 flex flex-wrap gap-3">
+            {showCta ? (
+              <Link
+                href={localePath(locale, ctaHref)}
+                className={cn(buttonVariants({ variant: "default" }), "min-h-11")}
+              >
+                {ctaLabel}
+              </Link>
+            ) : null}
+            {secondaryLabel && secondaryHref ? (
+              <Link
+                href={localePath(locale, secondaryHref)}
+                className={cn(
+                  buttonVariants({ variant: "outline" }),
+                  "min-h-11 border-white/35 bg-transparent text-white hover:bg-white/10",
+                )}
+              >
+                {secondaryLabel}
+              </Link>
+            ) : null}
+          </div>
+        ) : null}
       </Container>
     </section>
   );

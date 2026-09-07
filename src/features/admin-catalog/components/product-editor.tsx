@@ -246,9 +246,9 @@ export function ProductEditor({ productId }: { productId: string }) {
       void qc.invalidateQueries({ queryKey: ["product", productId] });
     },
     onError: (err) => {
-      if (err instanceof ApiClientError && err.status === 409) {
+      if (err instanceof ApiClientError) {
         alert(err.message);
-        void productQuery.refetch();
+        if (err.status === 409) void productQuery.refetch();
       }
     },
   });
@@ -530,12 +530,32 @@ export function ProductEditor({ productId }: { productId: string }) {
               Upcoming product — shows in “Coming soon”, not main catalogue
             </span>
           </label>
+          {!isUpcoming && !imageUrl && !imageMediaId ? (
+            <p className="rounded-[var(--radius-md)] border border-brand-red/30 bg-brand-red-light/40 px-3 py-2 text-sm text-ink">
+              Present catalogue products need a photo before publish. Open the
+              Basic tab → pick from Media (uploads go to R2).
+            </p>
+          ) : (
+            <p className="text-muted-foreground text-sm">
+              Images come from Admin → Media (R2). Local placeholders are not
+              used for published present lines.
+            </p>
+          )}
           <div className="flex flex-wrap gap-2">
             <Button
               type="button"
               className="min-h-11"
-              disabled={product.status === "published"}
+              disabled={
+                product.status === "published" ||
+                (!isUpcoming && !imageUrl && !imageMediaId)
+              }
               onClick={() => {
+                if (!isUpcoming && !imageUrl && !imageMediaId) {
+                  alert(
+                    "Attach a product photo on the Basic tab before publishing a present catalogue line.",
+                  );
+                  return;
+                }
                 if (confirm("Publish this product?")) {
                   publishMut.mutate("publish");
                 }

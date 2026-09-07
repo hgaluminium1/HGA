@@ -38,8 +38,10 @@ export default async function PublicLocaleLayout({
       <main id="main">{children}</main>
       <SiteFooter
         locale={locale}
-        quickLinks={nav.footerQuickLinks}
-        contact={nav.footerContact}
+        products={nav.footer.products}
+        company={nav.footer.company}
+        support={nav.footer.support}
+        contact={nav.footer.contact}
       />
       <BackToTop />
     </>

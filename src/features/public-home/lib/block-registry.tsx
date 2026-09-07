@@ -22,6 +22,7 @@ import {
 } from "@/features/public-corporate";
 import { MarketsSection } from "@/features/public-site/components/markets-section";
 import { UpcomingProductsStrip } from "@/features/public-site/components/upcoming-products";
+import { productImageUrl } from "@/features/public-catalog/lib/product-media";
 import {
   getCachedPublishedProducts,
 } from "@/features/public-site/lib/public-cache";
@@ -34,9 +35,6 @@ export type CmsBlock = {
   appearance?: string;
   data: unknown;
 };
-
-const FALLBACK_PRODUCT_IMAGE =
-  "https://picsum.photos/seed/hg-aluminium-product/700/562";
 
 async function hydrateProductsBlock(
   content: HomeContent["products"],
@@ -57,10 +55,7 @@ async function hydrateProductsBlock(
     items: items.map((p, index) => ({
       title: p.name.en,
       href: `products/${p.slug}`,
-      imageSrc:
-        p.imageUrl ||
-        `https://picsum.photos/seed/hg-${p.slug}/700/562` ||
-        FALLBACK_PRODUCT_IMAGE,
+      imageSrc: productImageUrl(p),
       imageAlt: p.name.en,
       wide: index === items.length - 1 && items.length % 2 === 1,
     })),

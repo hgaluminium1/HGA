@@ -153,8 +153,8 @@ export const productNavAllowlist: NavLink[] = [
 
 export const productNavFeatureDefault = {
   href: "products",
-  imageSrc: "https://picsum.photos/seed/hg-ingots-stack/460/440",
-  imageAlt: "Stacked aluminium ingots",
+  imageSrc: "/products/aluminium-ingots.jpg",
+  imageAlt: "Stacked aluminium ingots at HG plant",
   eyebrow: "Full Catalogue",
   title: "Explore every alloy grade & spec sheet →",
 } as const;
@@ -198,16 +198,25 @@ export const primaryNavAllowlist: NavLink[] = [
 /** @deprecated use resolvePublicNav */
 export const primaryNavLinks: NavLink[] = primaryNavAllowlist;
 
-/** Footer product + utility links share the same allowlists as header. */
-export const footerUtilityAllowlist: NavLink[] = [
+/** Footer Company column — durable corporate links (not SKUs). */
+export const footerCompanyAllowlist: NavLink[] = [
+  { label: "About Us", href: "about" },
+  { label: "Capacity", href: "capacity" },
+  { label: "Quality", href: "quality" },
   { label: "Careers", href: "careers" },
+];
+
+/** Footer Support / utility links. */
+export const footerUtilityAllowlist: NavLink[] = [
   { label: "Resources", href: "resources" },
   { label: "Contact / RFQ", href: "contact" },
 ];
 
-/** @deprecated use resolvePublicNav */
+/** @deprecated use resolvePublicNav().footer — kept for Storybook fallbacks */
 export const footerQuickLinks: NavLink[] = [
   ...productNavAllowlist.map(({ label, href }) => ({ label, href })),
+  { label: "View full catalogue", href: "products" },
+  ...footerCompanyAllowlist,
   ...footerUtilityAllowlist,
 ];
 

@@ -29,6 +29,15 @@ export async function PATCH(req: Request, ctx: Ctx) {
     const parsed = updateProductSchema.parse(body);
     const result = await updateProduct(id, parsed);
     if ("error" in result) {
+      if (result.error === "IMAGE_REQUIRED") {
+        return respondError(
+          "IMAGE_REQUIRED",
+          "message" in result && typeof result.message === "string"
+            ? result.message
+            : "Present products require an image before publish.",
+          400,
+        );
+      }
       return respondError("NOT_FOUND", "Product not found", 404);
     }
     revalidateProducts();
