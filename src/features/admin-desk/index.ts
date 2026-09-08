@@ -5,5 +5,4 @@ export { LoginForm } from "./components/login-form";
 export { PagesList } from "./components/pages-list";
 export { PageSectionsList } from "./components/page-sections-list";
 export { SectionWorkspace } from "./components/section-workspace";
-export { CatalogueComingSoon } from "./components/catalogue-coming-soon";
 export { CloudinaryPicker } from "./components/cloudinary-picker";
