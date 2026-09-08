@@ -1,22 +1,7 @@
 "use client";
 
-import {
-  DndContext,
-  PointerSensor,
-  closestCenter,
-  useSensor,
-  useSensors,
-  type DragEndEvent,
-} from "@dnd-kit/core";
-import {
-  SortableContext,
-  arrayMove,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { GripVertical, Plus, Trash2 } from "lucide-react";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -32,9 +17,8 @@ import {
   updatePageApi,
 } from "@/features/admin-pages/lib/api";
 import {
-  BLOCK_PICKER,
-  defaultBlockData,
-  type BlockType,
+  getPageTemplate,
+  syncBlocksToTemplate,
 } from "@/modules/cms/browser";
 
 type EditorBlock = {
@@ -44,78 +28,6 @@ type EditorBlock = {
   appearance: string;
   data: unknown;
 };
-
-function SortableBlock({
-  block,
-  onChange,
-  onRemove,
-}: {
-  block: EditorBlock;
-  onChange: (next: EditorBlock) => void;
-  onRemove: () => void;
-}) {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: block.id });
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-  };
-  const label =
-    BLOCK_PICKER.find((b) => b.type === block.type)?.label ?? block.type;
-
-  return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      className="border-line bg-surface rounded-[var(--radius-lg)] border p-4"
-    >
-      <div className="flex items-center gap-2">
-        <button
-          type="button"
-          className="text-muted-foreground min-h-11 min-w-11 cursor-grab"
-          aria-label="Drag to reorder"
-          {...attributes}
-          {...listeners}
-        >
-          <GripVertical className="mx-auto size-4" />
-        </button>
-        <p className="flex-1 font-semibold text-ink">{label}</p>
-        <select
-          className="border-line min-h-11 rounded-[var(--radius-md)] border px-2 text-sm"
-          value={block.appearance}
-          onChange={(e) =>
-            onChange({ ...block, appearance: e.target.value })
-          }
-        >
-          <option value="default">Default</option>
-          <option value="inverted">Inverted</option>
-          <option value="tinted">Tinted</option>
-          <option value="compact">Compact</option>
-        </select>
-        <Button
-          type="button"
-          variant="ghost"
-          size="icon"
-          className="min-h-11 min-w-11"
-          onClick={onRemove}
-          aria-label="Remove block"
-        >
-          <Trash2 className="size-4" />
-        </Button>
-      </div>
-      <div className="mt-3">
-        <p className="text-muted-foreground mb-1 text-xs font-medium">
-          Section content
-        </p>
-        <BlockDataForm
-          type={block.type}
-          data={block.data}
-          onChange={(data) => onChange({ ...block, data })}
-        />
-      </div>
-    </div>
-  );
-}
 
 export function PageEditor({ pageId }: { pageId: string }) {
   const qc = useQueryClient();
@@ -132,7 +44,7 @@ export function PageEditor({ pageId }: { pageId: string }) {
   const [tab, setTab] = useState<"content" | "settings" | "publishing">(
     "content",
   );
-  const [pickerOpen, setPickerOpen] = useState(false);
+  const [openSectionId, setOpenSectionId] = useState<string | null>(null);
   const [baseline, setBaseline] = useState("");
   const [version, setVersion] = useState(1);
 
@@ -144,18 +56,21 @@ export function PageEditor({ pageId }: { pageId: string }) {
     setSeoTitle(p.seo?.title ?? "");
     setSeoDescription(p.seo?.description ?? "");
     setVersion(p.version);
-    const b = [...p.blocks].sort((a, c) => a.order - c.order);
-    setBlocks(b);
+    const synced = syncBlocksToTemplate(p.slug, p.blocks);
+    setBlocks(synced);
+    setOpenSectionId((prev) => prev ?? synced[0]?.id ?? null);
     setBaseline(
       JSON.stringify({
         title: p.title,
         slug: p.slug,
         seoTitle: p.seo?.title ?? "",
         seoDescription: p.seo?.description ?? "",
-        blocks: b,
+        blocks: synced,
       }),
     );
   }, [pageQuery.data]);
+
+  const template = getPageTemplate(slug);
 
   const current = useMemo(
     () =>
@@ -180,10 +95,6 @@ export function PageEditor({ pageId }: { pageId: string }) {
     return () => window.removeEventListener("beforeunload", onBeforeUnload);
   }, [dirty]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 6 } }),
-  );
-
   const saveMut = useMutation({
     mutationFn: () =>
       updatePageApi(pageId, {
@@ -198,15 +109,15 @@ export function PageEditor({ pageId }: { pageId: string }) {
       setVersion(page.version);
       void qc.invalidateQueries({ queryKey: ["page", pageId] });
       void qc.invalidateQueries({ queryKey: ["pages"] });
-      const b = [...page.blocks].sort((a, c) => a.order - c.order);
-      setBlocks(b);
+      const synced = syncBlocksToTemplate(page.slug, page.blocks);
+      setBlocks(synced);
       setBaseline(
         JSON.stringify({
           title: page.title,
           slug: page.slug,
           seoTitle: page.seo?.title ?? "",
           seoDescription: page.seo?.description ?? "",
-          blocks: b,
+          blocks: synced,
         }),
       );
     },
@@ -262,34 +173,6 @@ export function PageEditor({ pageId }: { pageId: string }) {
     },
   });
 
-  function onDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-    setBlocks((items) => {
-      const oldIndex = items.findIndex((i) => i.id === active.id);
-      const newIndex = items.findIndex((i) => i.id === over.id);
-      return arrayMove(items, oldIndex, newIndex).map((b, order) => ({
-        ...b,
-        order,
-      }));
-    });
-  }
-
-  function addBlock(type: BlockType) {
-    const id = `${type}-${crypto.randomUUID().slice(0, 8)}`;
-    setBlocks((prev) => [
-      ...prev,
-      {
-        id,
-        type,
-        order: prev.length,
-        appearance: "default",
-        data: defaultBlockData(type),
-      },
-    ]);
-    setPickerOpen(false);
-  }
-
   if (pageQuery.isLoading) {
     return <p className="text-muted-foreground text-sm">Loading editor…</p>;
   }
@@ -302,6 +185,7 @@ export function PageEditor({ pageId }: { pageId: string }) {
   }
 
   const page = pageQuery.data;
+  const isEntity = template?.mode === "entity";
 
   return (
     <div>
@@ -309,17 +193,20 @@ export function PageEditor({ pageId }: { pageId: string }) {
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
             <h1 className="font-display truncate text-2xl font-semibold text-ink">
-              {page.title}
+              {template?.label ?? page.title}
             </h1>
             <StatusBadge status={page.status} />
           </div>
-          <p className="text-muted-foreground mt-1 text-sm">/{page.slug}</p>
+          <p className="text-muted-foreground mt-1 text-sm">
+            Fixed template · /{page.slug}
+            {template?.description ? ` — ${template.description}` : null}
+          </p>
         </div>
         <Button
           type="button"
           variant="outline"
           className="min-h-11"
-          disabled={previewMut.isPending}
+          disabled={previewMut.isPending || isEntity}
           onClick={() => previewMut.mutate()}
         >
           Preview draft
@@ -348,75 +235,119 @@ export function PageEditor({ pageId }: { pageId: string }) {
       </div>
 
       {tab === "content" ? (
-        <div className="mt-6 space-y-4">
-          <div className="flex flex-wrap gap-2">
-            <Button
-              type="button"
-              className="min-h-11 gap-2"
-              onClick={() => setPickerOpen((v) => !v)}
-            >
-              <Plus className="size-4" />
-              Add section
-            </Button>
-          </div>
-          {pickerOpen ? (
-            <div className="border-line grid gap-2 rounded-[var(--radius-lg)] border p-3 sm:grid-cols-2">
-              {BLOCK_PICKER.map((item) => (
-                <button
-                  key={item.type}
-                  type="button"
-                  className="hover:bg-surface-muted min-h-11 rounded-[var(--radius-md)] px-3 py-2 text-left"
-                  onClick={() => addBlock(item.type)}
-                >
-                  <span className="block font-semibold text-ink">
-                    {item.label}
-                  </span>
-                  <span className="text-muted-foreground text-xs">
-                    {item.description}
-                  </span>
-                </button>
-              ))}
-            </div>
-          ) : null}
-
-          {blocks.length === 0 ? (
-            <div className="border-line rounded-[var(--radius-lg)] border border-dashed p-8 text-center">
-              <p className="font-medium">No sections yet</p>
-              <p className="text-muted-foreground mt-1 text-sm">
-                Add a Hero or other section to build this page.
+        <div className="mt-6 space-y-3">
+          {isEntity ? (
+            <div className="border-line bg-surface rounded-[var(--radius-lg)] border p-6">
+              <p className="font-medium text-ink">
+                This page uses a fixed layout
+              </p>
+              <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
+                {slug === "chairmans-message" ? (
+                  <>
+                    Edit chairman photos and messages under{" "}
+                    <Link
+                      href="/admin/corporate/people"
+                      className="text-brand font-medium underline"
+                    >
+                      Company → People
+                    </Link>
+                    . Use role “chairman” and enable “Show on Chairman’s
+                    Message”. Title and SEO are on the Settings tab.
+                  </>
+                ) : slug === "contact" ? (
+                  <>
+                    Enquiry form is fixed. Update addresses, map links, and N
+                    locations under{" "}
+                    <Link
+                      href="/admin/settings/company"
+                      className="text-brand font-medium underline"
+                    >
+                      Company profile
+                    </Link>
+                    . Title and SEO are on the Settings tab.
+                  </>
+                ) : (
+                  <>Content for this page is managed via Company / Catalogue.</>
+                )}
               </p>
             </div>
-          ) : null}
-
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={onDragEnd}
-          >
-            <SortableContext
-              items={blocks.map((b) => b.id)}
-              strategy={verticalListSortingStrategy}
-            >
-              <div className="space-y-3">
-                {blocks.map((block) => (
-                  <SortableBlock
-                    key={block.id}
-                    block={block}
-                    onChange={(next) =>
-                      setBlocks((prev) =>
-                        prev.map((b) => (b.id === next.id ? next : b)),
-                      )
-                    }
-                    onRemove={() =>
-                      setBlocks((prev) =>
-                        prev.filter((b) => b.id !== block.id),
-                      )
-                    }
-                  />
-                ))}
-              </div>
-            </SortableContext>
-          </DndContext>
+          ) : (
+            <>
+              <p className="text-muted-foreground text-sm">
+                Sections are locked to this template. Open a section to edit
+                copy and images. Add/remove rows only inside lists (slides,
+                FAQ, etc.).
+              </p>
+              {template?.sections.map((section) => {
+                const block = blocks.find((b) => b.id === section.id);
+                if (!block) return null;
+                const open = openSectionId === section.id;
+                return (
+                  <div
+                    key={section.id}
+                    className="border-line bg-surface rounded-[var(--radius-lg)] border"
+                  >
+                    <button
+                      type="button"
+                      className="flex min-h-14 w-full items-center gap-3 px-4 py-3 text-left"
+                      onClick={() =>
+                        setOpenSectionId(open ? null : section.id)
+                      }
+                      aria-expanded={open}
+                    >
+                      <span className="flex-1">
+                        <span className="block font-semibold text-ink">
+                          {section.title}
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                          {section.help}
+                        </span>
+                      </span>
+                      <span className="text-muted-foreground text-xs">
+                        {open ? "Hide" : "Edit"}
+                      </span>
+                    </button>
+                    {open ? (
+                      <div className="border-line border-t px-4 py-4">
+                        <label className="text-muted-foreground mb-3 flex flex-wrap items-center gap-2 text-xs font-medium">
+                          Appearance
+                          <select
+                            className="border-line min-h-11 rounded-[var(--radius-md)] border px-2 text-sm text-ink"
+                            value={block.appearance}
+                            onChange={(e) =>
+                              setBlocks((prev) =>
+                                prev.map((b) =>
+                                  b.id === block.id
+                                    ? { ...b, appearance: e.target.value }
+                                    : b,
+                                ),
+                              )
+                            }
+                          >
+                            <option value="default">Default</option>
+                            <option value="inverted">Inverted</option>
+                            <option value="tinted">Tinted</option>
+                            <option value="compact">Compact</option>
+                          </select>
+                        </label>
+                        <BlockDataForm
+                          type={block.type}
+                          data={block.data}
+                          onChange={(data) =>
+                            setBlocks((prev) =>
+                              prev.map((b) =>
+                                b.id === block.id ? { ...b, data } : b,
+                              ),
+                            )
+                          }
+                        />
+                      </div>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </>
+          )}
         </div>
       ) : null}
 
@@ -433,10 +364,14 @@ export function PageEditor({ pageId }: { pageId: string }) {
           <label className="text-sm font-medium">
             Slug
             <input
-              className="border-line mt-1 min-h-11 w-full rounded-[var(--radius-md)] border px-3"
+              className="border-line bg-muted mt-1 min-h-11 w-full rounded-[var(--radius-md)] border px-3"
               value={slug}
-              onChange={(e) => setSlug(e.target.value)}
+              readOnly
+              title="Slug is locked to the page template"
             />
+            <span className="text-muted-foreground mt-1 block text-xs">
+              Locked to template — ask a developer for a new page URL.
+            </span>
           </label>
           <label className="text-sm font-medium">
             SEO title

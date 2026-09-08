@@ -1,5 +1,6 @@
 import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
+import type {} from "@auth/core/jwt";
 
 import { authConfig } from "@/auth.config";
 import { verifyUserCredentials } from "@/modules/identity";

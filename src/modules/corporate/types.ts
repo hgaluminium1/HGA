@@ -9,6 +9,16 @@ export type Address = {
   country: string;
 };
 
+/** Public map / office pin for Contact page (N locations). */
+export type CompanyLocationDTO = {
+  id: string;
+  label: string;
+  address: string;
+  mapsUrl: string;
+  embedUrl: string;
+  order: number;
+};
+
 export type CompanyProfileDTO = {
   id: string;
   legalName: string;
@@ -28,6 +38,7 @@ export type CompanyProfileDTO = {
   };
   logo: { png?: string | null; svg?: string | null; pdf?: string | null };
   brandColors: { primary?: string; secondary?: string; accent?: string };
+  locations: CompanyLocationDTO[];
   locale: string;
   version: number;
   updatedAt: string;
@@ -42,9 +53,11 @@ export type PersonDTO = {
   yearsExperience: number;
   bio: LocalizedString;
   photoId: string | null;
+  photoUrl: string | null;
   sortOrder: number;
   status: "draft" | "published";
   showOnInvestorPage: boolean;
+  showOnChairmansPage: boolean;
   version: number;
   deletedAt: string | null;
   createdAt: string;

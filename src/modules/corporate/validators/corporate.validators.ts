@@ -46,6 +46,19 @@ export const companyProfileSchema = z.object({
       accent: z.string().optional(),
     })
     .optional(),
+  locations: z
+    .array(
+      z.object({
+        id: z.string().min(1),
+        label: z.string().default(""),
+        address: z.string().default(""),
+        mapsUrl: z.string().default(""),
+        embedUrl: z.string().default(""),
+        order: z.number().int().default(0),
+      }),
+    )
+    .optional()
+    .default([]),
   locale: z.string().default("en"),
   version: z.number().int(),
 });
@@ -58,9 +71,11 @@ export const createPersonSchema = z.object({
   yearsExperience: z.number().default(0),
   bio: z.object({ en: z.string() }).default({ en: "" }),
   photoId: z.string().nullable().optional(),
+  photoUrl: z.string().nullable().optional(),
   sortOrder: z.number().int().default(0),
   status: z.enum(["draft", "published"]).optional(),
-  showOnInvestorPage: z.boolean().default(false),
+  showOnInvestorPage: z.boolean().optional().default(false),
+  showOnChairmansPage: z.boolean().optional().default(false),
 });
 
 export const updatePersonSchema = createPersonSchema.partial().extend({

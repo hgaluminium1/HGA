@@ -35,18 +35,19 @@ export function categoryImageUrl(
 
 /** Map CMS category slug → public landing href when one exists. */
 export function categoryLandingHref(categorySlug: string): string | null {
-  const map: Record<string, string> = {
-    "remelt-ingots": "products/ingots-alloys",
-    "ingots-alloys": "products/ingots-alloys",
-    cubes: "products/ingots-alloys",
-    shots: "products/ingots-alloys",
-    deoxidizer: "products/ingots-alloys",
-    "homogenised-billets": "products/billets",
-    billets: "products/billets",
-    "extrusion-profiles": "products/extrusion-profiles",
-    "aluminium-extrusions": "products/extrusion-profiles",
+  const legacy: Record<string, string> = {
+    "remelt-ingots": "products/category/ingots-alloys",
+    "ingots-alloys": "products/category/ingots-alloys",
+    cubes: "products/category/ingots-alloys",
+    shots: "products/category/ingots-alloys",
+    deoxidizer: "products/category/ingots-alloys",
+    "homogenised-billets": "products/category/billets",
+    billets: "products/category/billets",
+    "extrusion-profiles": "products/category/extrusion-profiles",
+    "aluminium-extrusions": "products/category/extrusion-profiles",
   };
-  return map[categorySlug] ?? null;
+  if (legacy[categorySlug]) return legacy[categorySlug];
+  return `products/category/${categorySlug}`;
 }
 
 export function catalogueCategoryNav(

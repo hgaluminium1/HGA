@@ -5,24 +5,25 @@ import {
   applyScheduledPagePublish,
   listDueScheduledPages,
 } from "@/modules/cms";
-import { PreviewToken } from "@/modules/cms/repositories/mongo/preview-token.model";
-import { Page } from "@/modules/cms/repositories/mongo/page.model";
 import {
   applyScheduledProductPublish,
   listDueScheduledProducts,
 } from "@/modules/catalog";
-import { Product } from "@/modules/catalog/repositories/mongo/product.model";
-import { Category } from "@/modules/catalog/repositories/mongo/category.model";
-import { Media } from "@/modules/media/repositories/mongo/media.model";
-import { Person } from "@/modules/corporate/repositories/mongo/person.model";
-import { CapacityMetric } from "@/modules/corporate/repositories/mongo/capacity-metric.model";
-import { Certification } from "@/modules/corporate/repositories/mongo/certification.model";
-import { SustainabilityMetric } from "@/modules/corporate/repositories/mongo/sustainability-metric.model";
-import { CustomerLogo } from "@/modules/corporate/repositories/mongo/customer-logo.model";
-import { CaseStudy } from "@/modules/corporate/repositories/mongo/case-study.model";
-import { Testimonial } from "@/modules/corporate/repositories/mongo/testimonial.model";
-import { ExpansionProject } from "@/modules/corporate/repositories/mongo/expansion-project.model";
 import type { Model } from "mongoose";
+
+import { PreviewToken } from "../../cms/repositories/mongo/preview-token.model";
+import { Page } from "../../cms/repositories/mongo/page.model";
+import { Product } from "../../catalog/repositories/mongo/product.model";
+import { Category } from "../../catalog/repositories/mongo/category.model";
+import { Media } from "../../media/repositories/mongo/media.model";
+import { Person } from "../../corporate/repositories/mongo/person.model";
+import { CapacityMetric } from "../../corporate/repositories/mongo/capacity-metric.model";
+import { Certification } from "../../corporate/repositories/mongo/certification.model";
+import { SustainabilityMetric } from "../../corporate/repositories/mongo/sustainability-metric.model";
+import { CustomerLogo } from "../../corporate/repositories/mongo/customer-logo.model";
+import { CaseStudy } from "../../corporate/repositories/mongo/case-study.model";
+import { Testimonial } from "../../corporate/repositories/mongo/testimonial.model";
+import { ExpansionProject } from "../../corporate/repositories/mongo/expansion-project.model";
 
 async function requireDb() {
   const conn = await dbConnect();
@@ -103,7 +104,9 @@ export async function runTrashPurge(dryRun: boolean) {
     ["expansion", ExpansionProject as unknown as Model<unknown>],
   ];
 
-  const stats: Record<string, number> = { retentionDays: trashConfig.retentionDays };
+  const stats: Record<string, number> = {
+    retentionDays: trashConfig.retentionDays,
+  };
   let total = 0;
   for (const [key, model] of collections) {
     const n = await purgeSoftDeleted(model, cutoff, dryRun);

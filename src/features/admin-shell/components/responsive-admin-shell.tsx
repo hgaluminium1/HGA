@@ -14,7 +14,7 @@ import {
   ImageIcon,
   LogOut,
   Menu,
-  Navigation,
+  PanelTop,
   Trash2,
   Upload,
   Users,
@@ -45,35 +45,54 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
         href: "/admin/pages",
         label: "Pages",
         icon: FileText,
-        hint: "Edit Home & marketing with forms — no JSON",
+        hint: "Fixed templates — edit section content only",
       },
+    ],
+  },
+  {
+    title: "Chrome",
+    items: [
       {
         href: "/admin/navigation",
-        label: "Navigation",
-        icon: Navigation,
-        hint: "Header & footer links",
+        label: "Header & footer",
+        icon: PanelTop,
+        hint: "Primary nav and footer columns",
       },
-      { href: "/admin/media", label: "Media", icon: ImageIcon, hint: "R2 uploads" },
     ],
   },
   {
     title: "Catalogue",
     items: [
       {
+        href: "/admin/categories",
+        label: "Categories",
+        icon: FolderTree,
+        hint: "Category → N products",
+      },
+      {
         href: "/admin/products",
         label: "Products",
         icon: Boxes,
         hint: "Present lines need a photo to publish",
       },
-      { href: "/admin/categories", label: "Categories", icon: FolderTree },
       { href: "/admin/dictionaries", label: "Dictionaries", icon: BookOpen },
     ],
   },
   {
     title: "Company",
     items: [
-      { href: "/admin/settings/company", label: "Company profile", icon: Building2 },
-      { href: "/admin/corporate/people", label: "People", icon: Users },
+      {
+        href: "/admin/settings/company",
+        label: "Company profile",
+        icon: Building2,
+        hint: "Addresses, map locations, contact",
+      },
+      {
+        href: "/admin/corporate/people",
+        label: "People / Chairmen",
+        icon: Users,
+        hint: "Photos & messages for Chairman’s page",
+      },
       {
         href: "/admin/corporate/capacity-metrics",
         label: "Capacity",
@@ -112,6 +131,17 @@ const NAV_GROUPS: { title: string; items: NavItem[] }[] = [
     ],
   },
   {
+    title: "Media",
+    items: [
+      {
+        href: "/admin/media",
+        label: "Media library",
+        icon: ImageIcon,
+        hint: "Upload photos for heroes, products, people",
+      },
+    ],
+  },
+  {
     title: "Tools",
     items: [
       { href: "/admin/import", label: "CSV import", icon: Upload },
@@ -127,29 +157,36 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
     <div className="space-y-5">
       {NAV_GROUPS.map((group) => (
         <div key={group.title}>
-          <p className="text-muted-foreground px-3 pb-1 text-[0.65rem] font-bold tracking-[0.12em] uppercase">
+          <p className="text-muted-foreground mb-2 px-2 text-[0.7rem] font-semibold tracking-wide uppercase">
             {group.title}
           </p>
           <ul className="space-y-0.5">
             {group.items.map((item) => {
               const active =
-                pathname === item.href || pathname.startsWith(`${item.href}/`);
+                pathname === item.href ||
+                pathname.startsWith(`${item.href}/`);
               const Icon = item.icon;
               return (
                 <li key={item.href}>
                   <Link
                     href={item.href}
                     onClick={onNavigate}
-                    title={item.hint}
                     className={cn(
-                      "flex min-h-10 items-center gap-2 rounded-[var(--radius-md)] px-3 text-sm font-medium transition-colors",
+                      "flex min-h-11 items-start gap-2.5 rounded-[var(--radius-md)] px-2.5 py-2 text-sm transition-colors",
                       active
-                        ? "bg-brand-blue-light text-brand-blue"
-                        : "text-ink hover:bg-bg-alt",
+                        ? "bg-brand/10 text-brand font-semibold"
+                        : "text-ink hover:bg-muted",
                     )}
                   >
-                    <Icon className="size-4 shrink-0" />
-                    {item.label}
+                    <Icon className="mt-0.5 size-4 shrink-0" />
+                    <span className="min-w-0">
+                      <span className="block leading-tight">{item.label}</span>
+                      {item.hint ? (
+                        <span className="text-muted-foreground mt-0.5 block text-[0.7rem] font-normal leading-snug">
+                          {item.hint}
+                        </span>
+                      ) : null}
+                    </span>
                   </Link>
                 </li>
               );
@@ -199,7 +236,7 @@ export function ResponsiveAdminShell({
               HG Admin
             </p>
             <p className="text-muted-foreground mt-1 text-xs leading-snug">
-              Edit catalogue & website content — forms only, no JSON.
+              Site → Page → Section → Field. No JSON.
             </p>
           </div>
           <nav className="flex-1 overflow-y-auto p-3">

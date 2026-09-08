@@ -9,7 +9,5 @@ export const siteConfig = {
     analytics: false,
     leadsCrmWebhook: false,
     investorsSection: false,
-    /** Lazy Three.js Home hero — off by default (Core Web Vitals). */
-    heroThree: false,
   },
 } as const;

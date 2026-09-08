@@ -73,19 +73,15 @@ export async function PresentProductsGrid({
     ...(categoryIds ?? []),
     ...(categoryId ? [categoryId] : []),
   ].filter(Boolean);
-  const { items: all } = await getCachedPublishedProducts({
-    limit: 100,
+  const { items } = await getCachedPublishedProducts({
+    limit,
     upcoming: false,
+    categoryIds: ids.length ? ids : undefined,
   });
-  const items = ids.length
-    ? all
-        .filter((p) => p.categoryIds.some((id) => ids.includes(id)))
-        .slice(0, limit)
-    : all.slice(0, limit);
   if (!items.length) return null;
 
   return (
-    <ul className="grid gap-4 min-[640px]:grid-cols-2 min-[640px]:gap-5 min-[1024px]:grid-cols-3">
+    <ul className="mx-auto grid max-w-[90rem] gap-4 min-[640px]:grid-cols-2 min-[640px]:gap-5 min-[1024px]:grid-cols-3 min-[1440px]:grid-cols-4">
       {items.map((product) => (
         <li key={product.id}>
           <ProductCard locale={locale} product={product} />

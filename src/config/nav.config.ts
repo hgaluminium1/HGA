@@ -133,19 +133,19 @@ export function localePath(locale: string, slug = "") {
 export const productNavAllowlist: NavLink[] = [
   {
     label: "Ingots & Alloys",
-    href: "products/ingots-alloys",
+    href: "products/category/ingots-alloys",
     description: "Remelt ingots and casting alloys",
     icon: "ingot",
   },
   {
     label: "Aluminium Billets",
-    href: "products/billets",
+    href: "products/category/billets",
     description: "Homogenised extrusion-ready billets",
     icon: "billet",
   },
   {
     label: "Extrusion Profiles",
-    href: "products/extrusion-profiles",
+    href: "products/category/extrusion-profiles",
     description: "Architectural, industrial and solar profiles",
     icon: "recycle",
   },
@@ -171,6 +171,7 @@ export const productNav: NavGroup = {
 export const companyNavAllowlist: NavLink[] = [
   { label: "About Us", href: "about" },
   { label: "Our Journey", href: "journey" },
+  { label: "Chairman’s Message", href: "chairmans-message" },
   { label: "Leadership", href: "leadership" },
   { label: "Capacity", href: "capacity" },
   { label: "Customers", href: "customers" },
@@ -201,6 +202,7 @@ export const primaryNavLinks: NavLink[] = primaryNavAllowlist;
 /** Footer Company column — durable corporate links (not SKUs). */
 export const footerCompanyAllowlist: NavLink[] = [
   { label: "About Us", href: "about" },
+  { label: "Chairman’s Message", href: "chairmans-message" },
   { label: "Capacity", href: "capacity" },
   { label: "Quality", href: "quality" },
   { label: "Careers", href: "careers" },

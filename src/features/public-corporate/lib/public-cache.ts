@@ -5,6 +5,7 @@ import {
   listPublishedCapacityMetrics,
   listPublishedCaseStudies,
   listPublishedCertifications,
+  listPublishedChairmen,
   listPublishedCustomerLogos,
   listPublishedPeople,
   listPublishedSustainabilityMetrics,
@@ -30,6 +31,15 @@ export function getCachedPublishedPeople() {
     tags: ["corporate"],
     revalidate: 60,
   })();
+}
+
+export function getCachedPublishedChairmen() {
+  if (cacheDisabled) return listPublishedChairmen();
+  return unstable_cache(
+    () => listPublishedChairmen(),
+    ["published-chairmen"],
+    { tags: ["corporate"], revalidate: 60 },
+  )();
 }
 
 export function getCachedPublishedCapacity() {

@@ -13,6 +13,7 @@ const personSchema = new Schema(
     yearsExperience: { type: Number, default: 0 },
     bio: { type: Map, of: String, default: () => new Map([["en", ""]]) },
     photoId: { type: String, default: null },
+    photoUrl: { type: String, default: null },
     sortOrder: { type: Number, default: 0 },
     status: {
       type: String,
@@ -20,6 +21,7 @@ const personSchema = new Schema(
       default: "draft",
     },
     showOnInvestorPage: { type: Boolean, default: false },
+    showOnChairmansPage: { type: Boolean, default: false },
     version: { type: Number, default: 1 },
     deletedAt: { type: Date, default: null, index: true },
   },

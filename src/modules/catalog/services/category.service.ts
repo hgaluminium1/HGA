@@ -100,6 +100,17 @@ export async function getCategoryById(
   return toDTO(doc as Record<string, unknown>);
 }
 
+export async function getPublishedCategoryBySlug(slug: string) {
+  await requireDb();
+  const doc = await Category.findOne({
+    slug,
+    status: "published",
+    deletedAt: null,
+  }).lean();
+  if (!doc) return null;
+  return toDTO(doc as Record<string, unknown>);
+}
+
 export async function createCategory(
   input: z.infer<typeof createCategorySchema>,
 ) {

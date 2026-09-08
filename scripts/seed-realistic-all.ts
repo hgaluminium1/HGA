@@ -557,13 +557,14 @@ async function seedSustainability() {
       console.log(`  = sustainability ${r.key}`);
       continue;
     }
-    let row = await createSustainabilityMetric({
+    const row = await createSustainabilityMetric({
       key: r.key,
       label: { en: r.label },
       value: r.value,
       unit: r.unit,
       disclosureTier: r.disclosureTier,
       methodologyNote: r.methodologyNote,
+      evidenceMediaIds: [],
       verificationStatus: "draft",
       publishStatus: "hidden",
     });
@@ -651,6 +652,7 @@ async function seedCaseStudies(productIds: string[]) {
     await createCaseStudy({
       ...c,
       productIds: productIds.slice(0, 2),
+      imageIds: [],
       approvedForWebsite: true,
       publishStatus: "published",
     });

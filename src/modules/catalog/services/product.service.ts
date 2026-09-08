@@ -119,6 +119,7 @@ export async function listPublishedProducts(opts: {
   cursor?: string;
   limit?: number;
   categoryId?: string;
+  categoryIds?: string[];
   /** default present only; true = upcoming; "all" = both */
   upcoming?: boolean | "all";
 } = {}) {
@@ -140,8 +141,14 @@ export async function listPublishedProducts(opts: {
       { "name.en": { $regex: opts.q, $options: "i" } },
     ];
   }
-  if (opts.categoryId) {
-    filter.categoryIds = opts.categoryId;
+  const catIds = [
+    ...(opts.categoryIds ?? []),
+    ...(opts.categoryId ? [opts.categoryId] : []),
+  ].filter(Boolean);
+  if (catIds.length === 1) {
+    filter.categoryIds = catIds[0];
+  } else if (catIds.length > 1) {
+    filter.categoryIds = { $in: catIds };
   }
   if (opts.cursor) {
     filter._id = { $lt: opts.cursor };

@@ -31,6 +31,7 @@ export function getCachedPublishedProducts(opts: {
   cursor?: string;
   limit?: number;
   categoryId?: string;
+  categoryIds?: string[];
   upcoming?: boolean | "all";
 } = {}): Promise<{ items: ProductDTO[]; nextCursor: string | null }> {
   if (cacheDisabled) {
@@ -45,6 +46,7 @@ export function getCachedPublishedProducts(opts: {
     opts.cursor ?? "",
     String(opts.limit ?? 20),
     opts.categoryId ?? "",
+    (opts.categoryIds ?? []).join(","),
     String(opts.upcoming ?? false),
   ];
   return unstable_cache(

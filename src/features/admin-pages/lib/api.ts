@@ -46,6 +46,8 @@ export async function createPageApi(body: {
   title: string;
   slug: string;
   locale?: string;
+  blocks?: unknown[];
+  seo?: { title?: string; description?: string };
 }) {
   const res = await fetch("/api/v1/pages", {
     method: "POST",

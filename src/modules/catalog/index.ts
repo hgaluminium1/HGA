@@ -30,6 +30,7 @@ export {
 export {
   createCategory,
   getCategoryById,
+  getPublishedCategoryBySlug,
   listCategoriesFlat,
   listCategoriesTree,
   moveCategory,

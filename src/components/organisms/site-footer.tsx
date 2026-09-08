@@ -128,32 +128,6 @@ export function SiteFooter({
               </li>
             </ul>
           </div>
-
-          <div>
-            <h5 className="font-display mb-3 text-sm font-semibold tracking-wide text-white uppercase">
-              Find Us
-            </h5>
-            <div className="relative flex h-36 items-end overflow-hidden rounded-[var(--radius-md)] bg-brand-blue-darker p-3">
-              <div
-                className="pointer-events-none absolute inset-0 opacity-35"
-                style={{
-                  backgroundImage:
-                    "linear-gradient(to right, rgb(255 255 255 / 20%) 1px, transparent 1px), linear-gradient(to bottom, rgb(255 255 255 / 20%) 1px, transparent 1px)",
-                  backgroundSize: "20px 20px",
-                }}
-                aria-hidden
-              />
-              <MapPin className="absolute top-1/2 left-1/2 size-6 -translate-x-1/2 -translate-y-1/2 text-brand-red" />
-              <a
-                href={contact.mapsUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="relative z-10 rounded-full bg-brand-red px-3 py-1.5 text-xs font-semibold text-white hover:bg-brand-red-dark"
-              >
-                Open in Maps
-              </a>
-            </div>
-          </div>
         </div>
       </Container>
       <div className="border-t border-white/10 py-4 text-center text-xs text-on-dark-muted">

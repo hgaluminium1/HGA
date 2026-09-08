@@ -419,6 +419,33 @@ export async function ContactPage({
   locale: string;
   defaultProduct?: string;
 }) {
+  const profile = await getCachedCompanyProfile();
+  const locations =
+    profile?.locations?.filter((l) => l.embedUrl || l.mapsUrl || l.address) ??
+    [];
+  const fallbackQuery =
+    profile?.registeredOffice?.line1 ||
+    "Laxmipura Nandasan Kadi Mahesana Gujarat";
+  const displayLocations =
+    locations.length > 0
+      ? locations
+      : [
+          {
+            id: "default",
+            label: "Registered office",
+            address: [
+              profile?.registeredOffice?.line1,
+              profile?.registeredOffice?.city,
+              profile?.registeredOffice?.state,
+            ]
+              .filter(Boolean)
+              .join(", "),
+            mapsUrl: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(fallbackQuery)}`,
+            embedUrl: `https://maps.google.com/maps?q=${encodeURIComponent(fallbackQuery)}&z=14&output=embed`,
+            order: 0,
+          },
+        ];
+
   return (
     <>
       <PageHero
@@ -441,8 +468,49 @@ export async function ContactPage({
                 className="mt-6"
               />
             </div>
-            <div>
+            <div className="space-y-8">
               <CompanyFactsBlock embedded />
+              <div>
+                <h2 className="font-display text-xl font-semibold">Find us</h2>
+                <div className="mt-4 space-y-6">
+                  {displayLocations.map((loc) => (
+                    <div key={loc.id}>
+                      {loc.label ? (
+                        <p className="text-sm font-semibold text-ink">
+                          {loc.label}
+                        </p>
+                      ) : null}
+                      {loc.address ? (
+                        <p className="text-muted-foreground mt-1 text-sm">
+                          {loc.address}
+                        </p>
+                      ) : null}
+                      {loc.embedUrl ? (
+                        <div className="border-line mt-3 overflow-hidden rounded-[var(--radius-lg)] border">
+                          <iframe
+                            title={`Map — ${loc.label || "Location"}`}
+                            src={loc.embedUrl}
+                            className="aspect-[16/10] w-full border-0"
+                            loading="lazy"
+                            referrerPolicy="no-referrer-when-downgrade"
+                            allowFullScreen
+                          />
+                        </div>
+                      ) : null}
+                      {loc.mapsUrl ? (
+                        <a
+                          href={loc.mapsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-brand mt-2 inline-flex min-h-11 items-center text-sm font-semibold underline-offset-2 hover:underline"
+                        >
+                          Open in Maps
+                        </a>
+                      ) : null}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
         </Container>

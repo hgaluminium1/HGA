@@ -1,5 +1,11 @@
-/** Suggested Media tags (§23.9) — editable config, not CMS required for Phase 5. */
+/** Suggested Media tags — section-scoped use for editors. */
 export const MEDIA_TAGS = [
+  "home.hero",
+  "home.mission",
+  "contact.map",
+  "person.photo",
+  "category.tile",
+  "product.hero",
   "drone",
   "exterior",
   "furnace",

@@ -1,23 +1,17 @@
-import { getMediaById } from "@/modules/media";
-
 export type MediaRef = {
   imageUrl?: string | null;
   imageMediaId?: string | null;
 };
 
 /**
- * Resolve a public image URL from CMS fields.
- * Prefer denormalized imageUrl; fall back to Media document via imageMediaId.
+ * Resolve a public image URL from denormalized CMS fields.
+ * Prefer imageUrl (set by MediaPicker). imageMediaId is reserved for
+ * future media-module resolution without coupling lib → modules.
  */
 export async function resolveMediaUrl(
   ref: MediaRef,
 ): Promise<string | null> {
-  const direct = ref.imageUrl?.trim();
-  if (direct) return direct;
-  const id = ref.imageMediaId?.trim();
-  if (!id) return null;
-  const media = await getMediaById(id);
-  return media?.url?.trim() || null;
+  return resolveMediaUrlSync(ref);
 }
 
 /** Sync helper when URL is already denormalized (public render path). */

@@ -118,6 +118,25 @@ function toCompanyDTO(doc: Record<string, unknown>): CompanyProfileDTO {
       secondary: colors.secondary,
       accent: colors.accent,
     },
+    locations: (
+      (doc.locations as {
+        id: string;
+        label: string;
+        address: string;
+        mapsUrl: string;
+        embedUrl: string;
+        order?: number;
+      }[]) ?? []
+    )
+      .map((l) => ({
+        id: l.id,
+        label: l.label ?? "",
+        address: l.address ?? "",
+        mapsUrl: l.mapsUrl ?? "",
+        embedUrl: l.embedUrl ?? "",
+        order: l.order ?? 0,
+      }))
+      .sort((a, b) => a.order - b.order),
     locale: String(doc.locale ?? "en"),
     version: Number(doc.version ?? 1),
     updatedAt: new Date(doc.updatedAt as Date).toISOString(),
@@ -132,7 +151,7 @@ export async function getCompanyProfile(): Promise<CompanyProfileDTO | null> {
 }
 
 export async function upsertCompanyProfile(
-  input: z.infer<typeof companyProfileSchema>,
+  input: z.input<typeof companyProfileSchema>,
 ) {
   try {
     const data = companyProfileSchema.parse(input);
@@ -172,9 +191,11 @@ function toPersonDTO(doc: Record<string, unknown>): PersonDTO {
     yearsExperience: Number(doc.yearsExperience ?? 0),
     bio: mapToObj(doc.bio),
     photoId: (doc.photoId as string | null) ?? null,
+    photoUrl: (doc.photoUrl as string | null) ?? null,
     sortOrder: Number(doc.sortOrder ?? 0),
     status: (doc.status as PersonDTO["status"]) ?? "draft",
     showOnInvestorPage: Boolean(doc.showOnInvestorPage),
+    showOnChairmansPage: Boolean(doc.showOnChairmansPage),
     version: Number(doc.version ?? 1),
     deletedAt: doc.deletedAt
       ? new Date(doc.deletedAt as Date).toISOString()
@@ -227,6 +248,19 @@ export async function listPublishedPeople() {
   return rows.map((r) => toPersonDTO(r as Record<string, unknown>));
 }
 
+/** Chairmen (and anyone flagged) for the Chairman’s Message page. */
+export async function listPublishedChairmen() {
+  await requireDb();
+  const rows = await Person.find({
+    deletedAt: null,
+    status: "published",
+    $or: [{ showOnChairmansPage: true }, { role: "chairman" }],
+  })
+    .sort({ sortOrder: 1, _id: 1 })
+    .lean();
+  return rows.map((r) => toPersonDTO(r as Record<string, unknown>));
+}
+
 export async function getPersonById(id: string) {
   await requireDb();
   const doc = await Person.findOne({ _id: id, deletedAt: null }).lean();
@@ -234,7 +268,7 @@ export async function getPersonById(id: string) {
   return toPersonDTO(doc as Record<string, unknown>);
 }
 
-export async function createPerson(input: z.infer<typeof createPersonSchema>) {
+export async function createPerson(input: z.input<typeof createPersonSchema>) {
   const data = createPersonSchema.parse(input);
   await requireDb();
   const doc = await Person.create({ ...data, status: data.status ?? "draft", version: 1 });

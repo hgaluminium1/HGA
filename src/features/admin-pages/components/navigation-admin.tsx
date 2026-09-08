@@ -213,13 +213,11 @@ export function NavigationAdmin() {
     <div className="space-y-6">
       <div>
         <h1 className="font-display text-2xl font-semibold text-ink">
-          Navigation
+          Header & footer
         </h1>
         <p className="text-muted-foreground mt-1 max-w-2xl text-sm leading-relaxed">
-          Edit header and footer links with forms — no JSON. Publish a menu to
-          override the built-in defaults on the public site. Products mega menu
-          categories still come from the product catalogue allowlist + published
-          products.
+          Edit primary and footer menus with forms — no JSON. Publish to override
+          defaults on the live site. Maps live on Contact, not in the footer.
         </p>
       </div>
       {query.isLoading ? (

@@ -15,6 +15,9 @@ export async function GET(req: Request) {
     q: url.searchParams.get("q") ?? undefined,
     cursor: url.searchParams.get("cursor") ?? undefined,
     categoryId: url.searchParams.get("categoryId") ?? undefined,
+    limit: url.searchParams.get("limit")
+      ? Number(url.searchParams.get("limit"))
+      : undefined,
     includeDeleted: url.searchParams.get("trash") === "1",
   });
   return respondSuccess(data);

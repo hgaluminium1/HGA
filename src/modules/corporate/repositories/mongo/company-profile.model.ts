@@ -48,6 +48,17 @@ const companyProfileSchema = new Schema(
       secondary: { type: String },
       accent: { type: String },
     },
+    locations: [
+      {
+        id: { type: String, required: true },
+        label: { type: String, default: "" },
+        address: { type: String, default: "" },
+        mapsUrl: { type: String, default: "" },
+        embedUrl: { type: String, default: "" },
+        order: { type: Number, default: 0 },
+        _id: false,
+      },
+    ],
     locale: { type: String, default: "en" },
     version: { type: Number, default: 1 },
   },

@@ -8,6 +8,14 @@ export {
   type BlockType,
 } from "./validators/page.validators";
 export {
+  PAGE_TEMPLATES,
+  getPageTemplate,
+  isTemplatedSlug,
+  syncBlocksToTemplate,
+  type PageTemplate,
+  type TemplateSection,
+} from "./templates/page-templates";
+export {
   createPage,
   getPageById,
   getPageBySlug,

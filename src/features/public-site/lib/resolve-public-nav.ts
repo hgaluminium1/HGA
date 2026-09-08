@@ -47,6 +47,8 @@ async function publishedSlugs(slugs: string[], locale: string) {
         "customers",
         "expansion",
         "products",
+        "chairmans-message",
+        "contact",
       ]);
       if (corporateOnly.has(slug)) return slug;
       const page = await getCachedPublishedPage(slug, locale);
@@ -78,7 +80,7 @@ function formatAddress(parts: {
 const COMPANY_SECTIONS: { title: string; hrefs: string[] }[] = [
   {
     title: "About",
-    hrefs: ["about", "journey", "leadership", "customers"],
+    hrefs: ["about", "journey", "chairmans-message", "leadership", "customers"],
   },
   {
     title: "Operations",

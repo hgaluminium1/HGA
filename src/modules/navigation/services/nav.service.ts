@@ -1,8 +1,8 @@
 import { dbConnect } from "@/lib/db/connect";
 import { assertVersionMatch } from "@/lib/http/conflict";
-import { NavMenu } from "@/modules/navigation/repositories/mongo/nav-menu.model";
-import type { NavMenuDTO, NavMenuKey } from "@/modules/navigation/types";
-import { upsertNavMenuSchema } from "@/modules/navigation/validators/nav.validators";
+import { NavMenu } from "../repositories/mongo/nav-menu.model";
+import type { NavMenuDTO, NavMenuKey } from "../types";
+import { upsertNavMenuSchema } from "../validators/nav.validators";
 import type { z } from "zod";
 
 async function requireDb() {
