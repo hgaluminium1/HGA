@@ -1,7 +1,6 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useSession } from "next-auth/react";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -21,9 +20,7 @@ import {
 
 type Tab = "pages" | "products" | "categories";
 
-export function TrashList() {
-  const { data: session } = useSession();
-  const canPurge = session?.user?.role === "superadmin";
+export function TrashList({ canPurge = false }: { canPurge?: boolean }) {
   const qc = useQueryClient();
   const [tab, setTab] = useState<Tab>("pages");
 

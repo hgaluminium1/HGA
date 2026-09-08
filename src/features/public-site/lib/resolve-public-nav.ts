@@ -13,6 +13,7 @@ import {
 import { getCachedPublishedPage } from "@/features/public-site/lib/public-cache";
 import { getCachedCompanyProfile } from "@/features/public-corporate/lib/public-cache";
 import { getCachedPublishedProducts } from "@/features/public-site/lib/public-cache";
+import { getPublishedNavMenu } from "@/modules/navigation";
 
 export type PublicNavFooter = {
   /** Category landings + View full catalogue — never individual SKUs. */
@@ -106,7 +107,8 @@ export async function resolvePublicNav(
   const footerCompanySlugs = footerCompanyAllowlist.map((i) => i.href);
   const utilitySlugs = footerUtilityAllowlist.map((i) => i.href);
 
-  const [live, present, upcoming, company] = await Promise.all([
+  const [live, present, upcoming, company, cmsFooterProducts, cmsFooterCompany, cmsFooterSupport, cmsPrimary] =
+    await Promise.all([
     publishedSlugs(
       [
         ...new Set([
@@ -123,10 +125,20 @@ export async function resolvePublicNav(
     getCachedPublishedProducts({ limit: 6, upcoming: false }),
     getCachedPublishedProducts({ limit: 4, upcoming: true }),
     getCachedCompanyProfile(),
+    getPublishedNavMenu("footer-products", locale).catch(() => null),
+    getPublishedNavMenu("footer-company", locale).catch(() => null),
+    getPublishedNavMenu("footer-support", locale).catch(() => null),
+    getPublishedNavMenu("primary", locale).catch(() => null),
   ]);
 
   const companyItems = companyNavAllowlist.filter((i) => live.has(i.href));
-  const primaryNavLinks = primaryNavAllowlist.filter((i) => live.has(i.href));
+  const primaryNavLinks = cmsPrimary?.items?.length
+    ? cmsPrimary.items.map(({ label, href, description }) => ({
+        label,
+        href,
+        description,
+      }))
+    : primaryNavAllowlist.filter((i) => live.has(i.href));
 
   const categoryItems = productNavAllowlist.filter((i) => live.has(i.href));
   const categoriesForNav = categoryItems.length
@@ -174,19 +186,29 @@ export async function resolvePublicNav(
     items: companyItems.filter((i) => sec.hrefs.includes(i.href)),
   })).filter((sec) => sec.items.length > 0);
 
-  const footerProducts: NavLink[] = [
-    ...categoriesForNav.map(({ label, href, description }) => ({
-      label,
-      href,
-      description,
-    })),
-    ...(live.has("products")
-      ? [{ label: "View full catalogue", href: "products" }]
-      : []),
-  ];
+  const footerProducts: NavLink[] = cmsFooterProducts?.items?.length
+    ? cmsFooterProducts.items.map(({ label, href, description }) => ({
+        label,
+        href,
+        description,
+      }))
+    : [
+        ...categoriesForNav.map(({ label, href, description }) => ({
+          label,
+          href,
+          description,
+        })),
+        ...(live.has("products")
+          ? [{ label: "View full catalogue", href: "products" }]
+          : []),
+      ];
 
-  const footerCompany = footerCompanyAllowlist.filter((i) => live.has(i.href));
-  const footerSupport = footerUtilityAllowlist.filter((i) => live.has(i.href));
+  const footerCompany = cmsFooterCompany?.items?.length
+    ? cmsFooterCompany.items.map(({ label, href }) => ({ label, href }))
+    : footerCompanyAllowlist.filter((i) => live.has(i.href));
+  const footerSupport = cmsFooterSupport?.items?.length
+    ? cmsFooterSupport.items.map(({ label, href }) => ({ label, href }))
+    : footerUtilityAllowlist.filter((i) => live.has(i.href));
 
   const office = company?.registeredOffice ?? company?.factoryAddress;
   const phone = company?.phones?.[0]?.number ?? footerContactFallback.phone;

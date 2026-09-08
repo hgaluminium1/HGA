@@ -1,15 +1,22 @@
-import type { Metadata } from "next";
+﻿import type { Metadata } from "next";
 
 import { QualityPage } from "@/features/public-site/components/content-pages";
+import { CmsOrFallback } from "@/features/public-site/components/cms-or-fallback";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
   title: "Quality",
-  description: "Quality systems, certifications, and process control.",
+  description: "Quality systems and certifications.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return <QualityPage locale={locale} />;
+  return (
+    <CmsOrFallback
+      locale={locale}
+      slug="quality"
+      fallback={<QualityPage locale={locale} />}
+    />
+  );
 }

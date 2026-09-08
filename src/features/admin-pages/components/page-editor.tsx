@@ -20,6 +20,7 @@ import { GripVertical, Plus, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { BlockDataForm } from "@/features/admin-pages/components/block-forms/block-data-form";
 import {
   SaveBar,
   StatusBadge,
@@ -102,21 +103,16 @@ function SortableBlock({
           <Trash2 className="size-4" />
         </Button>
       </div>
-      <label className="mt-3 block text-xs font-medium text-muted-foreground">
-        Block data (JSON)
-        <textarea
-          className="border-line mt-1 min-h-40 w-full rounded-[var(--radius-md)] border p-3 font-mono text-xs"
-          value={JSON.stringify(block.data, null, 2)}
-          onChange={(e) => {
-            try {
-              const data = JSON.parse(e.target.value) as unknown;
-              onChange({ ...block, data });
-            } catch {
-              // keep typing until valid JSON
-            }
-          }}
+      <div className="mt-3">
+        <p className="text-muted-foreground mb-1 text-xs font-medium">
+          Section content
+        </p>
+        <BlockDataForm
+          type={block.type}
+          data={block.data}
+          onChange={(data) => onChange({ ...block, data })}
         />
-      </label>
+      </div>
     </div>
   );
 }

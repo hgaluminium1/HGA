@@ -465,11 +465,25 @@ export async function CategoryLandingPage({
   categorySlugs: string[];
 }) {
   const cats = await listCategoriesFlat();
-  const matched = cats.filter((c) => categorySlugs.includes(c.slug));
-  const matchIds = matched.map((c) => c.id);
-  const heroImage = categoryImageUrl(
-    slug.startsWith("products/") ? slug : `products/${slug}`,
+  const matched = cats.filter(
+    (c) =>
+      categorySlugs.includes(c.slug) &&
+      (c.status === "published" || c.status === "draft"),
   );
+  const publishedMatched = matched.filter((c) => c.status === "published");
+  const primary = publishedMatched[0] ?? matched[0];
+  const matchIds = (publishedMatched.length ? publishedMatched : matched).map(
+    (c) => c.id,
+  );
+  const displayTitle = primary?.name.en || title;
+  const displayDescription =
+    primary?.description?.en?.trim() || description;
+  const heroImage =
+    primary?.imageUrl?.trim() ||
+    categoryImageUrl(
+      slug.startsWith("products/") ? slug : `products/${slug}`,
+      primary,
+    );
 
   return (
     <>
@@ -480,7 +494,7 @@ export async function CategoryLandingPage({
               locale={locale}
               items={[
                 { label: "Catalogue", href: "products" },
-                { label: title },
+                { label: displayTitle },
               ]}
               tone="dark"
               className="mb-5"
@@ -489,10 +503,10 @@ export async function CategoryLandingPage({
               Category
             </p>
             <h1 className="font-display mt-2.5 max-w-[16ch] text-[clamp(1.85rem,1.3rem+2.2vw,3.25rem)] font-semibold leading-[1.08]">
-              {title}
+              {displayTitle}
             </h1>
             <p className="text-on-dark-muted mt-3.5 max-w-[40rem] text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] leading-relaxed">
-              {description}
+              {displayDescription}
             </p>
             <div className="mt-7 flex flex-wrap gap-3">
               <Link
@@ -515,7 +529,7 @@ export async function CategoryLandingPage({
           <div className="relative hidden aspect-[16/11] overflow-hidden rounded-[var(--radius-lg)] min-[900px]:block">
             <Image
               src={heroImage}
-              alt={title}
+              alt={displayTitle}
               fill
               sizes="28rem"
               className="object-cover"
@@ -543,6 +557,7 @@ export async function CategoryLandingPage({
           {!matchIds.length ? (
             <p className="text-muted-foreground text-sm">
               Catalogue lines for this category will appear once published.
+              Edit category copy and image in Admin → Categories.
             </p>
           ) : null}
           <p className="mt-8 text-sm">

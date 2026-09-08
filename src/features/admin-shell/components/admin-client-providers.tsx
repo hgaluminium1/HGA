@@ -6,8 +6,6 @@ import {
 } from "@tanstack/react-query";
 import { useState } from "react";
 
-import { AdminProviders } from "@/features/admin-shell/components/admin-providers";
-
 export function AdminClientProviders({
   children,
 }: {
@@ -22,9 +20,5 @@ export function AdminClientProviders({
       }),
   );
 
-  return (
-    <AdminProviders>
-      <QueryClientProvider client={client}>{children}</QueryClientProvider>
-    </AdminProviders>
-  );
+  return <QueryClientProvider client={client}>{children}</QueryClientProvider>;
 }

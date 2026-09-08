@@ -13,8 +13,18 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { localePath } from "@/config/nav.config";
+import { siteConfig } from "@/config/site.config";
 import type { HomeContent } from "@/features/public-home/content/home.en";
 import { cn } from "@/lib/utils";
+import dynamic from "next/dynamic";
+
+const LazyHeroThree = dynamic(
+  () =>
+    import("@/features/public-home/components/hero-three-canvas").then(
+      (m) => m.HeroThreeCanvas,
+    ),
+  { ssr: false },
+);
 
 type HeroCarouselProps = {
   locale: string;
@@ -104,13 +114,19 @@ export function HeroCarousel({ locale, content }: HeroCarouselProps) {
             )}
             aria-hidden={i !== index}
           >
+            {siteConfig.flags.heroThree && i === index ? (
+              <LazyHeroThree />
+            ) : null}
             <Image
               src={slide.imageSrc}
               alt={i === index ? slide.imageAlt : ""}
               fill
               priority={i === 0}
               sizes="100vw"
-              className="object-cover object-[center_30%] sm:object-center"
+              className={cn(
+                "object-cover object-[center_30%] sm:object-center",
+                siteConfig.flags.heroThree && "opacity-40",
+              )}
             />
             <div
               className="absolute inset-0 bg-[linear-gradient(180deg,rgb(0_18_47_/_0.55)_0%,rgb(0_18_47_/_0.72)_42%,rgb(0_18_47_/_0.92)_100%),linear-gradient(90deg,rgb(0_18_47_/_0.78)_0%,rgb(0_18_47_/_0.35)_55%,rgb(0_18_47_/_0.2)_100%)]"

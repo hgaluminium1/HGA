@@ -4,6 +4,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { MediaPicker } from "@/features/admin-media/components/media-picker";
 import { StatusBadge } from "@/features/admin-pages/components/save-bar";
 import { categoriesConfig } from "@/config/categories.config";
 import type { CategoryDTO } from "@/modules/catalog/browser";
@@ -35,6 +36,9 @@ function CategoryNode({
   const [open, setOpen] = useState(depth < 1);
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(node.name.en);
+  const [description, setDescription] = useState(node.description?.en ?? "");
+  const [imageUrl, setImageUrl] = useState(node.imageUrl ?? "");
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [adding, setAdding] = useState(false);
   const [childName, setChildName] = useState("");
   const qc = useQueryClient();
@@ -43,6 +47,8 @@ function CategoryNode({
     mutationFn: () =>
       updateCategoryApi(node.id, {
         name: { en: name },
+        description: { en: description },
+        imageUrl: imageUrl || null,
         version: node.version,
       }),
     onSuccess: () => {
@@ -56,6 +62,16 @@ function CategoryNode({
         void qc.invalidateQueries({ queryKey: ["categories"] });
       }
     },
+  });
+
+  const publishMut = useMutation({
+    mutationFn: (status: "published" | "draft") =>
+      updateCategoryApi(node.id, { status, version: node.version }),
+    onSuccess: () => {
+      void qc.invalidateQueries({ queryKey: ["categories"] });
+      onRefresh();
+    },
+    onError: (err) => alert((err as Error).message),
   });
 
   const addMut = useMutation({
@@ -99,37 +115,54 @@ function CategoryNode({
         ) : (
           <span className="min-w-11" />
         )}
-        {editing ? (
-          <input
-            className="border-line min-h-11 flex-1 rounded-[var(--radius-md)] border px-2 text-sm"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
+        {node.imageUrl ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={node.imageUrl}
+            alt=""
+            className="size-10 rounded-[var(--radius-sm)] object-cover"
           />
         ) : (
-          <div className="min-w-0 flex-1">
-            <p className="font-medium text-ink">{node.name.en}</p>
-            <p className="text-muted-foreground text-xs">/{node.slug}</p>
-          </div>
+          <span className="bg-bg-alt size-10 rounded-[var(--radius-sm)]" />
         )}
+        <div className="min-w-0 flex-1">
+          <p className="font-medium text-ink">{node.name.en}</p>
+          <p className="text-muted-foreground text-xs">/{node.slug}</p>
+        </div>
         <StatusBadge
           status={node.status === "published" ? "published" : "draft"}
         />
-        {editing ? (
-          <Button
-            type="button"
-            className="min-h-11"
-            onClick={() => saveMut.mutate()}
-          >
-            Save
-          </Button>
-        ) : (
+        <Button
+          type="button"
+          variant="outline"
+          className="min-h-11"
+          onClick={() => {
+            setName(node.name.en);
+            setDescription(node.description?.en ?? "");
+            setImageUrl(node.imageUrl ?? "");
+            setEditing((v) => !v);
+          }}
+        >
+          {editing ? "Close" : "Edit"}
+        </Button>
+        {node.status === "published" ? (
           <Button
             type="button"
             variant="outline"
             className="min-h-11"
-            onClick={() => setEditing(true)}
+            disabled={publishMut.isPending}
+            onClick={() => publishMut.mutate("draft")}
           >
-            Edit
+            Unpublish
+          </Button>
+        ) : (
+          <Button
+            type="button"
+            className="min-h-11"
+            disabled={publishMut.isPending}
+            onClick={() => publishMut.mutate("published")}
+          >
+            Publish
           </Button>
         )}
         <Button
@@ -151,6 +184,67 @@ function CategoryNode({
           Delete
         </Button>
       </div>
+
+      {editing ? (
+        <div
+          className="border-line bg-bg-alt mb-3 space-y-3 rounded-[var(--radius-md)] border p-4"
+          style={{ marginLeft: `${depth * 16 + 8}px`, marginRight: 8 }}
+        >
+          <p className="text-muted-foreground text-xs">
+            Description and image appear on category landing pages. Photos from
+            Media (R2).
+          </p>
+          <label className="block text-sm font-medium">
+            Name
+            <input
+              className="border-line mt-1 min-h-11 w-full rounded-[var(--radius-md)] border px-2 text-sm"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
+          </label>
+          <label className="block text-sm font-medium">
+            Description
+            <textarea
+              className="border-line mt-1 min-h-20 w-full rounded-[var(--radius-md)] border px-2 py-2 text-sm"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </label>
+          <div className="flex flex-wrap items-end gap-2">
+            <label className="block min-w-0 flex-1 text-sm font-medium">
+              Image URL
+              <input
+                className="border-line mt-1 min-h-11 w-full rounded-[var(--radius-md)] border px-2 text-sm"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)}
+              />
+            </label>
+            <Button
+              type="button"
+              variant="outline"
+              className="min-h-11"
+              onClick={() => setPickerOpen(true)}
+            >
+              Choose media
+            </Button>
+          </div>
+          <Button
+            type="button"
+            className="min-h-11"
+            disabled={saveMut.isPending}
+            onClick={() => saveMut.mutate()}
+          >
+            Save category
+          </Button>
+          <MediaPicker
+            open={pickerOpen}
+            onOpenChange={setPickerOpen}
+            kind="image"
+            onSelect={(m) => setImageUrl(m.url)}
+          />
+        </div>
+      ) : null}
+
       {warnDeep && adding ? (
         <p className="text-amber-700 px-4 pb-2 text-xs">
           Soft max depth ({categoriesConfig.softMaxLevel}) reached — still
@@ -233,7 +327,8 @@ export function CategoriesTree() {
         </Button>
       </div>
       <p className="text-muted-foreground mt-1 text-sm">
-        N-level tree — expand rows to manage subcategories.
+        Publish categories, add descriptions and R2 images — landings and
+        catalogue use this data. No JSON required.
       </p>
 
       {creating ? (
@@ -270,8 +365,15 @@ export function CategoriesTree() {
         <div className="border-line mt-8 rounded-[var(--radius-lg)] border border-dashed p-8 text-center">
           <p className="font-medium">No categories yet</p>
           <p className="text-muted-foreground mt-1 text-sm">
-            Create a root category or run npm run seed:categories.
+            Create a root category, then Publish when ready for the public site.
           </p>
+          <Button
+            type="button"
+            className="mt-4 min-h-11"
+            onClick={() => setCreating(true)}
+          >
+            Create root category
+          </Button>
         </div>
       ) : null}
 

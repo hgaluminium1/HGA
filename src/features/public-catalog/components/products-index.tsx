@@ -1,4 +1,3 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/atoms/container";
@@ -12,18 +11,25 @@ import { InquireBand } from "@/features/public-site/components/inquire-band";
 import { UpcomingProductsStrip } from "@/features/public-site/components/upcoming-products";
 import { getCachedPublishedProducts } from "@/features/public-site/lib/public-cache";
 import { localePath } from "@/config/nav.config";
+import { listCategoriesFlat } from "@/modules/catalog";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 type ProductsIndexProps = {
   locale: string;
 };
 
 export async function ProductsIndex({ locale }: ProductsIndexProps) {
-  const { items } = await getCachedPublishedProducts({
-    limit: 48,
-    upcoming: false,
-  });
-  const categories = catalogueCategoryNav();
+  const [{ items }, cats] = await Promise.all([
+    getCachedPublishedProducts({
+      limit: 48,
+      upcoming: false,
+    }),
+    listCategoriesFlat(),
+  ]);
+  const categories = catalogueCategoryNav(
+    cats.filter((c) => c.status === "published"),
+  );
 
   if (items.length === 0) {
     return (

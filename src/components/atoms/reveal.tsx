@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -13,17 +14,15 @@ type RevealProps = {
 export function Reveal({ children, className, stagger = false }: RevealProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
+  const reduce = useReducedMotion();
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {
       setVisible(true);
       return;
     }
-
     const io = new IntersectionObserver(
       ([entry]) => {
         if (entry?.isIntersecting) {
@@ -35,19 +34,24 @@ export function Reveal({ children, className, stagger = false }: RevealProps) {
     );
     io.observe(el);
     return () => io.disconnect();
-  }, []);
+  }, [reduce]);
 
   return (
-    <div
+    <motion.div
       ref={ref}
-      className={cn(
-        "transition-[opacity,transform] duration-700 ease-[var(--ease)]",
-        visible ? "translate-y-0 opacity-100" : "translate-y-7 opacity-0",
-        stagger && "[&>*]:transition-[opacity,transform]",
-        className,
-      )}
+      className={cn(stagger && "[&>*]:will-change-transform", className)}
+      initial={reduce ? false : { opacity: 0, y: 28 }}
+      animate={
+        visible || reduce
+          ? { opacity: 1, y: 0 }
+          : { opacity: 0, y: 28 }
+      }
+      transition={{
+        duration: reduce ? 0 : 0.55,
+        ease: [0.22, 1, 0.36, 1],
+      }}
     >
       {children}
-    </div>
+    </motion.div>
   );
 }
