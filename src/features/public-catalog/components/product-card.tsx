@@ -45,8 +45,7 @@ export function ProductCard({
 }: ProductCardProps) {
   const upcoming = Boolean(product.isUpcoming) || tone === "pipeline";
   const image = productImageUrl(product);
-  const alloys = product.alloyGrades.slice(0, 3);
-  const alloyLine = alloys.join(" · ");
+  const blurb = (product.description ?? "").trim();
 
   return (
     <Link
@@ -89,24 +88,15 @@ export function ProductCard({
         <span className="font-display text-[clamp(1rem,0.95rem+0.25vw,1.125rem)] font-semibold leading-snug text-ink text-balance">
           {product.name.en}
         </span>
-        <span className="text-muted-foreground mt-1 block text-[0.8125rem] tabular-nums tracking-tight">
-          {product.sku}
-        </span>
-        {alloyLine ? (
-          <span className="text-brand-blue mt-1.5 block text-[0.75rem] font-medium tracking-wide">
-            {alloyLine}
-            {product.alloyGrades.length > 3 ? " +" : ""}
-          </span>
-        ) : null}
-        {product.description ? (
-          <span className="text-muted-foreground mt-2 line-clamp-2 text-[0.8125rem] leading-relaxed">
-            {product.description}
+        {blurb ? (
+          <span className="text-muted-foreground mt-1.5 line-clamp-2 text-[0.8125rem] leading-relaxed">
+            {blurb}
           </span>
         ) : (
           <span className="flex-1" aria-hidden />
         )}
         <span className="text-brand-blue mt-3 inline-flex items-center gap-1 text-[0.8125rem] font-semibold tracking-tight">
-          {upcoming ? "Register interest" : "View specs"}
+          {upcoming ? "Register interest" : "View product"}
           <ArrowUpRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
         </span>
       </span>

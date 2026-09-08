@@ -22,12 +22,27 @@ import {
   SustainabilityMetricsBlock,
 } from "@/features/public-corporate";
 import { MarketsSection } from "@/features/public-site/components/markets-section";
+import { InquireBand } from "@/features/public-site/components/inquire-band";
+import {
+  IndustryListBlock,
+  NumberedStepsBlock,
+  PageIntroBlock,
+  PillarListBlock,
+  ResourceListBlock,
+  TimelineBlock,
+} from "@/features/public-site/components/corp-cms-blocks";
 import { UpcomingProductsStrip } from "@/features/public-site/components/upcoming-products";
 import { productImageUrl } from "@/features/public-catalog/lib/product-media";
+import {
+  groupProductsByCategory,
+  type CategoryWithProducts,
+} from "@/features/public-catalog/lib/catalogue-groups";
 import {
   getCachedPublishedProducts,
 } from "@/features/public-site/lib/public-cache";
 import { getCachedPublishedLogos } from "@/features/public-corporate/lib/public-cache";
+import { listCategoriesFlat } from "@/modules/catalog";
+import { PublicEmptyState } from "@/features/public-site/components/cms-empty-state";
 
 export type CmsBlock = {
   id: string;
@@ -41,36 +56,31 @@ async function hydrateProductsBlock(
   content: HomeContent["products"],
 ): Promise<{
   content: HomeContent["products"];
-  products: Awaited<
-    ReturnType<typeof getCachedPublishedProducts>
-  >["items"];
+  groups: CategoryWithProducts[];
 }> {
-  const { items } = await getCachedPublishedProducts({
-    limit: 6,
-    upcoming: false,
-  });
-  if (!items.length) {
-    return {
-      content: { ...content, items: content.items ?? [] },
-      products: [],
-    };
-  }
+  const [cats, { items }] = await Promise.all([
+    listCategoriesFlat().catch(() => []),
+    getCachedPublishedProducts({ limit: 48, upcoming: false }),
+  ]);
+  const groups = groupProductsByCategory(cats, items);
   return {
     content: {
       eyebrow: content.eyebrow || "Our Products",
-      title: content.title || "Present catalogue lines",
+      title: content.title || "Shop by category",
       description:
         content.description ||
-        "Extrusion profiles, homogenised billets and remelt ingots — published and ready for enquiry.",
-      items: items.map((p, index) => ({
-        title: p.name.en,
-        href: `products/${p.slug}`,
-        imageSrc: productImageUrl(p),
-        imageAlt: p.name.en,
-        wide: index === items.length - 1 && items.length % 2 === 1,
-      })),
+        "Each category holds the products you can enquire about — extrusion, billets and remelt.",
+      items: groups.flatMap((g) =>
+        g.products.slice(0, 2).map((p, index) => ({
+          title: p.name.en,
+          href: `products/${p.slug}`,
+          imageSrc: productImageUrl(p),
+          imageAlt: p.name.en,
+          wide: index === 0,
+        })),
+      ),
     },
-    products: items,
+    groups,
   };
 }
 
@@ -111,11 +121,15 @@ async function hydrateCustomersBlock(
   };
 }
 
-function SoftFail({ type }: { type: string }) {
+function SoftFail({ type, locale = "en" }: { type: string; locale?: string }) {
   return (
-    <div className="border-line bg-surface-muted text-muted-foreground mx-auto my-6 max-w-3xl rounded-[var(--radius-md)] border border-dashed p-6 text-center text-sm">
-      Section “{type}” is unavailable in this preview.
-    </div>
+    <PublicEmptyState
+      locale={locale}
+      density="section"
+      title={`Section “${type}” unavailable.`}
+      description="This block could not render. Other page sections still work."
+      primary={{ label: "Contact / RFQ", href: "contact" }}
+    />
   );
 }
 
@@ -153,7 +167,7 @@ export async function renderCmsBlock(
           <ProductsSection
             locale={locale}
             content={hydrated.content}
-            products={hydrated.products}
+            groups={hydrated.groups}
           />,
         );
       }
@@ -165,6 +179,7 @@ export async function renderCmsBlock(
             eyebrow={copy.eyebrow}
             title={copy.title}
             description={copy.description}
+            showEmpty
           />,
         );
       }
@@ -190,6 +205,7 @@ export async function renderCmsBlock(
       case "customers":
         return wrap(
           <CustomersLogoStrip
+            locale={locale}
             content={await hydrateCustomersBlock(
               block.data as HomeContent["customers"],
             )}
@@ -225,27 +241,41 @@ export async function renderCmsBlock(
         return wrap(
           <FaqSection content={block.data as HomeContent["faq"]} />,
         );
+      case "page-intro":
+        return wrap(<PageIntroBlock locale={locale} data={block.data} />);
+      case "pillar-list":
+        return wrap(<PillarListBlock locale={locale} data={block.data} />);
+      case "timeline":
+        return wrap(<TimelineBlock locale={locale} data={block.data} />);
+      case "numbered-steps":
+        return wrap(
+          <NumberedStepsBlock locale={locale} data={block.data} />,
+        );
+      case "resource-list":
+        return wrap(<ResourceListBlock locale={locale} data={block.data} />);
+      case "industry-list":
+        return wrap(<IndustryListBlock locale={locale} data={block.data} />);
       case "stats":
-        return wrap(<StatsBlock />);
+        return wrap(<StatsBlock locale={locale} />);
       case "company-facts":
-        return wrap(<CompanyFactsBlock />);
+        return wrap(<CompanyFactsBlock locale={locale} />);
       case "cert-grid":
-        return wrap(<CertGridBlock />);
+        return wrap(<CertGridBlock locale={locale} />);
       case "sustainability-metrics":
-        return wrap(<SustainabilityMetricsBlock />);
+        return wrap(<SustainabilityMetricsBlock locale={locale} />);
       case "leadership-grid":
-        return wrap(<LeadershipGridBlock />);
+        return wrap(<LeadershipGridBlock locale={locale} />);
       case "logo-strip":
       case "gallery":
-        return wrap(<CustomerLogoStripBlock />);
+        return wrap(<CustomerLogoStripBlock locale={locale} />);
       case "expansion-roadmap":
-        return wrap(<ExpansionRoadmapBlock />);
+        return wrap(<ExpansionRoadmapBlock locale={locale} />);
       default:
-        return <SoftFail key={block.id} type={block.type} />;
+        return <SoftFail key={block.id} type={block.type} locale={locale} />;
+      }
+    } catch {
+      return <SoftFail key={block.id} type={block.type} locale={locale} />;
     }
-  } catch {
-    return <SoftFail key={block.id} type={block.type} />;
-  }
 }
 
 export async function CmsPageBlocks({
@@ -259,5 +289,11 @@ export async function CmsPageBlocks({
   const nodes = await Promise.all(
     ordered.map((b) => renderCmsBlock(b, locale)),
   );
-  return <>{nodes}</>;
+  const hasCtaBanner = ordered.some((b) => b.type === "cta-banner");
+  return (
+    <>
+      {nodes}
+      {!hasCtaBanner ? <InquireBand locale={locale} /> : null}
+    </>
+  );
 }

@@ -149,6 +149,28 @@
   .clip-capability {
     clip-path: polygon(0 0, 100% 0, 100% 100%, 0 96%);
   }
+
+  /**
+   * Fluid corporate split — container-driven columns (Apple-style continuous
+   * layout). Switches when the *component* is wide enough, not a device BP.
+   */
+  .corp-split {
+    grid-template-columns: 1fr;
+  }
+
+  @container (min-width: 42rem) {
+    .corp-split {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    }
+
+    .corp-split--reverse > :first-child {
+      order: 2;
+    }
+
+    .corp-split--reverse > :last-child {
+      order: 1;
+    }
+  }
 }
 
 @keyframes pulse-ring {

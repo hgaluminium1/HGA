@@ -1,32 +1,10 @@
 [
   {
-    "name": { "en": "Aluminium Extrusions" },
-    "slug": "aluminium-extrusions",
-    "children": [
-      {
-        "name": { "en": "Extrusion Profiles" },
-        "slug": "extrusion-profiles"
-      }
-    ]
-  },
-  {
-    "name": { "en": "Billets" },
-    "slug": "billets",
-    "children": [
-      {
-        "name": { "en": "Homogenised Billets" },
-        "slug": "homogenised-billets"
-      }
-    ]
-  },
-  {
-    "name": { "en": "Ingots & Alloys" },
-    "slug": "ingots-alloys",
-    "children": [
-      { "name": { "en": "Remelt Ingots" }, "slug": "remelt-ingots" },
-      { "name": { "en": "Cubes" }, "slug": "cubes" },
-      { "name": { "en": "Shots" }, "slug": "shots" },
-      { "name": { "en": "Deoxidizer" }, "slug": "deoxidizer" }
-    ]
+    "name": { "en": "Aluminium" },
+    "slug": "aluminium",
+    "description": {
+      "en": "HG Aluminium Smelters Limited — homogenised billets, extrusion profiles, remelt ingots and specialised aluminium forms from our Kadi / Mahesana campus."
+    },
+    "imageUrl": "/products/extrusion-profiles.jpg"
   }
 ]

@@ -69,21 +69,6 @@ export const publicPages = [
     description: "Product catalogue",
   },
   {
-    slug: "products/extrusion-profiles",
-    title: "Extrusion Profiles",
-    description: "Extrusion profiles",
-  },
-  {
-    slug: "products/billets",
-    title: "Aluminium Billets",
-    description: "Extrusion-ready billets",
-  },
-  {
-    slug: "products/ingots-alloys",
-    title: "Ingots & Alloys",
-    description: "Ingots and alloys",
-  },
-  {
     slug: "industries",
     title: "Industries & Applications",
     description: "Industries we serve",
@@ -132,22 +117,29 @@ export function localePath(locale: string, slug = "") {
  */
 export const productNavAllowlist: NavLink[] = [
   {
-    label: "Ingots & Alloys",
-    href: "products/category/ingots-alloys",
-    description: "Remelt ingots and casting alloys",
+    label: "Aluminium",
+    href: "products/category/aluminium",
+    description:
+      "Billets, extrusion profiles, ingots and specialised aluminium products",
     icon: "ingot",
   },
   {
-    label: "Aluminium Billets",
-    href: "products/category/billets",
-    description: "Homogenised extrusion-ready billets",
+    label: "Extrusion Profiles",
+    href: "products/aluminium-extrusion-profiles",
+    description: "Architectural, solar and industrial sections",
+    icon: "recycle",
+  },
+  {
+    label: "Homogenised Billets",
+    href: "products/aluminium-homogenized-billets",
+    description: "Extrusion-ready billets for profile manufacturers",
     icon: "billet",
   },
   {
-    label: "Extrusion Profiles",
-    href: "products/category/extrusion-profiles",
-    description: "Architectural, industrial and solar profiles",
-    icon: "recycle",
+    label: "Aluminium Ingots",
+    href: "products/aluminium-ingots",
+    description: "Secondary remelt and alloy ingots for foundries",
+    icon: "drop",
   },
 ];
 

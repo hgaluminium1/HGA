@@ -26,6 +26,14 @@ import {
   TestimonialsSectionForm,
 } from "@/features/admin-desk/components/home-block-forms";
 import {
+  IndustryListForm,
+  NumberedStepsForm,
+  PageIntroForm,
+  PillarListForm,
+  ResourceListForm,
+  TimelineForm,
+} from "@/features/admin-desk/components/corporate-page-forms";
+import {
   ApiClientError,
   ensurePageBySlug,
   previewPathForTemplate,
@@ -55,6 +63,12 @@ const EDITOR_BLURBS: Record<string, string> = {
   "joint-ventures": "Partnership highlights with a supporting photo.",
   "careers-teaser": "A short careers invite with photos and a button.",
   faq: "Common questions and answers visitors ask.",
+  "page-intro": "Opening narrative — eyebrow, title, body and optional CTA.",
+  "pillar-list": "Intro plus titled narrative pillars.",
+  timeline: "Yeared milestones visitors scan.",
+  "numbered-steps": "Ordered process or release rail.",
+  "resource-list": "Requestable technical packs.",
+  "industry-list": "Sectors, applications and product links.",
 };
 
 export function SectionWorkspace({
@@ -259,7 +273,12 @@ export function SectionWorkspace({
       </header>
 
       {showEntityPanel ? (
-        <EntityHydratedPanel title={title} help={help} />
+        <EntityHydratedPanel
+          title={title}
+          help={help}
+          slug={slug}
+          blockType={blockType}
+        />
       ) : blockType === "hero" ? (
         <HeroSectionForm value={draft} onChange={setDraft} />
       ) : blockType === "capability" ? (
@@ -282,6 +301,18 @@ export function SectionWorkspace({
         <CareersTeaserSectionForm value={draft} onChange={setDraft} />
       ) : blockType === "faq" ? (
         <FaqSectionForm value={draft} onChange={setDraft} />
+      ) : blockType === "page-intro" ? (
+        <PageIntroForm value={draft} onChange={setDraft} />
+      ) : blockType === "pillar-list" ? (
+        <PillarListForm value={draft} onChange={setDraft} />
+      ) : blockType === "timeline" ? (
+        <TimelineForm value={draft} onChange={setDraft} />
+      ) : blockType === "numbered-steps" ? (
+        <NumberedStepsForm value={draft} onChange={setDraft} />
+      ) : blockType === "resource-list" ? (
+        <ResourceListForm value={draft} onChange={setDraft} />
+      ) : blockType === "industry-list" ? (
+        <IndustryListForm value={draft} onChange={setDraft} />
       ) : (
         <ContentBlockForm type={blockType} value={draft} onChange={setDraft} />
       )}

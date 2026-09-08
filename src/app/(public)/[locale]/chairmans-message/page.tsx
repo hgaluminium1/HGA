@@ -5,6 +5,7 @@ import { Container } from "@/components/atoms/container";
 import { PageHero } from "@/features/public-site/components/page-hero";
 import { Section } from "@/components/atoms/section";
 import { getCachedPublishedChairmen } from "@/features/public-corporate/lib/public-cache";
+import { PublicEmptyState } from "@/features/public-site/components/cms-empty-state";
 import { CATALOGUE_PLACEHOLDER } from "@/lib/media/resolve-media-url";
 
 type PageProps = {
@@ -33,9 +34,13 @@ export default async function ChairmansMessagePage({ params }: PageProps) {
       <Section>
         <Container className="max-w-5xl space-y-16">
           {chairmen.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              Leadership messages will appear here once published in admin.
-            </p>
+            <PublicEmptyState
+              locale={locale}
+              density="section"
+              title="No chairman messages yet."
+              description="Publish people marked for the Chairman’s Message page in Admin → People."
+              primary={{ label: "Contact / RFQ", href: "contact" }}
+            />
           ) : null}
           {chairmen.map((person) => {
             const photo = person.photoUrl?.trim() || CATALOGUE_PLACEHOLDER;

@@ -6,12 +6,10 @@ import { Section } from "@/components/atoms/section";
 import { CatalogueBreadcrumbs } from "@/features/public-catalog/components/catalogue-breadcrumbs";
 import { LoadMoreProducts } from "@/features/public-catalog/components/load-more-products";
 import { categoryImageUrl } from "@/features/public-catalog/lib/product-media";
+import { PublicEmptyState } from "@/features/public-site/components/cms-empty-state";
 import { InquireBand } from "@/features/public-site/components/inquire-band";
 import { getCachedPublishedProducts } from "@/features/public-site/lib/public-cache";
-import {
-  getPublishedCategoryBySlug,
-  listCategoriesFlat,
-} from "@/modules/catalog";
+import { getPublishedCategoryBySlug } from "@/modules/catalog";
 import Image from "next/image";
 
 type PageProps = {
@@ -34,10 +32,6 @@ export default async function CategoryProductsPage({ params }: PageProps) {
   const { locale, slug } = await params;
   const category = await getPublishedCategoryBySlug(slug);
   if (!category) notFound();
-
-  const children = (await listCategoriesFlat()).filter(
-    (c) => c.parentId === category.id && c.status === "published",
-  );
 
   const pageSize = 24;
   const { items, nextCursor } = await getCachedPublishedProducts({
@@ -82,37 +76,26 @@ export default async function CategoryProductsPage({ params }: PageProps) {
         </Container>
       </section>
 
-      {children.length > 0 ? (
-        <Section>
-          <Container>
-            <h2 className="font-display text-xl font-semibold text-ink">
-              Subcategories
-            </h2>
-            <ul className="mt-4 grid gap-3 min-[640px]:grid-cols-2 min-[1024px]:grid-cols-3">
-              {children.map((child) => (
-                <li key={child.id}>
-                  <a
-                    href={`/${locale}/products/category/${child.slug}`}
-                    className="border-line hover:border-brand-blue block min-h-11 rounded-[var(--radius-md)] border px-4 py-3 text-sm font-semibold text-ink"
-                  >
-                    {child.name.en}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </Container>
-        </Section>
-      ) : null}
-
       <Section>
         <Container>
           <h2 className="font-display text-xl font-semibold text-ink">
             Products
           </h2>
           {items.length === 0 ? (
-            <p className="text-muted-foreground mt-4 text-sm">
-              No published products in this category yet.
-            </p>
+            <div className="mt-6">
+              <PublicEmptyState
+                locale={locale}
+                density="section"
+                title="No products in this category yet."
+                description="Published lines for this category will appear here."
+                primary={{ label: "Contact / RFQ", href: "contact" }}
+                secondary={{
+                  label: "All products",
+                  href: "products",
+                  variant: "outline",
+                }}
+              />
+            </div>
           ) : (
             <div className="mt-6">
               <LoadMoreProducts

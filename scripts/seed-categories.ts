@@ -9,27 +9,26 @@ import { createCategory, listCategoriesFlat } from "@/modules/catalog";
 type SeedNode = {
   name: { en: string };
   slug: string;
+  description?: { en: string };
+  imageUrl?: string;
   children?: SeedNode[];
 };
 
-async function seedNode(node: SeedNode, parentId: string | null) {
+async function seedFlat(node: SeedNode) {
   const existing = (await listCategoriesFlat()).find((c) => c.slug === node.slug);
-  let id = existing?.id ?? null;
-  if (!existing) {
-    const created = await createCategory({
-      name: node.name,
-      slug: node.slug,
-      parentId,
-      status: "published",
-    });
-    id = created.id;
-    console.log(`created category ${node.slug}`);
-  } else {
+  if (existing) {
     console.log(`skip existing ${node.slug}`);
+    return;
   }
-  for (const child of node.children ?? []) {
-    await seedNode(child, id);
-  }
+  await createCategory({
+    name: node.name,
+    slug: node.slug,
+    parentId: null,
+    description: node.description,
+    imageUrl: node.imageUrl,
+    status: "published",
+  });
+  console.log(`created category ${node.slug}`);
 }
 
 async function main() {
@@ -37,9 +36,12 @@ async function main() {
     resolve(process.cwd(), "config/categories.seed.json"),
     "utf8",
   );
-  const tree = JSON.parse(raw) as SeedNode[];
-  for (const root of tree) {
-    await seedNode(root, null);
+  const nodes = JSON.parse(raw) as SeedNode[];
+  for (const node of nodes) {
+    await seedFlat(node);
+    for (const child of node.children ?? []) {
+      await seedFlat(child);
+    }
   }
 }
 

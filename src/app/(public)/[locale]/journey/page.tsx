@@ -1,22 +1,16 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 
-import { JourneyPage } from "@/features/public-site/components/content-pages";
-import { CmsOrFallback } from "@/features/public-site/components/cms-or-fallback";
+import { CmsPageView } from "@/features/public-site";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
   title: "Our journey",
-  description: "Company journey and milestones.",
+  description:
+    "From incorporation to a growing extrusion and remelt platform in Gujarat.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return (
-    <CmsOrFallback
-      locale={locale}
-      slug="journey"
-      fallback={<JourneyPage locale={locale} />}
-    />
-  );
+  return <CmsPageView locale={locale} slug="journey" />;
 }

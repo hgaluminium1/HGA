@@ -18,6 +18,6 @@ function run(script: string) {
 run("scripts/wipe-cms-data.ts");
 run("scripts/seed-realistic-all.ts");
 run("scripts/seed-home-page.ts");
-run("scripts/seed-cms-shells.ts");
+run("scripts/seed-corporate-pages.ts");
 
 console.log("\n=== seed:all complete ===");

@@ -13,6 +13,12 @@ export const EDITABLE_CMS_BLOCK_TYPES = new Set<BlockType>([
   "joint-ventures",
   "careers-teaser",
   "faq",
+  "page-intro",
+  "pillar-list",
+  "timeline",
+  "numbered-steps",
+  "resource-list",
+  "industry-list",
 ]);
 
 /** Blocks hydrated from catalogue / corporate entities — honesty panel only. */

@@ -1,22 +1,16 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 
-import { ProcurementPage } from "@/features/public-site/components/content-pages";
-import { CmsOrFallback } from "@/features/public-site/components/cms-or-fallback";
+import { CmsPageView } from "@/features/public-site";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
-  title: "Procurement",
-  description: "Global procurement and export.",
+  title: "Procurement & Export",
+  description:
+    "Buyer path for domestic programmes and export enquiries — contacts and next steps.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return (
-    <CmsOrFallback
-      locale={locale}
-      slug="procurement"
-      fallback={<ProcurementPage locale={locale} />}
-    />
-  );
+  return <CmsPageView locale={locale} slug="procurement" />;
 }

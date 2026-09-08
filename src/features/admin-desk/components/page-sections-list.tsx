@@ -31,23 +31,16 @@ export function PageSectionsList({ slug }: { slug: string }) {
           {template.label}
         </h1>
         <p className="text-muted-foreground max-w-prose text-[0.8125rem] leading-snug">
-          {template.description} Open a section in the list below — or use the
-          sidebar while editing.
+          {template.description} Click a section to change its wording or
+          photos. Sections marked “Data” open the list that fills that block.
         </p>
       </header>
 
-      {template.mode === "entity" || template.sections.length === 0 ? (
+      {template.sections.length === 0 ? (
         <div className="border-line rounded-lg border border-dashed p-4">
-          <p className="text-[0.9375rem] font-semibold">Company data page</p>
+          <p className="text-[0.9375rem] font-semibold">Nothing to edit here</p>
           <p className="text-muted-foreground mt-1.5 text-[0.8125rem] leading-snug">
-            This page is filled from company records.{" "}
-            <Link
-              href={`/admin/pages/${slug}/overview`}
-              className="font-semibold underline"
-            >
-              Open overview
-            </Link>{" "}
-            to publish the page document.
+            This page has no editable sections yet.
           </p>
         </div>
       ) : (
@@ -68,8 +61,8 @@ export function PageSectionsList({ slug }: { slug: string }) {
                       <p className="text-[0.9375rem] font-semibold">
                         {section.title}
                       </p>
-                      <span className="text-muted-foreground text-[0.625rem] font-semibold uppercase tracking-wide">
-                        {entity ? "Auto" : "Edit"}
+                      <span className="text-[0.625rem] font-semibold uppercase tracking-wide text-[#0071e3]">
+                        {entity ? "Data" : "Edit"}
                       </span>
                     </div>
                     <p className="text-muted-foreground mt-0.5 text-[0.75rem] leading-snug">

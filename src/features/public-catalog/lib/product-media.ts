@@ -33,39 +33,26 @@ export function categoryImageUrl(
   return CATALOGUE_PLACEHOLDER;
 }
 
-/** Map CMS category slug → public landing href when one exists. */
-export function categoryLandingHref(categorySlug: string): string | null {
-  const legacy: Record<string, string> = {
-    "remelt-ingots": "products/category/ingots-alloys",
-    "ingots-alloys": "products/category/ingots-alloys",
-    cubes: "products/category/ingots-alloys",
-    shots: "products/category/ingots-alloys",
-    deoxidizer: "products/category/ingots-alloys",
-    "homogenised-billets": "products/category/billets",
-    billets: "products/category/billets",
-    "extrusion-profiles": "products/category/extrusion-profiles",
-    "aluminium-extrusions": "products/category/extrusion-profiles",
-  };
-  if (legacy[categorySlug]) return legacy[categorySlug];
+/** Public path for a category — flat catalogue only. */
+export function categoryLandingHref(categorySlug: string): string {
   return `products/category/${categorySlug}`;
 }
 
 export function catalogueCategoryNav(
-  categories?: Pick<CategoryDTO, "slug" | "imageUrl" | "name">[],
+  categories?: Pick<CategoryDTO, "slug" | "imageUrl" | "name" | "description">[],
 ) {
-  return productNavAllowlist.map((item) => {
-    const slugTail = item.href.replace(/^products\//, "");
-    const match = categories?.find(
-      (c) =>
-        categoryLandingHref(c.slug) === item.href ||
-        c.slug === slugTail ||
-        c.name.en.toLowerCase().includes(item.label.toLowerCase().slice(0, 6)),
-    );
-    return {
-      ...item,
-      imageSrc: categoryImageUrl(item.href, match),
-    };
-  });
+  if (categories?.length) {
+    return categories.map((c) => ({
+      label: c.name.en,
+      href: categoryLandingHref(c.slug),
+      description: c.description?.en,
+      imageSrc: categoryImageUrl(c.slug, c),
+    }));
+  }
+  return productNavAllowlist.map((item) => ({
+    ...item,
+    imageSrc: categoryImageUrl(item.href),
+  }));
 }
 
 export function formatDimensionMm(value: number | null | undefined) {

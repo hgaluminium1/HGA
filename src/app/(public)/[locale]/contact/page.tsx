@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 
-import { ContactPage } from "@/features/public-site/components/content-pages";
+import { ContactPage } from "@/features/public-corporate/pages";
 
 type PageProps = {
   params: Promise<{ locale: string }>;

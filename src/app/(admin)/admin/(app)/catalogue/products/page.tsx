@@ -1,10 +1,5 @@
-import { CatalogueComingSoon } from "@/features/admin-desk/components/catalogue-coming-soon";
+import { CatalogueProductsList } from "@/features/admin-desk/components/catalogue-products-list";
 
 export default function CatalogueProductsPage() {
-  return (
-    <CatalogueComingSoon
-      title="Products"
-      body="Create and edit catalogue products with photos, specs, and publish state. Kept separate from page sections on purpose."
-    />
-  );
+  return <CatalogueProductsList />;
 }

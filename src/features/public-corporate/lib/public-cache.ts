@@ -1,5 +1,6 @@
 import { unstable_cache } from "next/cache";
 
+import { listPublishedOpenings } from "@/modules/careers";
 import {
   getCompanyProfile,
   listPublishedCapacityMetrics,
@@ -102,5 +103,14 @@ export function getCachedPublishedExpansion() {
     () => listPublishedExpansionProjects(),
     ["published-expansion"],
     { tags: ["corporate"], revalidate: 60 },
+  )();
+}
+
+export function getCachedPublishedOpenings() {
+  if (cacheDisabled) return listPublishedOpenings();
+  return unstable_cache(
+    () => listPublishedOpenings(),
+    ["published-openings"],
+    { tags: ["careers"], revalidate: 60 },
   )();
 }

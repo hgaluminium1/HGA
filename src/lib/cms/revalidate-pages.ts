@@ -23,3 +23,7 @@ export function revalidateCorporate() {
 export function revalidateCapacity() {
   revalidateTag("capacity");
 }
+
+export function revalidateCareers() {
+  revalidateTag("careers");
+}

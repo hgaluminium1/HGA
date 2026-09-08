@@ -1,29 +1,9 @@
-import Image from "next/image";
 import Link from "next/link";
 
 import { Container } from "@/components/atoms/container";
 import { buttonVariants } from "@/components/ui/button";
 import { localePath } from "@/config/nav.config";
 import { cn } from "@/lib/utils";
-
-/** Stable mock heroes per page job — overridden when CMS provides media later. */
-export const PAGE_HERO_IMAGES = {
-  about: "https://picsum.photos/seed/hg-hero-about/1600/900",
-  journey: "https://picsum.photos/seed/hg-hero-journey/1600/900",
-  leadership: "https://picsum.photos/seed/hg-hero-lead/1600/900",
-  capacity: "https://picsum.photos/seed/hg-hero-cap/1600/900",
-  customers: "https://picsum.photos/seed/hg-hero-cust/1600/900",
-  expansion: "https://picsum.photos/seed/hg-hero-exp/1600/900",
-  industries: "https://picsum.photos/seed/hg-hero-ind/1600/900",
-  manufacturing: "https://picsum.photos/seed/hg-hero-mfg/1600/900",
-  quality: "https://picsum.photos/seed/hg-hero-qa/1600/900",
-  sustainability: "https://picsum.photos/seed/hg-hero-esg/1600/900",
-  procurement: "https://picsum.photos/seed/hg-hero-proc/1600/900",
-  careers: "https://picsum.photos/seed/hg-hero-car/1600/900",
-  resources: "https://picsum.photos/seed/hg-hero-res/1600/900",
-  contact: "https://picsum.photos/seed/hg-hero-contact/1600/900",
-  default: "https://picsum.photos/seed/hg-hero-default/1600/900",
-} as const;
 
 type PageHeroProps = {
   locale: string;
@@ -34,16 +14,19 @@ type PageHeroProps = {
   ctaHref?: string;
   secondaryLabel?: string;
   secondaryHref?: string;
-  tone?: "brand" | "ink";
+  tone?: "brand" | "ink" | "surface";
   showCta?: boolean;
-  /** Full-bleed photo plane — preferred over pure gradient. */
+  /**
+   * @deprecated Full-bleed stock photos are not used on inner pages.
+   * Kept optional for callers; intentionally ignored (typography-first).
+   */
   imageSrc?: string;
   imageAlt?: string;
 };
 
 /**
- * Inner-page hero — photo plane when provided, otherwise brand gradient.
- * One job: brand + title + short support + CTA group.
+ * Inner-page hero — typography-first (Stripe / Linear / Apple product pages).
+ * Brand + one headline + short support + optional CTA. No full-bleed photo plane.
  */
 export function PageHero({
   locale,
@@ -56,64 +39,61 @@ export function PageHero({
   secondaryHref,
   tone = "brand",
   showCta = true,
-  imageSrc,
-  imageAlt = "",
 }: PageHeroProps) {
-  const hasPhoto = Boolean(imageSrc);
+  const isSurface = tone === "surface";
 
   return (
     <section
       className={cn(
-        "relative overflow-hidden text-white",
-        !hasPhoto &&
-          (tone === "brand"
-            ? "bg-[linear-gradient(125deg,var(--brand-blue-darker)_0%,var(--ink)_52%,var(--brand-blue-dark)_100%)]"
-            : "bg-ink"),
+        "relative overflow-hidden border-b",
+        isSurface
+          ? "border-line bg-bg text-ink"
+          : tone === "ink"
+            ? "border-transparent bg-ink text-white"
+            : "border-transparent bg-[linear-gradient(125deg,var(--brand-blue-darker)_0%,var(--ink)_55%,var(--brand-blue-dark)_100%)] text-white",
       )}
     >
-      {hasPhoto ? (
-        <>
-          <Image
-            src={imageSrc!}
-            alt={imageAlt}
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover"
-          />
-          <div
-            className="absolute inset-0 bg-[linear-gradient(105deg,rgb(0_18_47_/_0.88)_0%,rgb(0_18_47_/_0.55)_55%,rgb(3_66_171_/_0.45)_100%)]"
-            aria-hidden
-          />
-        </>
-      ) : (
+      {!isSurface ? (
         <div
-          className="pointer-events-none absolute inset-0 opacity-40"
+          className="pointer-events-none absolute inset-0 opacity-35"
           style={{
             backgroundImage:
-              "radial-gradient(ellipse at 12% 20%, rgba(3,66,171,0.5), transparent 48%), radial-gradient(ellipse at 88% 75%, rgba(232,1,21,0.16), transparent 42%)",
+              "radial-gradient(ellipse at 8% 0%, rgba(3,66,171,0.45), transparent 42%), radial-gradient(ellipse at 92% 100%, rgba(232,1,21,0.12), transparent 38%)",
           }}
           aria-hidden
         />
-      )}
-      <Container className="relative py-[clamp(2.75rem,7vw,4.75rem)]">
-        <p className="text-[0.72rem] font-bold tracking-[0.14em] text-brand-red uppercase">
+      ) : null}
+      <Container className="relative py-[clamp(2rem,4.5vw,3.25rem)]">
+        <p
+          className={cn(
+            "text-[0.72rem] font-bold tracking-[0.14em] uppercase",
+            isSurface ? "text-brand-red" : "text-brand-red",
+          )}
+        >
           {eyebrow}
         </p>
-        <h1 className="font-display mt-2.5 max-w-[18ch] text-[clamp(1.85rem,1.3rem+2.2vw,3.25rem)] font-semibold leading-[1.08] text-balance">
+        <h1 className="font-display mt-2.5 max-w-[20ch] text-[clamp(1.75rem,1.25rem+1.8vw,2.75rem)] font-semibold leading-[1.1] text-balance">
           {title}
         </h1>
         {description ? (
-          <p className="text-on-dark-muted mt-3.5 max-w-[40rem] text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] leading-relaxed">
+          <p
+            className={cn(
+              "mt-3 max-w-[40rem] text-[clamp(0.9375rem,0.9rem+0.2vw,1.05rem)] leading-relaxed",
+              isSurface ? "text-muted-foreground" : "text-on-dark-muted",
+            )}
+          >
             {description}
           </p>
         ) : null}
         {showCta || (secondaryLabel && secondaryHref) ? (
-          <div className="mt-7 flex flex-wrap gap-3">
+          <div className="mt-6 flex flex-wrap gap-3">
             {showCta ? (
               <Link
                 href={localePath(locale, ctaHref)}
-                className={cn(buttonVariants({ variant: "default" }), "min-h-11")}
+                className={cn(
+                  buttonVariants({ variant: "default" }),
+                  "min-h-10",
+                )}
               >
                 {ctaLabel}
               </Link>
@@ -123,7 +103,9 @@ export function PageHero({
                 href={localePath(locale, secondaryHref)}
                 className={cn(
                   buttonVariants({ variant: "outline" }),
-                  "min-h-11 border-white/35 bg-transparent text-white hover:bg-white/10",
+                  "min-h-10",
+                  !isSurface &&
+                    "border-white/35 bg-transparent text-white hover:bg-white/10",
                 )}
               >
                 {secondaryLabel}
@@ -135,3 +117,22 @@ export function PageHero({
     </section>
   );
 }
+
+/** @deprecated Prefer omitting images — kept so older imports compile. */
+export const PAGE_HERO_IMAGES = {
+  about: "",
+  journey: "",
+  leadership: "",
+  capacity: "",
+  customers: "",
+  expansion: "",
+  industries: "",
+  manufacturing: "",
+  quality: "",
+  sustainability: "",
+  procurement: "",
+  careers: "",
+  resources: "",
+  contact: "",
+  default: "",
+} as const;

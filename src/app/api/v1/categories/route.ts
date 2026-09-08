@@ -11,7 +11,7 @@ import {
 export async function GET(req: Request) {
   const authz = await authorize("catalog.read");
   if ("error" in authz) return authz.error;
-  const view = new URL(req.url).searchParams.get("view") ?? "tree";
+  const view = new URL(req.url).searchParams.get("view") ?? "flat";
   const trash = new URL(req.url).searchParams.get("trash") === "1";
   if (trash || view === "flat") {
     const items = await listCategoriesFlat({ includeDeleted: trash });

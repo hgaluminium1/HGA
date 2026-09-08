@@ -4,11 +4,15 @@ import { Container } from "@/components/atoms/container";
 import { Section } from "@/components/atoms/section";
 import { buttonVariants } from "@/components/ui/button";
 import { CatalogueBreadcrumbs } from "@/features/public-catalog/components/catalogue-breadcrumbs";
-import { CategoryCard } from "@/features/public-catalog/components/category-card";
-import { LoadMoreProducts } from "@/features/public-catalog/components/load-more-products";
-import { PRODUCT_GRID_CLASS } from "@/features/public-catalog/components/product-card";
-import { categoryLandingHref } from "@/features/public-catalog/lib/product-media";
-import { CmsEmptyState } from "@/features/public-site/components/cms-empty-state";
+import {
+  CatalogueByCategory,
+  CategoryBrowseGrid,
+} from "@/features/public-catalog/components/catalogue-by-category";
+import { groupProductsByCategory } from "@/features/public-catalog/lib/catalogue-groups";
+import {
+  CmsEmptyState,
+  PublicEmptyState,
+} from "@/features/public-site/components/cms-empty-state";
 import { InquireBand } from "@/features/public-site/components/inquire-band";
 import { UpcomingProductsStrip } from "@/features/public-site/components/upcoming-products";
 import { getCachedPublishedProducts } from "@/features/public-site/lib/public-cache";
@@ -20,21 +24,22 @@ type ProductsIndexProps = {
   locale: string;
 };
 
+/**
+ * Catalogue home: Categories first, then that category’s N products.
+ * Visitor path matches admin: Categories → Products under each.
+ */
 export async function ProductsIndex({ locale }: ProductsIndexProps) {
-  const pageSize = 24;
-  const [{ items, nextCursor }, cats] = await Promise.all([
+  const [{ items }, cats] = await Promise.all([
     getCachedPublishedProducts({
-      limit: pageSize,
+      limit: 100,
       upcoming: false,
     }),
     listCategoriesFlat(),
   ]);
 
-  const publishedCats = cats
-    .filter((c) => c.status === "published" && !c.parentId)
-    .sort((a, b) => a.order - b.order);
+  const groups = groupProductsByCategory(cats, items);
 
-  if (publishedCats.length === 0 && items.length === 0) {
+  if (groups.length === 0 && items.length === 0) {
     return (
       <>
         <CatalogueIndexHero locale={locale} />
@@ -47,7 +52,7 @@ export async function ProductsIndex({ locale }: ProductsIndexProps) {
     <>
       <CatalogueIndexHero locale={locale} />
 
-      {publishedCats.length > 0 ? (
+      {groups.length > 0 ? (
         <Section>
           <Container>
             <div className="mb-8">
@@ -57,50 +62,40 @@ export async function ProductsIndex({ locale }: ProductsIndexProps) {
               <h2 className="font-display mt-1.5 text-[clamp(1.35rem,1.15rem+0.8vw,1.75rem)] font-semibold text-ink">
                 Browse categories
               </h2>
+              <p className="text-muted-foreground mt-2 max-w-[42ch] text-[0.9375rem] leading-relaxed">
+                Pick a category, then open any product under it.
+              </p>
             </div>
-            <ul className={cn("mx-auto max-w-[90rem]", PRODUCT_GRID_CLASS)}>
-              {publishedCats.map((cat) => (
-                <li key={cat.id}>
-                  <CategoryCard
-                    locale={locale}
-                    href={
-                      categoryLandingHref(cat.slug) ??
-                      `products/category/${cat.slug}`
-                    }
-                    title={cat.name.en}
-                    description={cat.description?.en}
-                    imageSrc={cat.imageUrl}
-                  />
-                </li>
-              ))}
-            </ul>
+            <CategoryBrowseGrid locale={locale} groups={groups} />
           </Container>
         </Section>
-      ) : null}
-
-      {items.length > 0 ? (
-        <Section alt>
+      ) : (
+        <Section>
           <Container>
-            <div className="mb-8">
-              <p className="text-[0.7rem] font-bold tracking-[0.12em] text-brand-blue uppercase">
-                Present lines
-              </p>
-              <h2 className="font-display mt-1.5 text-[clamp(1.35rem,1.15rem+0.8vw,1.75rem)] font-semibold text-ink">
-                Ready for enquiry
-              </h2>
-            </div>
-            <LoadMoreProducts
+            <PublicEmptyState
               locale={locale}
-              initialItems={items}
-              initialCursor={nextCursor}
-              pageSize={pageSize}
+              density="section"
+              title="No categories published yet."
+              description="Publish categories in Admin, then attach products to each one."
+              primary={{ label: "Contact / RFQ", href: "contact" }}
             />
           </Container>
         </Section>
-      ) : null}
+      )}
+
+      <CatalogueByCategory
+        locale={locale}
+        groups={groups}
+        productsPerCategory={8}
+        density="catalogue"
+      />
 
       <div id="upcoming" className="scroll-mt-24">
-        <UpcomingProductsStrip locale={locale} showCatalogueLink={false} />
+        <UpcomingProductsStrip
+          locale={locale}
+          showCatalogueLink={false}
+          showEmpty
+        />
       </div>
       <InquireBand locale={locale} />
     </>
@@ -120,25 +115,25 @@ function CatalogueIndexHero({ locale }: { locale: string }) {
         <p className="text-[0.72rem] font-bold tracking-[0.14em] text-brand-red uppercase">
           Products
         </p>
-        <h1 className="font-display mt-2.5 max-w-[16ch] text-[clamp(1.85rem,1.3rem+2.2vw,3.25rem)] font-semibold leading-[1.08]">
-          Product catalogue
+        <h1 className="font-display mt-2 text-[clamp(1.85rem,1.4rem+1.8vw,2.85rem)] font-semibold tracking-tight text-balance">
+          Categories and products
         </h1>
-        <p className="text-on-dark-muted mt-3.5 max-w-[40rem] text-[clamp(0.95rem,0.9rem+0.25vw,1.1rem)] leading-relaxed">
-          Extrusion profiles, homogenised billets and remelt ingots from Kadi —
-          browse by category, then enquire with alloy and tonnage.
+        <p className="mt-3 max-w-xl text-white/80 text-[clamp(0.95rem,0.9rem+0.25vw,1.05rem)] leading-relaxed">
+          Browse by category — each category holds the products you can enquire
+          about.
         </p>
-        <div className="mt-7 flex flex-wrap gap-3">
+        <div className="mt-6 flex flex-wrap gap-3">
           <Link
             href={localePath(locale, "contact")}
-            className={cn(buttonVariants({ variant: "default" }), "min-h-11")}
+            className={cn(buttonVariants({ variant: "default" }), "min-h-10")}
           >
-            Inquire
+            Contact / RFQ
           </Link>
           <Link
             href="#upcoming"
             className={cn(
               buttonVariants({ variant: "outline" }),
-              "min-h-11 border-white/35 bg-transparent text-white hover:bg-white/10",
+              "min-h-10 border-white/30 bg-transparent text-white hover:bg-white/10 hover:text-white",
             )}
           >
             Upcoming lines

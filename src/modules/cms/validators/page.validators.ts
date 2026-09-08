@@ -148,6 +148,79 @@ export const faqBlockDataSchema = z.object({
   items: z.array(z.object({ question: z.string(), answer: z.string() })),
 });
 
+export const pageIntroBlockDataSchema = z.object({
+  eyebrow: z.string().default(""),
+  title: z.string().default(""),
+  body: z.string().default(""),
+  ctaLabel: z.string().optional(),
+  ctaHref: z.string().optional(),
+});
+
+export const pillarListBlockDataSchema = z.object({
+  eyebrow: z.string().default(""),
+  title: z.string().default(""),
+  body: z.string().optional(),
+  items: z
+    .array(z.object({ title: z.string().default(""), body: z.string().default("") }))
+    .default([]),
+});
+
+export const timelineBlockDataSchema = z.object({
+  eyebrow: z.string().default(""),
+  title: z.string().default(""),
+  body: z.string().optional(),
+  items: z
+    .array(
+      z.object({
+        year: z.string().default(""),
+        title: z.string().default(""),
+        body: z.string().default(""),
+      }),
+    )
+    .default([]),
+});
+
+export const numberedStepsBlockDataSchema = z.object({
+  eyebrow: z.string().default(""),
+  title: z.string().default(""),
+  body: z.string().optional(),
+  items: z
+    .array(z.object({ title: z.string().default(""), body: z.string().default("") }))
+    .default([]),
+});
+
+export const resourceListBlockDataSchema = z.object({
+  eyebrow: z.string().default(""),
+  title: z.string().default(""),
+  body: z.string().optional(),
+  items: z
+    .array(
+      z.object({
+        title: z.string().default(""),
+        body: z.string().default(""),
+        tag: z.string().default(""),
+        requestHref: z.string().default("contact"),
+      }),
+    )
+    .default([]),
+});
+
+export const industryListBlockDataSchema = z.object({
+  eyebrow: z.string().default(""),
+  title: z.string().default(""),
+  body: z.string().optional(),
+  items: z
+    .array(
+      z.object({
+        label: z.string().default(""),
+        description: z.string().default(""),
+        applications: z.array(z.string()).default([]),
+        productHref: z.string().default("products"),
+      }),
+    )
+    .default([]),
+});
+
 export const BLOCK_TYPES = [
   "hero",
   "capability",
@@ -159,6 +232,12 @@ export const BLOCK_TYPES = [
   "joint-ventures",
   "careers-teaser",
   "faq",
+  "page-intro",
+  "pillar-list",
+  "timeline",
+  "numbered-steps",
+  "resource-list",
+  "industry-list",
   "stats",
   "leadership-grid",
   "company-facts",
@@ -188,6 +267,12 @@ const blockDataByType = {
   "joint-ventures": jointVenturesBlockDataSchema,
   "careers-teaser": careersTeaserBlockDataSchema,
   faq: faqBlockDataSchema,
+  "page-intro": pageIntroBlockDataSchema,
+  "pillar-list": pillarListBlockDataSchema,
+  timeline: timelineBlockDataSchema,
+  "numbered-steps": numberedStepsBlockDataSchema,
+  "resource-list": resourceListBlockDataSchema,
+  "industry-list": industryListBlockDataSchema,
   stats: corporateBlockDataSchema,
   "leadership-grid": corporateBlockDataSchema,
   "company-facts": corporateBlockDataSchema,
@@ -301,6 +386,36 @@ export const BLOCK_PICKER: { type: BlockType; label: string; description: string
       description: "Employer brand section",
     },
     { type: "faq", label: "FAQ", description: "Accordion questions" },
+    {
+      type: "page-intro",
+      label: "Page intro",
+      description: "Eyebrow, title, body and optional CTA",
+    },
+    {
+      type: "pillar-list",
+      label: "Pillar list",
+      description: "Intro plus titled narrative pillars",
+    },
+    {
+      type: "timeline",
+      label: "Timeline",
+      description: "Yeared milestones narrative",
+    },
+    {
+      type: "numbered-steps",
+      label: "Numbered steps",
+      description: "Ordered process / release rail",
+    },
+    {
+      type: "resource-list",
+      label: "Resource list",
+      description: "Requestable technical packs",
+    },
+    {
+      type: "industry-list",
+      label: "Industry list",
+      description: "Markets and applications",
+    },
     { type: "stats", label: "Capacity stats", description: "Verified capacity metrics" },
     {
       type: "leadership-grid",
@@ -422,6 +537,147 @@ export function defaultBlockData(type: BlockType): unknown {
       };
     case "faq":
       return { eyebrow: "FAQ", title: "Questions", items: [] };
+    case "page-intro":
+      return {
+        eyebrow: "Who we are",
+        title: "Cast, homogenise and extrude — under one roof",
+        body: "We cast, homogenise and extrude aluminium for architectural, industrial, solar and foundry customers.",
+        ctaLabel: "",
+        ctaHref: "",
+      };
+    case "pillar-list":
+      return {
+        eyebrow: "Focus",
+        title: "What we stand on",
+        body: "",
+        items: [
+          {
+            title: "Chemistry you can programme",
+            body: "Cast and homogenised billets under the same roof as extrusion — lot identity from melt to mill certificate.",
+          },
+          {
+            title: "Dies, dimensions, delivery",
+            body: "Architectural, industrial and solar sections with CCD discipline and cut-to-length packing.",
+          },
+          {
+            title: "Gujarat base, buyer-ready cadence",
+            body: "Kadi / Mahesana operations built for repeat volume — not one-off spot metal with opaque origin.",
+          },
+        ],
+      };
+    case "timeline":
+      return {
+        eyebrow: "Our journey",
+        title: "A short history of metal under control",
+        body: "Each chapter is an operational step — plant, process, markets, then disclosed capacity.",
+        items: [
+          {
+            year: "2018",
+            title: "Company incorporation",
+            body: "HG Aluminium Smelters Limited established to build secondary aluminium and extrusion capability in Gujarat.",
+          },
+          {
+            year: "Plant",
+            title: "Kadi / Mahesana campus online",
+            body: "Melting, casting, homogenising and extrusion commissioned under one operational roof.",
+          },
+          {
+            year: "Today",
+            title: "Capacity with disclosure discipline",
+            body: "Published metrics and roadmap projects only when verified or disclosure-approved.",
+          },
+        ],
+      };
+    case "numbered-steps":
+      return {
+        eyebrow: "Process",
+        title: "From charge to certificate",
+        body: "Each stage has a job. Together they produce extrusion, billets and remelt with traceable release.",
+        items: [
+          {
+            title: "Melt & chemistry",
+            body: "Secondary pathways and melt practice tuned for billet and remelt programmes.",
+          },
+          {
+            title: "Cast & homogenise",
+            body: "Billet casting with homogenising cycles that set the extrusion window.",
+          },
+          {
+            title: "Extrude",
+            body: "Press cycles with die control, temperature discipline and first-piece gates.",
+          },
+          {
+            title: "Finish & dispatch",
+            body: "Cut-to-length, packing and mill certificates with every consignment.",
+          },
+        ],
+      };
+    case "resource-list":
+      return {
+        eyebrow: "Resources",
+        title: "Ask for the pack. Get the right files.",
+        body: "Tell us which programme you are qualifying — we send the matching set.",
+        items: [
+          {
+            title: "Mill test certificate samples",
+            body: "Example MTC layout for extrusion and billet lots.",
+            tag: "Certificates",
+            requestHref: "contact",
+          },
+          {
+            title: "Alloy / temper capability note",
+            body: "Working window for common 6xxx grades and tempers.",
+            tag: "Capability",
+            requestHref: "contact",
+          },
+          {
+            title: "RFQ field checklist",
+            body: "Alloy, temper, CCD, tonnage, destination — minimum set for a fast answer.",
+            tag: "Buying",
+            requestHref: "contact",
+          },
+        ],
+      };
+    case "industry-list":
+      return {
+        eyebrow: "Markets",
+        title: "Industries & applications",
+        body: "Markets where HG extrusion, billets and remelt alloys are specified.",
+        items: [
+          {
+            label: "Solar",
+            description:
+              "Module frames, mounting structures, rails and sections for solar parks.",
+            applications: [
+              "Solar module frames",
+              "Mounting structures",
+              "Aluminium rails",
+            ],
+            productHref: "products/category/extrusion-profiles",
+          },
+          {
+            label: "Infrastructure & construction",
+            description:
+              "Architectural façades, industrial sections and scaffolding systems.",
+            applications: [
+              "Façade profiles",
+              "Window & door sections",
+              "Metro & infra",
+            ],
+            productHref: "products/category/extrusion-profiles",
+          },
+          {
+            label: "Cable & electrical",
+            description:
+              "Alloy and remelt feed for conductors and cable manufacturers.",
+            applications: [
+              "Conductor alloys",
+              "Transmission-related aluminium",
+            ],
+            productHref: "products/category/ingots-alloys",
+          },
+        ],
+      };
     case "stats":
     case "leadership-grid":
     case "company-facts":

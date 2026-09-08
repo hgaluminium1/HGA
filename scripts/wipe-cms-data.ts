@@ -1,5 +1,5 @@
 /**
- * Wipe all CMS / catalog / corporate / jobs content (keeps AdminUser).
+ * Wipe all CMS / catalog / corporate / careers / jobs content (keeps AdminUser).
  * Usage: npx tsx scripts/wipe-cms-data.ts
  */
 import { loadEnvLocal } from "./load-env-local";
@@ -15,6 +15,7 @@ import { Dictionary } from "../src/modules/catalog/repositories/mongo/dictionary
 import { Media } from "../src/modules/media/repositories/mongo/media.model";
 import { CompanyProfile } from "../src/modules/corporate/repositories/mongo/company-profile.model";
 import { Person } from "../src/modules/corporate/repositories/mongo/person.model";
+import { CareerOpening } from "../src/modules/careers/repositories/mongo/opening.model";
 import { CapacityMetric } from "../src/modules/corporate/repositories/mongo/capacity-metric.model";
 import { Certification } from "../src/modules/corporate/repositories/mongo/certification.model";
 import { SustainabilityMetric } from "../src/modules/corporate/repositories/mongo/sustainability-metric.model";
@@ -41,6 +42,7 @@ async function main() {
     ["media", Media],
     ["company", CompanyProfile],
     ["people", Person],
+    ["careerOpenings", CareerOpening],
     ["capacity", CapacityMetric],
     ["certifications", Certification],
     ["sustainability", SustainabilityMetric],

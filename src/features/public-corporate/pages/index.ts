@@ -1,0 +1,11 @@
+export { AboutPage } from "./about-page";
+export { JourneyPage } from "./journey-page";
+export { ManufacturingPage } from "./manufacturing-page";
+export { QualityPage } from "./quality-page";
+export { SustainabilityPage } from "./sustainability-page";
+export { ProcurementPage } from "./procurement-page";
+export { ResourcesPage } from "./resources-page";
+export { CapacityPage } from "./capacity-page";
+export { CustomersPage } from "./customers-page";
+export { ExpansionPage } from "./expansion-page";
+export { ContactPage } from "./contact-page";

@@ -1,10 +1,5 @@
-import { CatalogueComingSoon } from "@/features/admin-desk/components/catalogue-coming-soon";
+import { CatalogueCategoriesPanel } from "@/features/admin-desk/components/catalogue-categories-panel";
 
 export default function CatalogueCategoriesPage() {
-  return (
-    <CatalogueComingSoon
-      title="Categories"
-      body="Manage the product category tree and tiles. Separate deep research wave after page section editors."
-    />
-  );
+  return <CatalogueCategoriesPanel />;
 }

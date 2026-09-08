@@ -13,21 +13,73 @@ import { cn } from "@/lib/utils";
 
 const NAV_GROUPS = [
   {
-    label: "Website",
-    items: [{ href: "/admin/pages", label: "Pages", match: "/admin/pages" }],
-  },
-  {
-    label: "Catalogue",
+    label: "Edit site",
     items: [
+      { href: "/admin/pages", label: "Pages", match: "/admin/pages" },
+      {
+        href: "/admin/catalogue/categories",
+        label: "Categories",
+        match: "/admin/catalogue/categories",
+      },
       {
         href: "/admin/catalogue/products",
         label: "Products",
         match: "/admin/catalogue/products",
       },
+    ],
+  },
+  {
+    label: "Page data",
+    items: [
       {
-        href: "/admin/catalogue/categories",
-        label: "Categories",
-        match: "/admin/catalogue/categories",
+        href: "/admin/corporate/people",
+        label: "People",
+        match: "/admin/corporate/people",
+      },
+      {
+        href: "/admin/corporate/capacity",
+        label: "Capacity",
+        match: "/admin/corporate/capacity",
+      },
+      {
+        href: "/admin/corporate/certifications",
+        label: "Certifications",
+        match: "/admin/corporate/certifications",
+      },
+      {
+        href: "/admin/corporate/sustainability",
+        label: "Sustainability",
+        match: "/admin/corporate/sustainability",
+      },
+      {
+        href: "/admin/corporate/logos",
+        label: "Customers",
+        match: "/admin/corporate/logos",
+      },
+      {
+        href: "/admin/corporate/case-studies",
+        label: "Case studies",
+        match: "/admin/corporate/case-studies",
+      },
+      {
+        href: "/admin/corporate/testimonials",
+        label: "Testimonials",
+        match: "/admin/corporate/testimonials",
+      },
+      {
+        href: "/admin/corporate/expansion",
+        label: "Expansion",
+        match: "/admin/corporate/expansion",
+      },
+      {
+        href: "/admin/corporate/company",
+        label: "Company",
+        match: "/admin/corporate/company",
+      },
+      {
+        href: "/admin/careers",
+        label: "Open roles",
+        match: "/admin/careers",
       },
     ],
   },

@@ -49,17 +49,24 @@ import {
   updateSustainabilityMetric,
   upsertCompanyProfile,
 } from "@/modules/corporate";
-import { createPage, getPageBySlug, publishPage } from "@/modules/cms";
+import {
+  createOpening,
+  listOpenings,
+  publishOpening,
+} from "@/modules/careers";
+import { getPageBySlug, publishPage } from "@/modules/cms";
 import { dictionarySeed } from "./specs.dictionary.seed";
 
 type SeedNode = {
   name: { en: string };
   slug: string;
+  description?: { en: string };
+  imageUrl?: string;
   children?: SeedNode[];
 };
 
 const SOURCE =
-  "Client intake brief + LEI registry (seed) — confirm before production";
+  "docs/Data product briefs + LEI registry (HG Aluminium Smelters Limited) — confirm before production";
 
 async function seedCategories() {
   const raw = readFileSync(
@@ -78,6 +85,8 @@ async function seedCategories() {
         name: node.name,
         slug: node.slug,
         parentId,
+        description: node.description,
+        imageUrl: node.imageUrl,
         status: "published",
       });
       id = created.id;
@@ -211,6 +220,17 @@ async function seedPeople() {
         en: "Leads QC lab, mill certificates, and ISO process audits for extrusion and billet lines.",
       },
       sortOrder: 4,
+    },
+    {
+      name: { en: "Smit Patel" },
+      slug: "smit-patel",
+      role: "executive" as const,
+      boardDesignation: "Head of Finance & Accounts",
+      yearsExperience: 6,
+      bio: {
+        en: "Leads finance and accounts for HG Aluminium Smelters Limited at the Kadi / Mahesana campus — statutory reporting, working capital and commercial controls.",
+      },
+      sortOrder: 5,
     },
   ];
 
@@ -523,6 +543,16 @@ async function seedSustainability() {
         "Internal mass-balance of press scrap and billet remelt (demo seed).",
     },
     {
+      key: "specific_energy_intensity",
+      label: "Specific melt energy intensity (indexed)",
+      value: "100",
+      unit: "baseline",
+      disclosureTier: "verified_metric" as const,
+      publish: true,
+      methodologyNote:
+        "Indexed to FY baseline for remelt furnaces — absolute kWh/t on enquiry.",
+    },
+    {
       key: "etp_commissioned",
       label: "Effluent treatment plant",
       value: null,
@@ -530,6 +560,15 @@ async function seedSustainability() {
       disclosureTier: "initiative" as const,
       publish: true,
       methodologyNote: "On-site ETP for anodising / process water (commitment).",
+    },
+    {
+      key: "zero_liquid_discharge_path",
+      label: "ZLD pathway study",
+      value: null,
+      unit: "",
+      disclosureTier: "initiative" as const,
+      publish: true,
+      methodologyNote: "Engineering study for tighter water loop closure.",
     },
     {
       key: "biomass_furnace_support",
@@ -548,6 +587,15 @@ async function seedSustainability() {
       disclosureTier: "commitment" as const,
       publish: false,
       methodologyNote: "Draft figure — publish after board approval.",
+    },
+    {
+      key: "supplier_code_rollout",
+      label: "Supplier code of conduct rollout",
+      value: null,
+      unit: "",
+      disclosureTier: "commitment" as const,
+      publish: true,
+      methodologyNote: "Rolling to key scrap and alloy suppliers through FY.",
     },
   ];
 
@@ -772,16 +820,239 @@ async function seedExpansion() {
   }
 }
 
+async function seedCareerOpenings() {
+  const openings = [
+    {
+      title: "Extrusion Press Operator",
+      slug: "extrusion-press-operator",
+      department: "operations" as const,
+      location: "Kadi, Gujarat",
+      employmentType: "full_time" as const,
+      summary:
+        "Run 7\" / mid-size press cycles with die change discipline, temperature control and lot traceability.",
+      description: `Responsibilities
+• Operate extrusion presses to production plan; record billet heats, die IDs and scrap reasons
+• Execute die changes safely with maintenance support; hold first-piece checks with QC
+• Maintain 5S on press bay; escalate hydraulic / temperature deviations immediately
+
+Requirements
+• 2+ years extrusion or heavy process plant experience preferred
+• Comfortable with shift work and shop-floor safety systems
+• Basic English / Hindi reading for job cards and mill notes
+
+What success looks like
+Clean first-piece passes, low scrap on standard dies, and reliable handovers between shifts.`,
+      sortOrder: 10,
+      publish: true,
+    },
+    {
+      title: "Quality Assurance Inspector",
+      slug: "quality-assurance-inspector",
+      department: "quality" as const,
+      location: "Kadi, Gujarat",
+      employmentType: "full_time" as const,
+      summary:
+        "Own dimensional checks, surface finish gates and mill certificate prep for extrusion and billet lots.",
+      description: `Responsibilities
+• Inspect profiles against drawings / CCD limits; record NCRs and hold lots as needed
+• Support spectro / hardness / tensile sampling with the QC lab
+• Prepare mill test certificate packs for customer despatch
+
+Requirements
+• Diploma / B.Tech in metallurgy, mechanical or related; 1–3 years QA in metals preferred
+• Familiarity with IS / EN dimensional practice is a plus
+• Clear written communication for customer-facing certificates
+
+What success looks like
+Zero escape NCRs on published lots and audit-ready records for ISO visits.`,
+      sortOrder: 20,
+      publish: true,
+    },
+    {
+      title: "Maintenance Technician — Hydraulics & Utilities",
+      slug: "maintenance-technician-hydraulics",
+      department: "maintenance" as const,
+      location: "Kadi, Gujarat",
+      employmentType: "full_time" as const,
+      summary:
+        "Keep press hydraulics, furnaces and plant utilities reliable across planned and breakdown work.",
+      description: `Responsibilities
+• Preventive maintenance on hydraulic power packs, valves and cylinders
+• Support furnace / homogenising utility uptime with the operations team
+• Maintain spares discipline and breakdown logs
+
+Requirements
+• ITI / Diploma in mechanical or mechatronics; 3+ years industrial maintenance
+• Hands-on hydraulic troubleshooting experience
+• Willingness for call-outs during critical production windows`,
+      sortOrder: 30,
+      publish: true,
+    },
+    {
+      title: "Sales Executive — Western India",
+      slug: "sales-executive-western-india",
+      department: "commercial" as const,
+      location: "Ahmedabad / field (Gujarat & West)",
+      employmentType: "full_time" as const,
+      summary:
+        "Grow extrusion and billet programmes with OEMs, fabricators and project buyers across Western India.",
+      description: `Responsibilities
+• Own RFQ response with technical + commercial coordination
+• Build account plans for architectural, solar and industrial buyers
+• Visit plants and project sites; close annual volume agreements
+
+Requirements
+• 3–6 years B2B sales in metals, building products or industrial materials
+• Strong Hindi / Gujarati / English; CRM hygiene
+• Comfortable discussing alloys, tempers and lead times with engineers
+
+What success looks like
+Qualified pipeline, on-time RFQ turnaround, and repeat programmes — not one-off spot orders.`,
+      sortOrder: 40,
+      publish: true,
+    },
+    {
+      title: "Process Engineer — Extrusion",
+      slug: "process-engineer-extrusion",
+      department: "engineering" as const,
+      location: "Kadi, Gujarat",
+      employmentType: "full_time" as const,
+      summary:
+        "Stabilise press recipes, die performance and yield for architectural and industrial sections.",
+      description: `Responsibilities
+• Own process windows (billet temp, exit speed, quench) for key dies
+• Lead yield / scrap reduction projects with production and QC
+• Support new die trials and customer PPAP-style documentation
+
+Requirements
+• B.E. / B.Tech mechanical or metallurgy; 2–5 years extrusion or metals process
+• Data comfort (Excel / basic SPC); shop-floor credibility
+• Clear documentation habits`,
+      sortOrder: 50,
+      publish: true,
+    },
+    {
+      title: "Homogenising Furnace Operator",
+      slug: "homogenising-furnace-operator",
+      department: "operations" as const,
+      location: "Kadi, Gujarat",
+      employmentType: "full_time" as const,
+      summary:
+        "Run homogenising cycles for extrusion billets with heat-treat discipline and lot identity.",
+      description: `Responsibilities
+• Load / unload billets per charge plan; verify alloy and cast identity
+• Monitor soak profiles; log deviations and escalate
+• Coordinate with casting and press planning on ready stock
+
+Requirements
+• Prior furnace / heat-treat experience preferred; strong safety habits
+• Shift flexibility`,
+      sortOrder: 15,
+      publish: true,
+    },
+    {
+      title: "Die Corrector / Tool Room Assistant",
+      slug: "die-corrector-tool-room",
+      department: "engineering" as const,
+      location: "Kadi, Gujarat",
+      employmentType: "full_time" as const,
+      summary:
+        "Support die correction, polishing and tool-room readiness for the press programme.",
+      description: `Responsibilities
+• Assist die correctors on bearing / pocket work under supervision
+• Maintain die storage, identification and polish standards
+• Support trial dies and feedback loops with process engineering
+
+Requirements
+• ITI fitter / tool & die; eagerness to learn extrusion die craft
+• Steady hand and patience with metalwork`,
+      sortOrder: 55,
+      publish: true,
+    },
+    {
+      title: "HR Executive — Plant",
+      slug: "hr-executive-plant",
+      department: "hr" as const,
+      location: "Kadi, Gujarat",
+      employmentType: "full_time" as const,
+      summary:
+        "Own plant hiring coordination, attendance hygiene and onboarding for shop-floor and staff roles.",
+      description: `Responsibilities
+• Screen and schedule candidates for open roles; coordinate offers with leadership
+• Maintain attendance / contractor gate discipline with operations
+• Run induction on safety and company policies
+
+Requirements
+• Graduate with 2+ years plant or manufacturing HR
+• Gujarati / Hindi fluency; discrete handling of employee data`,
+      sortOrder: 60,
+      publish: true,
+    },
+    {
+      title: "Stores & Logistics Coordinator",
+      slug: "stores-logistics-coordinator",
+      department: "operations" as const,
+      location: "Kadi, Gujarat",
+      employmentType: "full_time" as const,
+      summary:
+        "Keep billets, dies, packing materials and finished goods moving with accurate stock identity.",
+      description: `Responsibilities
+• Receive and issue materials against job cards; cycle-count critical SKUs
+• Coordinate dispatch packing with QC release status
+• Interface with transporters on loading windows
+
+Requirements
+• 2+ years stores / warehouse in manufacturing
+• ERP or spreadsheet inventory discipline`,
+      sortOrder: 25,
+      publish: true,
+    },
+    {
+      title: "Graduate Engineer Trainee — Manufacturing",
+      slug: "graduate-engineer-trainee",
+      department: "engineering" as const,
+      location: "Kadi, Gujarat",
+      employmentType: "internship" as const,
+      summary:
+        "12-month rotational exposure across press, QC and process — draft role pending campus calendar.",
+      description: `A structured trainee path across extrusion operations, quality and process engineering. Not yet open for applications — kept as draft until the campus / lateral window is confirmed.`,
+      sortOrder: 90,
+      publish: false,
+    },
+  ];
+
+  const existing = await listOpenings({ status: "all" });
+  for (const o of openings) {
+    if (existing.items.some((x) => x.slug === o.slug)) {
+      console.log(`  = opening ${o.slug}`);
+      continue;
+    }
+    const { publish, ...rest } = o;
+    const created = await createOpening({
+      ...rest,
+      status: "draft",
+    });
+    if (publish) {
+      await publishOpening(created.id, "publish", created.version);
+    }
+    console.log(`  + opening ${o.slug}${publish ? " (published)" : " (draft)"}`);
+  }
+}
+
 async function seedProducts() {
   const cats = await listCategoriesFlat();
-  const bySlug = (slug: string) => cats.find((c) => c.slug === slug)?.id;
+  const aluminiumId = cats.find((c) => c.slug === "aluminium")?.id;
+  if (!aluminiumId) {
+    throw new Error("Category 'aluminium' missing — seed categories first");
+  }
 
+  /** One category → N products. Images from /public/products. Copy from docs/Data. */
   const products = [
     {
       sku: "HG-EXT-PROFILE",
       name: { en: "Aluminium Extrusion Profiles" },
       slug: "aluminium-extrusion-profiles",
-      categorySlugs: ["extrusion-profiles"],
+      imageUrl: "/products/extrusion-profiles.jpg",
       alloyGrades: ["6063", "6061", "6005", "6082"],
       tempers: ["T5", "T6"],
       surfaceFinishes: ["mill", "anodized", "powder_coated"],
@@ -794,88 +1065,88 @@ async function seedProducts() {
       weightPerMeterKg: 2.4,
       isUpcoming: false,
       description:
-        "Architectural, industrial and solar extrusion profiles with die development support, CCD control and mill certificates on every lot.",
+        "Custom aluminium extrusion profiles for solar module frames and mounting, architectural façades, doors and windows, reusable formwork, industrial machinery frames, electrical heat-sinks and lightweight mobility sections. Supplied to customer drawings with dimensional consistency, corrosion resistance and surface quality for demanding downstream programmes.",
     },
     {
       sku: "HG-BIL-HOMO",
-      name: { en: "Aluminium Homogenized Billets" },
+      name: { en: "Homogenised Aluminium Billets" },
       slug: "aluminium-homogenized-billets",
-      categorySlugs: ["homogenised-billets"],
-      alloyGrades: ["6063", "6061", "6082"],
+      imageUrl: "/products/aluminium-billets.jpg",
+      alloyGrades: ["6063", "6061", "6082", "6005"],
       tempers: ["F"],
       surfaceFinishes: ["mill"],
-      anodizingColors: [],
-      ralColors: [],
+      anodizingColors: [] as string[],
+      ralColors: [] as string[],
       toleranceStandards: ["IS", "ASTM"],
       packaging: ["bundle"],
       maxLengthMm: 6000,
       isUpcoming: false,
       description:
-        "Cast and homogenised extrusion billets for captive and merchant press programmes — chemistry and homogenising certificates supplied.",
+        "High-quality homogenised aluminium billets engineered for extrusion manufacturers. Cast and homogenised for consistent chemistry, extrusion performance and surface finish — the feedstock for architectural, solar, industrial, automotive and electrical profile programmes.",
     },
     {
       sku: "HG-ING-REMELT",
       name: { en: "Aluminium Ingots" },
       slug: "aluminium-ingots",
-      categorySlugs: ["remelt-ingots"],
-      alloyGrades: ["1050", "1100"],
+      imageUrl: "/products/aluminium-ingots.jpg",
+      alloyGrades: ["1050", "1100", "ADC12", "LM6"],
       tempers: ["F"],
       surfaceFinishes: ["mill"],
-      anodizingColors: [],
-      ralColors: [],
+      anodizingColors: [] as string[],
+      ralColors: [] as string[],
       toleranceStandards: ["IS"],
       packaging: ["bundle", "pallet"],
       isUpcoming: false,
       description:
-        "Secondary remelt aluminium ingots for foundry and captive melting. Lot chemistry certificates with each consignment.",
+        "Secondary aluminium and alloy ingots for foundries, remelting units and metal-processing industries. Dependable chemistry for pressure / gravity die casting, sand casting, automotive and engineering components, and suitable electrical / conductor grades when specified.",
     },
     {
-      sku: "HG-CUBE-UP",
+      sku: "HG-CUBE",
       name: { en: "Aluminium Cubes" },
       slug: "aluminium-cubes",
-      categorySlugs: ["cubes"],
-      alloyGrades: ["1050"],
+      imageUrl: "/products/aluminium-cubes.jpg",
+      alloyGrades: ["1050", "1100"],
       tempers: ["F"],
       surfaceFinishes: ["mill"],
-      anodizingColors: [],
-      ralColors: [],
+      anodizingColors: [] as string[],
+      ralColors: [] as string[],
       toleranceStandards: ["IS"],
       packaging: ["bag", "pallet"],
-      isUpcoming: true,
+      isUpcoming: false,
       description:
-        "Upcoming cube product for foundry and steel applications. Register interest for early allocation.",
+        "Aluminium cubes for foundry melt additions and steel-plant charge programmes. Sized for controlled melting, consistent chemistry and efficient furnace handling — supplied to agreed packing and lot identity.",
     },
     {
-      sku: "HG-SHOT-UP",
+      sku: "HG-SHOT",
       name: { en: "Aluminium Shots" },
       slug: "aluminium-shots",
-      categorySlugs: ["shots"],
+      imageUrl: "/products/aluminium-shots.jpg",
       alloyGrades: ["1050"],
       tempers: ["F"],
       surfaceFinishes: ["mill"],
-      anodizingColors: [],
-      ralColors: [],
+      anodizingColors: [] as string[],
+      ralColors: [] as string[],
       toleranceStandards: ["IS"],
       packaging: ["bag", "pallet"],
-      isUpcoming: true,
+      isUpcoming: false,
       description:
-        "Upcoming aluminium shots for melt additions. Specs publish at commercial release.",
+        "Aluminium shots for melt additions in foundry and metallurgical applications. Designed for rapid dissolution, predictable recovery and clean furnace practice — packed for plant handling and lot traceability.",
     },
     {
-      sku: "HG-DEOX-UP",
+      sku: "HG-DEOX",
       name: { en: "Aluminium Deoxidizer" },
       slug: "aluminium-deoxidizer",
-      categorySlugs: ["deoxidizer"],
+      imageUrl: "/products/aluminium-deoxidizer.jpg",
       alloyGrades: ["1050"],
       tempers: ["F"],
       surfaceFinishes: ["mill"],
-      anodizingColors: [],
-      ralColors: [],
+      anodizingColors: [] as string[],
+      ralColors: [] as string[],
       toleranceStandards: ["IS"],
       packaging: ["bag", "pallet"],
-      isUpcoming: true,
+      isUpcoming: false,
       description:
-        "Upcoming deoxidizer line for steelmaking applications. Register interest to prioritise development.",
+        "Aluminium deoxidizer products for steelmaking and metallurgical deoxidation programmes. Form and chemistry tuned for predictable oxygen control — enquire for grade, sizing and monthly allocation.",
     },
   ];
 
@@ -884,24 +1155,8 @@ async function seedProducts() {
 
   for (const p of products) {
     const found = existing.items.find((x) => x.slug === p.slug);
-    const imageUrl =
-      p.slug === "aluminium-ingots"
-        ? "/products/aluminium-ingots.jpg"
-        : p.slug === "aluminium-homogenized-billets"
-          ? "/products/aluminium-billets.jpg"
-          : p.slug === "aluminium-extrusion-profiles"
-            ? "/products/extrusion-profiles.jpg"
-            : p.slug === "aluminium-cubes"
-              ? "/products/aluminium-cubes.jpg"
-              : p.slug === "aluminium-shots"
-                ? "/products/aluminium-shots.jpg"
-                : p.slug === "aluminium-deoxidizer"
-                  ? "/products/aluminium-deoxidizer.jpg"
-                  : undefined;
+    const categoryIds = [aluminiumId];
     if (found) {
-      const categoryIds = p.categorySlugs
-        .map(bySlug)
-        .filter((id): id is string => Boolean(id));
       const updated = await updateProduct(found.id, {
         isUpcoming: p.isUpcoming,
         description: p.description,
@@ -918,9 +1173,9 @@ async function seedProducts() {
           ? { weightPerMeterKg: p.weightPerMeterKg }
           : {}),
         categoryIds,
-        imageUrl: imageUrl ?? found.imageUrl ?? undefined,
+        imageUrl: p.imageUrl,
         seo: {
-          title: p.name.en,
+          title: `${p.name.en} | HG Aluminium Smelters`,
           description: p.description,
         },
         version: found.version,
@@ -936,12 +1191,9 @@ async function seedProducts() {
       } else {
         ids.push(found.id);
       }
-      console.log(`  = product ${p.slug} (isUpcoming=${p.isUpcoming})`);
+      console.log(`  = product ${p.slug}`);
       continue;
     }
-    const categoryIds = p.categorySlugs
-      .map(bySlug)
-      .filter((id): id is string => Boolean(id));
     const created = await createProduct({
       sku: p.sku,
       name: p.name,
@@ -959,9 +1211,9 @@ async function seedProducts() {
       weightPerMeterKg: p.weightPerMeterKg,
       description: p.description,
       isUpcoming: p.isUpcoming,
-      imageUrl,
+      imageUrl: p.imageUrl,
       seo: {
-        title: p.name.en,
+        title: `${p.name.en} | HG Aluminium Smelters`,
         description: p.description,
       },
       status: "draft",
@@ -969,129 +1221,16 @@ async function seedProducts() {
     const published = await publishProduct(created.id, created.version);
     if ("error" in published) throw new Error(JSON.stringify(published));
     ids.push(published.product.id);
-    console.log(`  + product ${p.slug} (isUpcoming=${p.isUpcoming})`);
+    console.log(`  + product ${p.slug}`);
   }
   return ids;
 }
 
 async function seedCmsPages() {
-  const { Page } = await import(
-    "@/modules/cms/repositories/mongo/page.model"
-  );
-
-  const shells = [
-    {
-      slug: "about",
-      title: "About HG Aluminium",
-      seo: {
-        title: "About HG Aluminium Smelters",
-        description:
-          "Gujarat-based aluminium extrusion, billet and remelt manufacturer serving architectural, industrial and solar markets.",
-      },
-      blocks: [
-        {
-          id: "about-facts",
-          type: "company-facts",
-          order: 0,
-          appearance: "default" as const,
-          data: { seeded: true },
-        },
-        {
-          id: "about-stats",
-          type: "stats",
-          order: 1,
-          appearance: "default" as const,
-          data: { seeded: true },
-        },
-        {
-          id: "about-leadership",
-          type: "leadership-grid",
-          order: 2,
-          appearance: "default" as const,
-          data: { seeded: true },
-        },
-        {
-          id: "about-certs",
-          type: "cert-grid",
-          order: 3,
-          appearance: "default" as const,
-          data: { seeded: true },
-        },
-        {
-          id: "about-expansion",
-          type: "expansion-roadmap",
-          order: 4,
-          appearance: "default" as const,
-          data: { seeded: true },
-        },
-      ],
-    },
-    {
-      slug: "quality",
-      title: "Quality & Certifications",
-      seo: {
-        title: "Quality | HG Aluminium",
-        description:
-          "ISO-aligned quality systems, mill certificates and process control at HG Aluminium.",
-      },
-      blocks: [
-        {
-          id: "quality-certs",
-          type: "cert-grid",
-          order: 0,
-          appearance: "default" as const,
-          data: { seeded: true },
-        },
-        {
-          id: "quality-facts",
-          type: "company-facts",
-          order: 1,
-          appearance: "default" as const,
-          data: { seeded: true },
-        },
-      ],
-    },
-  ];
-
-  for (const s of shells) {
-    const existing = await getPageBySlug(s.slug, "en");
-    const broken =
-      existing &&
-      existing.blocks.some(
-        (b) => b.data == null || typeof b.data !== "object",
-      );
-
-    if (existing && !broken) {
-      if (existing.status !== "published") {
-        const pub = await publishPage(existing.id, existing.version);
-        if ("error" in pub) throw new Error(JSON.stringify(pub));
-        console.log(`  = page ${s.slug} (published)`);
-      } else {
-        console.log(`  = page ${s.slug}`);
-      }
-      continue;
-    }
-
-    if (existing && broken) {
-      await Page.deleteOne({ _id: existing.id });
-      console.log(`  ~ page ${s.slug} (removed broken blocks)`);
-    }
-
-    const page = await createPage({
-      title: s.title,
-      slug: s.slug,
-      locale: "en",
-      seo: s.seo,
-      blocks: s.blocks as Parameters<typeof createPage>[0]["blocks"],
-    });
-    const pub = await publishPage(page.id, page.version);
-    if ("error" in pub) throw new Error(JSON.stringify(pub));
-    console.log(`  + page ${s.slug}`);
-  }
-
+  // Entity/dedicated React pages do not use CMS block shells.
   const home = await getPageBySlug("home", "en");
   if (!home) {
-    console.log("  ! home missing — run npm run seed:home-page for full home");
+    console.log("  ! home missing — run pnpm run seed:home-page for full home");
   } else if (home.status !== "published") {
     await publishPage(home.id, home.version);
     console.log("  = page home (published)");
@@ -1139,7 +1278,10 @@ async function main() {
   console.log("\n12. Expansion projects");
   await seedExpansion();
 
-  console.log("\n13. CMS pages");
+  console.log("\n13. Career openings");
+  await seedCareerOpenings();
+
+  console.log("\n14. CMS pages");
   await seedCmsPages();
 
   console.log("\n=== Seed complete ===");
@@ -1150,12 +1292,20 @@ async function main() {
         note: "Leadership names & cert issuers are demo placeholders. Capacity figures from client intake brief. Company address/GST from LEI registry.",
         publicSurfaces: [
           "/en",
+          "/en/about",
+          "/en/journey",
           "/en/leadership",
           "/en/capacity",
           "/en/customers",
           "/en/expansion",
+          "/en/manufacturing",
+          "/en/quality",
+          "/en/sustainability",
+          "/en/procurement",
+          "/en/resources",
+          "/en/contact",
+          "/en/careers",
           "/en/products",
-          "/en/about",
         ],
       },
       null,

@@ -1,22 +1,16 @@
-﻿import type { Metadata } from "next";
+import type { Metadata } from "next";
 
-import { SustainabilityPage } from "@/features/public-site/components/content-pages";
-import { CmsOrFallback } from "@/features/public-site/components/cms-or-fallback";
+import { CmsPageView } from "@/features/public-site";
 
 type PageProps = { params: Promise<{ locale: string }> };
 
 export const metadata: Metadata = {
   title: "Sustainability",
-  description: "ESG and sustainability.",
+  description:
+    "Secondary pathways, responsible operations and disclosure-tiered metrics.",
 };
 
 export default async function Page({ params }: PageProps) {
   const { locale } = await params;
-  return (
-    <CmsOrFallback
-      locale={locale}
-      slug="sustainability"
-      fallback={<SustainabilityPage locale={locale} />}
-    />
-  );
+  return <CmsPageView locale={locale} slug="sustainability" />;
 }

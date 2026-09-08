@@ -18,7 +18,11 @@ type CloudinaryPickerProps = {
   help?: string;
   valueUrl: string;
   valuePublicId?: string;
-  onChange: (next: { url: string; publicId: string }) => void;
+  onChange: (next: {
+    url: string;
+    publicId: string;
+    mediaId?: string;
+  }) => void;
   className?: string;
   size?: number;
 };
@@ -47,7 +51,11 @@ export function CloudinaryPicker({
     setError(null);
     try {
       const result = await uploadMediaApi(file);
-      onChange({ url: result.media.url, publicId: result.media.key });
+      onChange({
+        url: result.media.url,
+        publicId: result.media.key,
+        mediaId: result.media.id,
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Upload failed");
     } finally {

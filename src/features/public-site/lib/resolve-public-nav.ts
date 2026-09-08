@@ -10,10 +10,12 @@ import {
   type NavLink,
   type NavSection,
 } from "@/config/nav.config";
+import { categoryLandingHref } from "@/features/public-catalog/lib/product-media";
 import { getCachedPublishedPage } from "@/features/public-site/lib/public-cache";
 import { getCachedCompanyProfile } from "@/features/public-corporate/lib/public-cache";
 import { getCachedPublishedProducts } from "@/features/public-site/lib/public-cache";
 import { getPublishedNavMenu } from "@/modules/navigation";
+import { listCategoriesFlat } from "@/modules/catalog";
 
 export type PublicNavFooter = {
   /** Category landings + View full catalogue — never individual SKUs. */
@@ -109,7 +111,7 @@ export async function resolvePublicNav(
   const footerCompanySlugs = footerCompanyAllowlist.map((i) => i.href);
   const utilitySlugs = footerUtilityAllowlist.map((i) => i.href);
 
-  const [live, present, upcoming, company, cmsFooterProducts, cmsFooterCompany, cmsFooterSupport, cmsPrimary] =
+  const [live, present, upcoming, company, publishedCats, cmsFooterProducts, cmsFooterCompany, cmsFooterSupport, cmsPrimary] =
     await Promise.all([
     publishedSlugs(
       [
@@ -127,6 +129,7 @@ export async function resolvePublicNav(
     getCachedPublishedProducts({ limit: 6, upcoming: false }),
     getCachedPublishedProducts({ limit: 4, upcoming: true }),
     getCachedCompanyProfile(),
+    listCategoriesFlat().catch(() => []),
     getPublishedNavMenu("footer-products", locale).catch(() => null),
     getPublishedNavMenu("footer-company", locale).catch(() => null),
     getPublishedNavMenu("footer-support", locale).catch(() => null),
@@ -142,15 +145,23 @@ export async function resolvePublicNav(
       }))
     : primaryNavAllowlist.filter((i) => live.has(i.href));
 
-  const categoryItems = productNavAllowlist.filter((i) => live.has(i.href));
-  const categoriesForNav = categoryItems.length
-    ? categoryItems
-    : productNavAllowlist.slice(0, 3);
+  const liveCategoryLinks: NavLink[] = publishedCats
+    .filter((c) => c.status === "published" && !c.deletedAt)
+    .sort((a, b) => a.order - b.order)
+    .map((c) => ({
+      label: c.name.en,
+      href: categoryLandingHref(c.slug),
+      description: c.description?.en,
+    }));
+
+  const categoriesForNav = liveCategoryLinks.length
+    ? liveCategoryLinks
+    : productNavAllowlist;
 
   const presentLinks: NavLink[] = present.items.slice(0, 4).map((p) => ({
     label: p.name.en,
     href: `products/${p.slug}`,
-    description: p.sku,
+    description: p.description?.slice(0, 80) || undefined,
   }));
 
   const upcomingLinks: NavLink[] = upcoming.items.slice(0, 3).map((p) => ({

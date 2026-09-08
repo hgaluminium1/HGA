@@ -14,6 +14,7 @@ import {
 } from "@/features/public-catalog/components/product-card";
 import { categoryImageUrl } from "@/features/public-catalog/lib/product-media";
 import { localePath } from "@/config/nav.config";
+import { PublicEmptyState } from "@/features/public-site/components/cms-empty-state";
 import {
   getCachedPublishedProducts,
   getCachedUpcomingProducts,
@@ -27,6 +28,8 @@ type UpcomingProductsStripProps = {
   description?: string;
   /** Hide the catalogue deep-link when already on /products. */
   showCatalogueLink?: boolean;
+  /** When true, show a section empty state instead of hiding the band. */
+  showEmpty?: boolean;
 };
 
 export async function UpcomingProductsStrip({
@@ -35,9 +38,25 @@ export async function UpcomingProductsStrip({
   title = "Upcoming products",
   description = "Coming soon from HG — register interest for early allocation.",
   showCatalogueLink = true,
+  showEmpty = false,
 }: UpcomingProductsStripProps) {
   const { items } = await getCachedUpcomingProducts({ limit: 12 });
-  if (!items.length) return null;
+  if (!items.length) {
+    if (!showEmpty) return null;
+    return (
+      <Section data-block="upcoming-products" alt>
+        <Container>
+          <PublicEmptyState
+            locale={locale}
+            density="section"
+            title="No upcoming products yet."
+            description="Pipeline lines appear here once an editor marks products as coming soon."
+            primary={{ label: "Browse products", href: "products" }}
+          />
+        </Container>
+      </Section>
+    );
+  }
 
   return (
     <Section
@@ -111,7 +130,18 @@ export async function PresentProductsGrid({
     upcoming: false,
     categoryIds: ids.length ? ids : undefined,
   });
-  if (!items.length) return null;
+  if (!items.length) {
+    return (
+      <PublicEmptyState
+        locale={locale}
+        density="section"
+        title="No products in this category yet."
+        description="Published catalogue lines for this category will appear here."
+        primary={{ label: "Contact / RFQ", href: "contact" }}
+        secondary={{ label: "All products", href: "products", variant: "outline" }}
+      />
+    );
+  }
 
   return (
     <ul className={cn("mx-auto max-w-[90rem]", PRODUCT_GRID_CLASS)}>
