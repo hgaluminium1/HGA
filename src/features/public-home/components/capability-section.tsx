@@ -3,6 +3,7 @@ import { CountUp } from "@/components/atoms/count-up";
 import { Eyebrow } from "@/components/atoms/eyebrow";
 import { Reveal } from "@/components/atoms/reveal";
 import type { HomeContent } from "@/features/public-home/content/home.en";
+import { cn } from "@/lib/utils";
 
 type CapabilitySectionProps = {
   content: HomeContent["capability"];
@@ -30,7 +31,19 @@ function highlightBody(body: string, words: string[]) {
   );
 }
 
+/**
+ * Stats grid adapts to N items from CMS:
+ * 1 → single card, 2 → 2-col, 3+ → 2-col wrapping (3-col from ~720px when ≥3).
+ */
+function statsGridClass(count: number) {
+  if (count <= 1) return "grid-cols-1";
+  if (count === 2) return "grid-cols-2";
+  return "grid-cols-2 min-[720px]:grid-cols-3";
+}
+
 export function CapabilitySection({ content }: CapabilitySectionProps) {
+  const stats = content.stats ?? [];
+
   return (
     <section
       data-block="capability"
@@ -52,23 +65,30 @@ export function CapabilitySection({ content }: CapabilitySectionProps) {
           </p>
         </Reveal>
 
-        <Reveal stagger>
-          <div className="grid grid-cols-2 gap-3 min-[520px]:gap-4 min-[900px]:grid-cols-2">
-            {content.stats.map((stat) => (
-              <div
-                key={stat.label}
-                className="rounded-[var(--radius-md)] border border-white/12 bg-white/8 px-4 py-4 backdrop-blur-[6px] min-[520px]:px-5 min-[520px]:py-5"
-              >
-                <div className="font-display flex items-baseline gap-0.5 text-[clamp(1.45rem,1.1rem+1.8vw,2.25rem)] font-bold text-white">
-                  <CountUp target={stat.target} suffix={stat.suffix} />
+        {stats.length > 0 ? (
+          <Reveal stagger>
+            <div
+              className={cn(
+                "grid gap-3 min-[520px]:gap-4",
+                statsGridClass(stats.length),
+              )}
+            >
+              {stats.map((stat, i) => (
+                <div
+                  key={`${stat.label}-${i}`}
+                  className="rounded-[var(--radius-md)] border border-white/12 bg-white/8 px-4 py-4 backdrop-blur-[6px] min-[520px]:px-5 min-[520px]:py-5"
+                >
+                  <div className="font-display flex items-baseline gap-0.5 text-[clamp(1.45rem,1.1rem+1.8vw,2.25rem)] font-bold text-white">
+                    <CountUp target={stat.target} suffix={stat.suffix} />
+                  </div>
+                  <div className="text-on-dark-muted mt-1.5 text-[clamp(0.75rem,0.7rem+0.2vw,0.85rem)] leading-snug">
+                    {stat.label}
+                  </div>
                 </div>
-                <div className="text-on-dark-muted mt-1.5 text-[clamp(0.75rem,0.7rem+0.2vw,0.85rem)] leading-snug">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </Reveal>
+              ))}
+            </div>
+          </Reveal>
+        ) : null}
       </Container>
     </section>
   );

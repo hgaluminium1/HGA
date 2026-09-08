@@ -11,6 +11,7 @@ import { MissionVideoSection } from "@/features/public-home/components/mission-v
 import { ProductsSection } from "@/features/public-home/components/products-section";
 import { TestimonialsCarousel } from "@/features/public-home/components/testimonials-carousel";
 import type { HomeContent } from "@/features/public-home/content/home.en";
+import { normalizeHeroContent } from "@/features/public-home/lib/normalize-hero";
 import {
   CertGridBlock,
   CompanyFactsBlock,
@@ -38,27 +39,60 @@ export type CmsBlock = {
 
 async function hydrateProductsBlock(
   content: HomeContent["products"],
-): Promise<HomeContent["products"]> {
+): Promise<{
+  content: HomeContent["products"];
+  products: Awaited<
+    ReturnType<typeof getCachedPublishedProducts>
+  >["items"];
+}> {
   const { items } = await getCachedPublishedProducts({
-    limit: 8,
+    limit: 6,
     upcoming: false,
   });
   if (!items.length) {
-    return { ...content, items: content.items ?? [] };
+    return {
+      content: { ...content, items: content.items ?? [] },
+      products: [],
+    };
   }
   return {
-    eyebrow: content.eyebrow || "Our Products",
-    title: content.title || "Present catalogue lines",
+    content: {
+      eyebrow: content.eyebrow || "Our Products",
+      title: content.title || "Present catalogue lines",
+      description:
+        content.description ||
+        "Extrusion profiles, homogenised billets and remelt ingots — published and ready for enquiry.",
+      items: items.map((p, index) => ({
+        title: p.name.en,
+        href: `products/${p.slug}`,
+        imageSrc: productImageUrl(p),
+        imageAlt: p.name.en,
+        wide: index === items.length - 1 && items.length % 2 === 1,
+      })),
+    },
+    products: items,
+  };
+}
+
+function parseUpcomingCopy(data: unknown): {
+  eyebrow: string;
+  title: string;
+  description: string;
+} {
+  const d =
+    data && typeof data === "object" && !Array.isArray(data)
+      ? (data as Record<string, unknown>)
+      : {};
+  return {
+    eyebrow: typeof d.eyebrow === "string" && d.eyebrow ? d.eyebrow : "Pipeline",
+    title:
+      typeof d.title === "string" && d.title
+        ? d.title
+        : "Upcoming products",
     description:
-      content.description ||
-      "Extrusion profiles, homogenised billets and remelt ingots — published and ready for enquiry.",
-    items: items.map((p, index) => ({
-      title: p.name.en,
-      href: `products/${p.slug}`,
-      imageSrc: productImageUrl(p),
-      imageAlt: p.name.en,
-      wide: index === items.length - 1 && items.length % 2 === 1,
-    })),
+      typeof d.description === "string"
+        ? d.description
+        : "Coming soon from HG — register interest for early allocation.",
   };
 }
 
@@ -102,7 +136,7 @@ export async function renderCmsBlock(
         return wrap(
           <HeroCarousel
             locale={locale}
-            content={block.data as HomeContent["hero"]}
+            content={normalizeHeroContent(block.data)}
           />,
         );
       case "capability":
@@ -111,17 +145,29 @@ export async function renderCmsBlock(
             content={block.data as HomeContent["capability"]}
           />,
         );
-      case "products":
+      case "products": {
+        const hydrated = await hydrateProductsBlock(
+          block.data as HomeContent["products"],
+        );
         return wrap(
           <ProductsSection
             locale={locale}
-            content={await hydrateProductsBlock(
-              block.data as HomeContent["products"],
-            )}
+            content={hydrated.content}
+            products={hydrated.products}
           />,
         );
-      case "upcoming-products":
-        return wrap(<UpcomingProductsStrip locale={locale} />);
+      }
+      case "upcoming-products": {
+        const copy = parseUpcomingCopy(block.data);
+        return wrap(
+          <UpcomingProductsStrip
+            locale={locale}
+            eyebrow={copy.eyebrow}
+            title={copy.title}
+            description={copy.description}
+          />,
+        );
+      }
       case "markets":
         return wrap(<MarketsSection locale={locale} limit={8} />);
       case "mission": {

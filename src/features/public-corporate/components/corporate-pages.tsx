@@ -1,7 +1,10 @@
 import { Container } from "@/components/atoms/container";
 import { Section } from "@/components/atoms/section";
 import { InquireBand } from "@/features/public-site/components/inquire-band";
-import { PageHero } from "@/features/public-site/components/page-hero";
+import {
+  PAGE_HERO_IMAGES,
+  PageHero,
+} from "@/features/public-site/components/page-hero";
 import { CmsEmptyState } from "@/features/public-site/components/cms-empty-state";
 import {
   getCachedPublishedCapacity,
@@ -35,11 +38,10 @@ export async function LeadershipGridBlock() {
         <h2 className="font-display text-2xl font-semibold">Leadership</h2>
         <ul className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {sorted.map((p) => (
-            <li
-              key={p.id}
-              className="border-line bg-surface rounded-[var(--radius-lg)] border p-6"
-            >
-              <p className="font-display text-lg font-semibold">{p.name.en}</p>
+            <li key={p.id} className="border-t-2 border-brand-blue/60 pt-4">
+              <p className="font-display text-lg font-semibold text-ink">
+                {p.name.en}
+              </p>
               <p className="text-muted-foreground text-sm">
                 {p.boardDesignation || p.role}
               </p>
@@ -70,19 +72,30 @@ export async function LeadershipPage({ locale }: { locale: string }) {
         description="Board and executive stewardship of HG Aluminium Smelters Limited."
         secondaryLabel="About HG"
         secondaryHref="about"
+        imageSrc={PAGE_HERO_IMAGES.leadership}
       />
       <Section>
         <Container>
           <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {sorted.map((p) => (
-              <li
-                key={p.id}
-                className="border-line bg-surface rounded-[var(--radius-lg)] border p-6"
-              >
-                <p className="text-[0.65rem] font-bold tracking-[0.12em] text-brand-accent uppercase">
+              <li key={p.id} className="group flex flex-col">
+                <div className="relative aspect-[4/3] overflow-hidden rounded-[var(--radius-lg)] bg-bg-alt ring-1 ring-black/[0.06]">
+                  <div className="absolute inset-0 flex items-center justify-center bg-[linear-gradient(145deg,var(--brand-blue-light),var(--bg-alt))]">
+                    <span className="font-display text-3xl font-semibold text-brand-blue/40">
+                      {p.name.en
+                        .split(" ")
+                        .map((w) => w[0])
+                        .slice(0, 2)
+                        .join("")}
+                    </span>
+                  </div>
+                </div>
+                <p className="mt-3 text-[0.65rem] font-bold tracking-[0.12em] text-brand-blue uppercase">
                   {p.role.replace("_", " ")}
                 </p>
-                <p className="font-display mt-2 text-xl font-semibold">{p.name.en}</p>
+                <p className="font-display mt-1 text-xl font-semibold text-ink">
+                  {p.name.en}
+                </p>
                 <p className="text-muted-foreground text-sm">
                   {p.boardDesignation || p.role}
                 </p>
@@ -92,7 +105,7 @@ export async function LeadershipPage({ locale }: { locale: string }) {
                   </p>
                 ) : null}
                 {p.bio.en ? (
-                  <p className="text-muted-foreground mt-3 text-sm leading-relaxed">
+                  <p className="text-muted-foreground mt-3 line-clamp-4 text-sm leading-relaxed">
                     {p.bio.en}
                   </p>
                 ) : null}
@@ -124,20 +137,21 @@ export async function CapacityPage({ locale }: { locale: string }) {
         description="Verified metrics only — draft or unverified figures stay off this page."
         secondaryLabel="Manufacturing"
         secondaryHref="manufacturing"
+        imageSrc={PAGE_HERO_IMAGES.capacity}
       />
       <Section>
         <Container>
-          <dl className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <dl className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {metrics.map((m) => (
               <div
                 key={m.id}
-                className="border-line bg-surface rounded-[var(--radius-lg)] border p-5"
+                className="border-t-2 border-brand-blue/70 pt-4"
               >
                 <dt className="text-muted-foreground text-sm">{m.label.en}</dt>
-                <dd className="font-display mt-2 text-3xl font-semibold tracking-tight">
+                <dd className="font-display mt-2 text-[clamp(1.75rem,1.4rem+1.2vw,2.5rem)] font-semibold tracking-tight text-ink">
                   {m.value}
                   {m.unit ? (
-                    <span className="text-muted-foreground ml-1 text-base font-normal">
+                    <span className="text-muted-foreground ml-1.5 text-base font-normal">
                       {m.unit}
                     </span>
                   ) : null}
@@ -177,6 +191,7 @@ export async function CustomersPage({ locale }: { locale: string }) {
         description="Approved name tiles and anonymised project stories. Brand logos appear only with explicit permission."
         secondaryLabel="Industries"
         secondaryHref="industries"
+        imageSrc={PAGE_HERO_IMAGES.customers}
       />
       <Section>
         <Container>
@@ -185,13 +200,15 @@ export async function CustomersPage({ locale }: { locale: string }) {
               <h2 className="font-display text-2xl font-semibold">
                 Organisations we serve
               </h2>
-              <ul className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+              <ul className="mt-6 grid grid-cols-2 gap-x-4 gap-y-1 sm:grid-cols-3 lg:grid-cols-4">
                 {logos.map((l) => (
                   <li
                     key={l.id}
-                    className="border-line bg-surface flex min-h-[5.5rem] items-center justify-center rounded-[var(--radius-md)] border px-3 text-center text-sm font-semibold"
+                    className="group flex min-h-[4rem] items-center justify-center border-b border-black/[0.06] px-2 py-4 text-center"
                   >
-                    {l.name}
+                    <span className="font-display text-sm font-semibold text-ink/45 transition-colors group-hover:text-ink">
+                      {l.name}
+                    </span>
                   </li>
                 ))}
               </ul>
@@ -342,11 +359,11 @@ export async function StatsBlock() {
     <Section alt>
       <Container>
         <h2 className="font-display text-2xl font-semibold">At a glance</h2>
-        <dl className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <dl className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {metrics.slice(0, 8).map((m) => (
-            <div key={m.id}>
+            <div key={m.id} className="border-t border-black/[0.08] pt-4">
               <dt className="text-muted-foreground text-sm">{m.label.en}</dt>
-              <dd className="font-display text-xl font-semibold">
+              <dd className="font-display mt-1.5 text-[clamp(1.35rem,1.1rem+0.8vw,1.75rem)] font-semibold text-ink">
                 {m.value} {m.unit}
               </dd>
             </div>
@@ -364,14 +381,16 @@ export async function CertGridBlock() {
     <Section>
       <Container>
         <h2 className="font-display text-2xl font-semibold">Certifications</h2>
-        <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+        <ul className="mt-8 grid gap-4 sm:grid-cols-2">
           {certs.map((c) => (
             <li
               key={c.id}
-              className="border-line rounded-[var(--radius-lg)] border p-4"
+              className="flex flex-col border-t-2 border-brand-blue/50 pt-4"
             >
-              <p className="font-semibold">{c.name}</p>
-              <p className="text-muted-foreground text-sm">{c.issuer}</p>
+              <p className="font-display text-lg font-semibold text-ink">
+                {c.name}
+              </p>
+              <p className="text-muted-foreground mt-1 text-sm">{c.issuer}</p>
             </li>
           ))}
         </ul>
@@ -432,19 +451,20 @@ export async function ExpansionPage({ locale }: { locale: string }) {
         description="Confirmed and planned capacity programmes. INR figures appear only when public disclosure is approved."
         secondaryLabel="Capacity"
         secondaryHref="capacity"
+        imageSrc={PAGE_HERO_IMAGES.expansion}
       />
       <Section>
         <Container>
-          <ul className="space-y-5">
+          <ul className="space-y-8">
             {projects.map((p) => (
               <li
                 key={p.id}
-                className="border-line rounded-[var(--radius-lg)] border p-6"
+                className="border-t border-black/[0.08] pt-6 first:border-t-0 first:pt-0"
               >
-                <p className="text-xs font-bold tracking-[0.12em] text-brand-accent uppercase">
+                <p className="text-xs font-bold tracking-[0.12em] text-brand-blue uppercase">
                   {p.status}
                 </p>
-                <p className="font-display mt-1 text-xl font-semibold">
+                <p className="font-display mt-1 text-xl font-semibold text-ink">
                   {p.title.en}
                 </p>
                 {p.description.en ? (

@@ -6,6 +6,7 @@ import { buttonVariants } from "@/components/ui/button";
 import { CatalogueBreadcrumbs } from "@/features/public-catalog/components/catalogue-breadcrumbs";
 import { CategoryCard } from "@/features/public-catalog/components/category-card";
 import { LoadMoreProducts } from "@/features/public-catalog/components/load-more-products";
+import { PRODUCT_GRID_CLASS } from "@/features/public-catalog/components/product-card";
 import { categoryLandingHref } from "@/features/public-catalog/lib/product-media";
 import { CmsEmptyState } from "@/features/public-site/components/cms-empty-state";
 import { InquireBand } from "@/features/public-site/components/inquire-band";
@@ -57,7 +58,7 @@ export async function ProductsIndex({ locale }: ProductsIndexProps) {
                 Browse categories
               </h2>
             </div>
-            <ul className="mx-auto grid max-w-[90rem] gap-4 min-[640px]:grid-cols-2 min-[640px]:gap-5 min-[1024px]:grid-cols-3 min-[1440px]:grid-cols-4">
+            <ul className={cn("mx-auto max-w-[90rem]", PRODUCT_GRID_CLASS)}>
               {publishedCats.map((cat) => (
                 <li key={cat.id}>
                   <CategoryCard
@@ -99,7 +100,7 @@ export async function ProductsIndex({ locale }: ProductsIndexProps) {
       ) : null}
 
       <div id="upcoming" className="scroll-mt-24">
-        <UpcomingProductsStrip locale={locale} />
+        <UpcomingProductsStrip locale={locale} showCatalogueLink={false} />
       </div>
       <InquireBand locale={locale} />
     </>

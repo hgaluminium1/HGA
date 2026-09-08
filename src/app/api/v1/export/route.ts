@@ -3,7 +3,7 @@ import { respondError } from "@/lib/http/respond";
 import {
   exportEntityCsv,
   importEntitySchema,
-} from "@/features/admin-import/lib/import.service";
+} from "@/modules/import";
 
 export async function GET(req: Request) {
   const authz = await authorize("import.write");

@@ -23,7 +23,7 @@ export function JointVenturesSection({ content }: JointVenturesSectionProps) {
       id="infrastructure"
       className="relative text-white"
     >
-      <div className="relative min-h-[clamp(26rem,70vw,32rem)] min-[768px]:min-h-[28rem]">
+      <div className="relative min-h-[clamp(26rem,72vw,34rem)] min-[900px]:min-h-[30rem]">
         <Image
           src={content.imageSrc}
           alt={content.imageAlt}
@@ -32,40 +32,41 @@ export function JointVenturesSection({ content }: JointVenturesSectionProps) {
           className="object-cover"
         />
         <div
-          className="absolute inset-0 bg-[linear-gradient(110deg,rgb(0_18_47_/_0.92)_8%,rgb(0_18_47_/_0.55)_70%)]"
+          className="absolute inset-0 bg-[linear-gradient(105deg,rgb(0_18_47_/_0.94)_0%,rgb(0_18_47_/_0.72)_48%,rgb(0_18_47_/_0.35)_100%)]"
           aria-hidden
         />
 
-        <div className="absolute inset-0 z-[1] flex items-end py-[clamp(2rem,5vw,3.5rem)] min-[768px]:items-center">
+        <div className="absolute inset-0 z-[1] flex items-end py-[clamp(2.25rem,5vw,3.75rem)] min-[900px]:items-center">
           <Container>
             <Reveal>
-              <Eyebrow light>{content.eyebrow}</Eyebrow>
-              <h2 className="font-display mt-2.5 max-w-[18ch] text-[clamp(1.55rem,1.2rem+1.5vw,2.5rem)] font-semibold leading-[1.12] text-balance">
-                {content.title}
-              </h2>
-              <ul className="mt-6 grid max-w-[40rem] gap-3 rounded-[var(--radius-lg)] bg-white p-4 text-ink shadow-[var(--shadow-lg)] min-[560px]:grid-cols-3 min-[560px]:gap-2 min-[560px]:p-5">
-                {content.items.map((item) => {
-                  const Icon = iconMap[item.icon];
-                  return (
-                    <li
-                      key={item.title}
-                      className="flex items-start gap-3 rounded-[var(--radius-sm)] p-2 min-[560px]:flex-col min-[560px]:items-start"
-                    >
-                      <span className="bg-brand-blue-light text-brand-blue flex size-10 shrink-0 items-center justify-center rounded-[10px]">
-                        <Icon className="size-5" />
-                      </span>
-                      <span>
-                        <strong className="block text-[0.92rem] font-semibold">
-                          {item.title}
-                        </strong>
-                        <small className="text-muted-foreground mt-0.5 block text-[0.78rem] leading-snug">
-                          {item.subtitle}
-                        </small>
-                      </span>
-                    </li>
-                  );
-                })}
-              </ul>
+              <div className="grid max-w-[52rem] gap-8 min-[900px]:grid-cols-[1.2fr_1fr] min-[900px]:items-end min-[900px]:gap-12">
+                <div>
+                  <Eyebrow light>{content.eyebrow}</Eyebrow>
+                  <h2 className="font-display mt-2.5 text-[clamp(1.55rem,1.2rem+1.5vw,2.5rem)] font-semibold leading-[1.12] text-balance">
+                    {content.title}
+                  </h2>
+                </div>
+                <ul className="flex flex-col gap-4 border-t border-white/20 pt-5 min-[900px]:border-t-0 min-[900px]:border-l min-[900px]:pt-0 min-[900px]:pl-8">
+                  {content.items.map((item) => {
+                    const Icon = iconMap[item.icon];
+                    return (
+                      <li key={item.title} className="flex items-start gap-3">
+                        <span className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-[8px] bg-white/12 text-white">
+                          <Icon className="size-4" />
+                        </span>
+                        <span>
+                          <strong className="block text-[0.9375rem] font-semibold">
+                            {item.title}
+                          </strong>
+                          <small className="mt-0.5 block text-[0.8rem] leading-snug text-white/65">
+                            {item.subtitle}
+                          </small>
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
             </Reveal>
           </Container>
         </div>

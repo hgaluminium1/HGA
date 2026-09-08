@@ -3,6 +3,11 @@ import { randomUUID } from "node:crypto";
 
 import { assertVersionMatch, isConflictError } from "@/lib/http/conflict";
 import { dbConnect } from "@/lib/db/connect";
+import {
+  cloudinaryDestroy,
+  cloudinaryUploadBuffer,
+  isCloudinaryConfigured,
+} from "@/lib/cloudinary/client";
 import { isR2Configured, r2DeleteObject, r2PutObject } from "@/lib/r2/client";
 import {
   MEDIA_ALLOWED_MIME,
@@ -57,6 +62,10 @@ function kindFromMime(mime: string, forced?: MediaKind): MediaKind {
   if (mime === "application/pdf") return "pdf";
   if (mime.startsWith("video/")) return "video";
   return "image";
+}
+
+function isMediaConfigured() {
+  return isCloudinaryConfigured() || isR2Configured();
 }
 
 export async function listMedia(opts: {
@@ -119,13 +128,18 @@ export async function createMediaFromUpload(input: {
   | { media: MediaDTO; reused: boolean }
   | { error: "MEDIA_NOT_CONFIGURED" | "VALIDATION_ERROR"; message: string }
 > {
-  if (!isR2Configured()) {
+  if (!isMediaConfigured()) {
     return {
       error: "MEDIA_NOT_CONFIGURED",
-      message: "R2 is not configured. Set R2_* env vars.",
+      message:
+        "Media storage is not configured. Set Cloudinary env vars (preferred) or R2_*.",
     };
   }
-  if (!MEDIA_ALLOWED_MIME.includes(input.mime as (typeof MEDIA_ALLOWED_MIME)[number])) {
+  if (
+    !MEDIA_ALLOWED_MIME.includes(
+      input.mime as (typeof MEDIA_ALLOWED_MIME)[number],
+    )
+  ) {
     return {
       error: "VALIDATION_ERROR",
       message: `MIME type not allowed: ${input.mime}`,
@@ -148,18 +162,36 @@ export async function createMediaFromUpload(input: {
     };
   }
 
-  const ext =
-    input.filename.includes(".")
+  const kind = kindFromMime(input.mime, input.kind);
+  let url: string;
+  let key: string;
+  let width: number | null = null;
+  let height: number | null = null;
+
+  if (isCloudinaryConfigured()) {
+    const uploaded = await cloudinaryUploadBuffer({
+      buffer: input.buffer,
+      filename: input.filename,
+      mime: input.mime,
+      folder: "hg",
+    });
+    url = uploaded.url;
+    key = uploaded.publicId;
+    width = uploaded.width;
+    height = uploaded.height;
+  } else {
+    const ext = input.filename.includes(".")
       ? input.filename.split(".").pop()?.toLowerCase()
       : "bin";
-  const key = `uploads/${new Date().toISOString().slice(0, 10)}/${randomUUID()}.${ext}`;
-  const { url } = await r2PutObject({
-    key,
-    body: input.buffer,
-    contentType: input.mime,
-  });
+    key = `uploads/${new Date().toISOString().slice(0, 10)}/${randomUUID()}.${ext}`;
+    const put = await r2PutObject({
+      key,
+      body: input.buffer,
+      contentType: input.mime,
+    });
+    url = put.url;
+  }
 
-  const kind = kindFromMime(input.mime, input.kind);
   const doc = await Media.create({
     kind,
     tags: input.tags ?? [],
@@ -169,6 +201,8 @@ export async function createMediaFromUpload(input: {
     key,
     mime: input.mime,
     size: input.buffer.byteLength,
+    width,
+    height,
     hash,
     version: 1,
   });
@@ -198,7 +232,8 @@ export async function updateMedia(
     await existing.save();
     return { media: toDTO(existing.toObject() as Record<string, unknown>) };
   } catch (err) {
-    if (isConflictError(err)) return { error: "CONFLICT" as const, message: err.message };
+    if (isConflictError(err))
+      return { error: "CONFLICT" as const, message: err.message };
     throw err;
   }
 }
@@ -229,7 +264,13 @@ export async function purgeMedia(id: string) {
   await requireDb();
   const doc = await Media.findOne({ _id: id, deletedAt: { $ne: null } });
   if (!doc) return null;
-  await r2DeleteObject(doc.key);
+  if (isCloudinaryConfigured() && !doc.key.startsWith("uploads/")) {
+    const resourceType =
+      doc.kind === "video" ? "video" : doc.kind === "pdf" ? "raw" : "image";
+    await cloudinaryDestroy(doc.key, resourceType);
+  } else {
+    await r2DeleteObject(doc.key);
+  }
   await Media.deleteOne({ _id: id });
   return { id };
 }

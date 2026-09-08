@@ -37,6 +37,9 @@ export async function ensureSeedSuperadmin() {
   const email = process.env.ADMIN_EMAIL?.toLowerCase().trim();
   const password = process.env.ADMIN_PASSWORD;
   if (!email || !password) return { created: false, reason: "missing_env" as const };
+  if (password.length < 8) {
+    return { created: false, reason: "weak_password" as const };
+  }
 
   const existing = await User.findOne({ email }).lean();
   if (existing) return { created: false, reason: "exists" as const };

@@ -69,26 +69,29 @@ export function TestimonialsCarousel({ content }: TestimonialsCarouselProps) {
                 {content.items.map((item) => (
                   <div
                     key={item.name}
-                    className="shrink-0 p-1.5"
+                    className="shrink-0 px-2 py-1"
                     style={{ flexBasis: slideBasis, maxWidth: slideBasis }}
                   >
-                    <article className="border-line bg-surface flex h-full flex-col rounded-[var(--radius-lg)] border p-5 min-[480px]:p-6">
-                      <div className="flex items-center gap-3">
-                        <div className="font-display flex size-12 shrink-0 items-center justify-center rounded-full bg-brand-blue text-sm font-bold text-white">
+                    <article className="flex h-full flex-col border-t-2 border-brand-blue/80 pt-5">
+                      <blockquote className="font-display flex-1 text-[clamp(1.05rem,0.95rem+0.45vw,1.25rem)] font-medium leading-snug text-ink text-balance">
+                        “{item.quote}”
+                      </blockquote>
+                      <div className="mt-6 flex items-center gap-3">
+                        <div
+                          className="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-blue-light text-[0.7rem] font-bold tracking-wide text-brand-blue"
+                          aria-hidden
+                        >
                           {item.initials}
                         </div>
                         <div className="min-w-0">
-                          <h4 className="truncate text-base font-semibold">
+                          <p className="truncate text-[0.875rem] font-semibold text-ink">
                             {item.name}
-                          </h4>
-                          <p className="text-muted-foreground truncate text-[0.8rem]">
+                          </p>
+                          <p className="text-muted-foreground truncate text-[0.75rem]">
                             {item.role}
                           </p>
                         </div>
                       </div>
-                      <blockquote className="text-muted-foreground mt-4 flex-1 text-[clamp(0.9rem,0.86rem+0.2vw,0.98rem)] leading-relaxed">
-                        “{item.quote}”
-                      </blockquote>
                     </article>
                   </div>
                 ))}
@@ -96,17 +99,17 @@ export function TestimonialsCarousel({ content }: TestimonialsCarouselProps) {
             </div>
 
             {pageCount > 1 ? (
-              <div className="mt-6 flex items-center justify-center gap-3 min-[480px]:mt-8 min-[480px]:gap-5">
+              <div className="mt-8 flex items-center justify-center gap-3">
                 <button
                   type="button"
                   aria-label="Previous testimonial"
                   disabled={index <= 0}
-                  className="border-line inline-flex size-10 items-center justify-center rounded-full border disabled:opacity-40"
+                  className="inline-flex size-10 items-center justify-center rounded-full text-ink transition hover:bg-black/[0.04] disabled:opacity-30"
                   onClick={() => setIndex((i) => Math.max(0, i - 1))}
                 >
                   <ArrowLeft className="size-4" />
                 </button>
-                <div className="flex gap-2">
+                <div className="flex gap-1.5">
                   {dots.map((dot) => (
                     <button
                       key={dot}
@@ -114,10 +117,10 @@ export function TestimonialsCarousel({ content }: TestimonialsCarouselProps) {
                       aria-label={`Go to testimonials page ${dot + 1}`}
                       aria-current={dot === index}
                       className={cn(
-                        "h-2 rounded-full transition-all duration-300",
+                        "h-1.5 rounded-full transition-all duration-300",
                         dot === index
                           ? "w-5 bg-brand-blue"
-                          : "bg-line w-2",
+                          : "bg-line w-1.5",
                       )}
                       onClick={() => setIndex(dot)}
                     />
@@ -127,7 +130,7 @@ export function TestimonialsCarousel({ content }: TestimonialsCarouselProps) {
                   type="button"
                   aria-label="Next testimonial"
                   disabled={index >= maxIndex}
-                  className="border-line inline-flex size-10 items-center justify-center rounded-full border disabled:opacity-40"
+                  className="inline-flex size-10 items-center justify-center rounded-full text-ink transition hover:bg-black/[0.04] disabled:opacity-30"
                   onClick={() => setIndex((i) => Math.min(maxIndex, i + 1))}
                 >
                   <ArrowRight className="size-4" />

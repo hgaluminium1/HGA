@@ -11,7 +11,7 @@ import {
   parseCsvText,
   validateImportRows,
   type ImportEntity,
-} from "@/features/admin-import/lib/import.service";
+} from "@/modules/import";
 
 export async function POST(req: Request) {
   const authz = await authorize("import.write");

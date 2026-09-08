@@ -26,6 +26,7 @@
     "src/modules/**/di.ts",
     "src/features/**/index.ts",
     "src/modules/**/index.ts",
+    "src/modules/**/browser.ts",
     "src/components/ui/**",
     "**/*.gitkeep"
   ],

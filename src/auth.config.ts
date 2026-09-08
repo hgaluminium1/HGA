@@ -1,11 +1,18 @@
 import type { NextAuthConfig } from "next-auth";
 
+const SESSION_MAX_AGE_SEC = 8 * 60 * 60; // 8 hours
+
 export const authConfig = {
   providers: [],
   pages: {
     signIn: "/admin/login",
   },
-  session: { strategy: "jwt" },
+  session: {
+    strategy: "jwt",
+    maxAge: SESSION_MAX_AGE_SEC,
+  },
+  // HttpOnly + SameSite=Lax + Secure in production via Auth.js defaults
+  useSecureCookies: process.env.NODE_ENV === "production",
   callbacks: {
     authorized({ auth, request }) {
       const { pathname } = request.nextUrl;
@@ -16,7 +23,6 @@ export const authConfig = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id!;
-        // role set in full auth.ts authorize path
         if ("role" in user && user.role) {
           token.role = user.role as never;
         }

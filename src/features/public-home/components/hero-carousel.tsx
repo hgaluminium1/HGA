@@ -23,6 +23,8 @@ type HeroCarouselProps = {
 
 const AUTOPLAY_MS = 7000;
 
+const DEFAULT_CTA = { label: "Inquire Now", href: "contact" };
+
 /**
  * Billboard carousel — reliable autoplay:
  * - Interval advances slides (not hover-gated on the whole hero — that blocked play).
@@ -30,7 +32,7 @@ const AUTOPLAY_MS = 7000;
  * - Explicit pause + reduced-motion + video modal stop the timer.
  */
 export function HeroCarousel({ locale, content }: HeroCarouselProps) {
-  const { slides, primaryCta, secondaryCta, videoSrc, videoPoster } = content;
+  const { slides } = content;
   const [index, setIndex] = useState(0);
   const [videoOpen, setVideoOpen] = useState(false);
   const [paused, setPaused] = useState(false);
@@ -39,6 +41,10 @@ export function HeroCarousel({ locale, content }: HeroCarouselProps) {
 
   const count = slides.length;
   const active = slides[index] ?? slides[0];
+  const primaryCta = active?.primaryCta ?? DEFAULT_CTA;
+  const videoSrc = active?.video?.src ?? "";
+  const videoPoster = active?.video?.posterSrc ?? "";
+  const videoLabel = active?.video?.label ?? "Watch video";
   const playing = count > 1 && !paused && !videoOpen && !reduceMotion;
 
   const go = useCallback(
@@ -152,7 +158,7 @@ export function HeroCarousel({ locale, content }: HeroCarouselProps) {
                   }}
                 >
                   <Play className="size-4" />
-                  {secondaryCta.label}
+                  {videoLabel}
                 </Button>
               ) : null}
             </div>
@@ -188,7 +194,8 @@ export function HeroCarousel({ locale, content }: HeroCarouselProps) {
                               ? `hero-progress ${AUTOPLAY_MS}ms linear forwards`
                               : undefined,
                             animationPlayState: playing ? "running" : "paused",
-                          }}
+                          }
+                          }
                         />
                       ) : (
                         <span
@@ -250,16 +257,17 @@ export function HeroCarousel({ locale, content }: HeroCarouselProps) {
           showCloseButton
         >
           <DialogHeader className="sr-only">
-            <DialogTitle>Company story video</DialogTitle>
+            <DialogTitle>{videoLabel}</DialogTitle>
           </DialogHeader>
           <div className="aspect-video w-full">
-            {videoOpen ? (
+            {videoOpen && videoSrc ? (
               <video
+                key={`${index}-${videoSrc}`}
                 className="size-full"
                 controls
                 playsInline
                 autoPlay
-                poster={videoPoster}
+                poster={videoPoster || undefined}
               >
                 <source src={videoSrc} type="video/mp4" />
               </video>

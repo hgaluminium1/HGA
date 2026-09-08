@@ -3,8 +3,12 @@
 import { useState, useTransition } from "react";
 
 import { Button } from "@/components/ui/button";
-import { ProductCard } from "@/features/public-catalog/components/product-card";
+import {
+  PRODUCT_GRID_CLASS,
+  ProductCard,
+} from "@/features/public-catalog/components/product-card";
 import type { ProductDTO } from "@/modules/catalog";
+import { cn } from "@/lib/utils";
 
 type LoadMoreProductsProps = {
   locale: string;
@@ -54,7 +58,7 @@ export function LoadMoreProducts({
 
   return (
     <div>
-      <ul className="mx-auto grid max-w-[90rem] gap-4 min-[640px]:grid-cols-2 min-[640px]:gap-5 min-[1024px]:grid-cols-3 min-[1440px]:grid-cols-4">
+      <ul className={cn("mx-auto max-w-[90rem]", PRODUCT_GRID_CLASS)}>
         {items.map((product) => (
           <li key={product.id}>
             <ProductCard locale={locale} product={product} />

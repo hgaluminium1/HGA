@@ -13,18 +13,38 @@ export const heroBlockDataSchema = z.object({
   slides: z
     .array(
       z.object({
-        imageSrc: z.string().min(1),
+        imageSrc: z.string(),
         imageAlt: z.string(),
+        imagePublicId: z.string().optional(),
         eyebrow: z.string(),
-        title: z.string().min(1),
+        title: z.string(),
         subtitle: z.string(),
+        primaryCta: z
+          .object({ label: z.string(), href: z.string() })
+          .optional(),
+        video: z
+          .object({
+            src: z.string().min(1),
+            publicId: z.string().optional(),
+            posterSrc: z.string().optional(),
+            posterPublicId: z.string().optional(),
+            label: z.string().optional(),
+          })
+          .nullable()
+          .optional(),
       }),
     )
     .min(1),
-  primaryCta: z.object({ label: z.string(), href: z.string() }),
-  secondaryCta: z.object({ label: z.string() }),
-  videoSrc: z.string(),
-  videoPoster: z.string(),
+  /** @deprecated Prefer per-slide primaryCta; kept for legacy drafts */
+  primaryCta: z
+    .object({ label: z.string(), href: z.string() })
+    .optional(),
+  /** @deprecated Prefer per-slide video */
+  secondaryCta: z.object({ label: z.string() }).optional(),
+  /** @deprecated Prefer per-slide video.src */
+  videoSrc: z.string().optional(),
+  /** @deprecated Prefer per-slide video.posterSrc */
+  videoPoster: z.string().optional(),
 });
 
 export const capabilityBlockDataSchema = z.object({
@@ -57,6 +77,12 @@ export const productsBlockDataSchema = z.object({
       }),
     )
     .default([]),
+});
+
+export const upcomingProductsBlockDataSchema = z.object({
+  eyebrow: z.string().default("Pipeline"),
+  title: z.string().default("Upcoming products"),
+  description: z.string().default(""),
 });
 
 export const missionBlockDataSchema = z.object({
@@ -170,7 +196,7 @@ const blockDataByType = {
   "logo-strip": corporateBlockDataSchema,
   gallery: corporateBlockDataSchema,
   "expansion-roadmap": corporateBlockDataSchema,
-  "upcoming-products": corporateBlockDataSchema,
+  "upcoming-products": upcomingProductsBlockDataSchema,
   markets: corporateBlockDataSchema,
 } as const;
 
@@ -334,12 +360,10 @@ export function defaultBlockData(type: BlockType): unknown {
             eyebrow: "New section",
             title: "Headline",
             subtitle: "Supporting text",
+            primaryCta: { label: "Inquire Now", href: "contact" },
+            video: null,
           },
         ],
-        primaryCta: { label: "Inquire Now", href: "contact" },
-        secondaryCta: { label: "Watch Our Story" },
-        videoSrc: "",
-        videoPoster: "",
       };
     case "capability":
       return {
@@ -406,8 +430,14 @@ export function defaultBlockData(type: BlockType): unknown {
     case "logo-strip":
     case "gallery":
     case "expansion-roadmap":
-    case "upcoming-products":
     case "markets":
       return { seeded: true };
+    case "upcoming-products":
+      return {
+        eyebrow: "Pipeline",
+        title: "Upcoming products",
+        description:
+          "Coming soon from HG — register interest for early allocation.",
+      };
   }
 }

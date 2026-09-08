@@ -2,11 +2,17 @@ import NextAuth from "next-auth";
 import { NextResponse } from "next/server";
 
 import { authConfig } from "@/auth.config";
+import { safeAdminCallbackUrl } from "@/lib/auth/safe-callback-url";
 
 const { auth } = NextAuth(authConfig);
 
 export default auth(async (req) => {
   const { pathname } = req.nextUrl;
+
+  // Authenticated users on login → desk
+  if (pathname.startsWith("/admin/login") && req.auth) {
+    return NextResponse.redirect(new URL("/admin", req.nextUrl.origin));
+  }
 
   // Auth gate for admin (except login)
   if (
@@ -15,17 +21,24 @@ export default auth(async (req) => {
     !req.auth
   ) {
     const url = new URL("/admin/login", req.nextUrl.origin);
-    url.searchParams.set("callbackUrl", pathname);
+    url.searchParams.set(
+      "callbackUrl",
+      safeAdminCallbackUrl(pathname),
+    );
     return NextResponse.redirect(url);
   }
 
-  // Protect CMS write APIs without session (cookie checked via auth)
+  // Protect CMS write APIs without session
   const cmsApi =
     pathname.startsWith("/api/v1/pages") ||
     pathname.startsWith("/api/v1/preview") ||
     pathname.startsWith("/api/v1/products") ||
     pathname.startsWith("/api/v1/categories") ||
     pathname.startsWith("/api/v1/dictionaries") ||
+    pathname.startsWith("/api/v1/media") ||
+    pathname.startsWith("/api/v1/corporate") ||
+    pathname.startsWith("/api/v1/import") ||
+    pathname.startsWith("/api/v1/export") ||
     (pathname.startsWith("/api/v1/redirects") &&
       !pathname.startsWith("/api/v1/redirects/active"));
   if (cmsApi && !req.auth) {
@@ -38,7 +51,6 @@ export default auth(async (req) => {
     );
   }
 
-  // Skip redirect map for APIs and static
   if (
     pathname.startsWith("/api") ||
     pathname.startsWith("/_next") ||

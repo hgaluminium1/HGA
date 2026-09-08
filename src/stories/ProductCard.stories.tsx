@@ -1,47 +1,38 @@
 import type { Meta, StoryObj } from "@storybook/nextjs-vite";
-import Image from "next/image";
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { ProductCard } from "@/features/public-catalog/components/product-card";
+import type { ProductDTO } from "@/modules/catalog";
 
-type ProductCardProps = {
-  title: string;
-  href: string;
-  imageSrc: string;
-  imageAlt: string;
-  wide?: boolean;
+const sample: ProductDTO = {
+  id: "story-1",
+  sku: "HG-BIL-6063",
+  name: { en: "Aluminium Billets" },
+  slug: "billets",
+  categoryIds: [],
+  alloyGrades: ["6063", "6061", "6082"],
+  tempers: [],
+  surfaceFinishes: [],
+  anodizingColors: [],
+  ralColors: [],
+  toleranceStandards: [],
+  packaging: [],
+  description:
+    "Homogenised billets for architectural and industrial extrusion programmes.",
+  imageUrl: "https://picsum.photos/seed/hg-billets/700/525",
+  imageMediaId: null,
+  drawingMediaIds: [],
+  blocks: [],
+  seo: {},
+  status: "published",
+  scheduledPublishAt: null,
+  publishedAt: null,
+  publishedVersion: null,
+  isUpcoming: false,
+  version: 1,
+  deletedAt: null,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
 };
-
-function ProductCard({
-  title,
-  href,
-  imageSrc,
-  imageAlt,
-  wide,
-}: ProductCardProps) {
-  return (
-    <Link
-      href={href}
-      className={cn(
-        "shadow-brand-sm group relative flex min-h-[300px] items-end overflow-hidden rounded-[var(--radius-lg)]",
-        wide && "min-h-[220px]",
-      )}
-    >
-      <Image src={imageSrc} alt={imageAlt} fill className="object-cover" />
-      <span className="absolute inset-0 bg-linear-to-t from-ink/85 to-transparent" />
-      <span className="relative z-10 flex w-full items-end justify-between gap-3 p-5 text-on-dark">
-        <span>
-          <span className="text-xs font-bold tracking-wide uppercase text-gold">
-            Our Product
-          </span>
-          <strong className="mt-1 block text-lg">{title}</strong>
-        </span>
-        <ArrowUpRight className="size-5" />
-      </span>
-    </Link>
-  );
-}
 
 const meta = {
   title: "Molecules/ProductCard",
@@ -49,10 +40,8 @@ const meta = {
   parameters: { layout: "padded" },
   tags: ["autodocs"],
   args: {
-    title: "Aluminium Billets",
-    href: "/en/products/billets",
-    imageSrc: "https://picsum.photos/seed/hg-billets/700/562",
-    imageAlt: "Cylindrical aluminium billets",
+    locale: "en",
+    product: sample,
   },
 } satisfies Meta<typeof ProductCard>;
 
@@ -60,4 +49,9 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {};
-export const Wide: Story = { args: { wide: true } };
+export const Upcoming: Story = {
+  args: {
+    product: { ...sample, isUpcoming: true, name: { en: "Solar frame profile" } },
+    tone: "pipeline",
+  },
+};

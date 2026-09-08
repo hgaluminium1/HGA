@@ -34,7 +34,12 @@ function blocksFromHomeContent() {
       type: "upcoming-products" as BlockType,
       order: 3,
       appearance: "default" as const,
-      data: { seeded: true },
+      data: {
+        eyebrow: "Pipeline",
+        title: "Upcoming products",
+        description:
+          "Coming soon from HG — register interest for early allocation.",
+      },
     },
     {
       id: "markets",
@@ -50,8 +55,8 @@ function blocksFromHomeContent() {
       appearance: "default" as const,
       data: {
         ...c.mission,
-        videoSrc: c.hero.videoSrc,
-        videoPoster: c.hero.videoPoster,
+        videoSrc: c.hero.slides[0]?.video?.src ?? "",
+        videoPoster: c.hero.slides[0]?.video?.posterSrc ?? "",
       },
     },
     {

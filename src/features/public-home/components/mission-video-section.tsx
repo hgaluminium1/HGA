@@ -32,32 +32,45 @@ export function MissionVideoSection({
       id="home-sustainability"
       className="relative overflow-hidden text-white"
     >
-      <div className="relative min-h-[clamp(20rem,55vw,34rem)]">
+      <div className="relative min-h-[clamp(22rem,58vw,36rem)]">
         <Image
           src={content.imageSrc}
           alt={content.imageAlt}
           fill
           sizes="100vw"
+          priority={false}
           className="object-cover"
         />
         <div
-          className="absolute inset-0 bg-[linear-gradient(180deg,rgb(0_18_47_/_0.78),rgb(0_18_47_/_0.58))]"
+          className="absolute inset-0 bg-[linear-gradient(165deg,rgb(0_18_47_/_0.82)_0%,rgb(0_18_47_/_0.45)_45%,rgb(3_66_171_/_0.55)_100%)]"
+          aria-hidden
+        />
+        <div
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_0%,rgb(0_18_47_/_0.35)_100%)]"
           aria-hidden
         />
 
         <div className="absolute inset-0 z-[2] flex flex-col items-center justify-center px-[var(--pad-inline)] text-center">
-          <Reveal className="flex max-w-[40rem] flex-col items-center">
-            <p className="font-display text-balance text-[clamp(1.15rem,0.95rem+1.4vw,1.85rem)] leading-[1.35]">
+          <Reveal className="flex max-w-[42rem] flex-col items-center">
+            <p className="text-[0.7rem] font-bold tracking-[0.16em] text-brand-red uppercase">
+              Our mission
+            </p>
+            <p className="font-display mt-4 text-balance text-[clamp(1.25rem,1rem+1.6vw,2.1rem)] font-semibold leading-[1.28]">
               {content.statement}
             </p>
             {videoSrc ? (
               <button
                 type="button"
                 aria-label="Play company story video"
-                className="mt-7 flex size-14 items-center justify-center rounded-full bg-white text-ink shadow-[0_8px_28px_rgb(0_0_0_/_0.35)] transition-transform hover:scale-105 min-[480px]:size-[66px]"
+                className="group mt-8 inline-flex items-center gap-3 rounded-full border border-white/25 bg-white/10 py-2 pr-5 pl-2 backdrop-blur-md transition-[background,transform] hover:scale-[1.02] hover:bg-white/16"
                 onClick={() => setOpen(true)}
               >
-                <Play className="ml-0.5 size-5 fill-current min-[480px]:size-[22px]" />
+                <span className="flex size-11 items-center justify-center rounded-full bg-white text-ink shadow-[0_8px_24px_rgb(0_0_0_/_0.3)] min-[480px]:size-12">
+                  <Play className="ml-0.5 size-4 fill-current min-[480px]:size-[18px]" />
+                </span>
+                <span className="text-left text-[0.8125rem] font-semibold tracking-tight">
+                  Watch our story
+                </span>
               </button>
             ) : null}
           </Reveal>
@@ -79,7 +92,7 @@ export function MissionVideoSection({
                 controls
                 playsInline
                 autoPlay
-                poster={videoPoster}
+                poster={videoPoster || content.imageSrc}
               >
                 <source src={videoSrc} type="video/mp4" />
               </video>

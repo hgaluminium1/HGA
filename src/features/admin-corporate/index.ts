@@ -1,9 +1,0 @@
-export { CompanyProfileForm } from "@/features/admin-corporate/components/company-profile-form";
-export { PeopleAdmin } from "@/features/admin-corporate/components/people-admin";
-export { CapacityAdmin } from "@/features/admin-corporate/components/capacity-admin";
-export { CertificationsAdmin } from "@/features/admin-corporate/components/certifications-admin";
-export { SustainabilityAdmin } from "@/features/admin-corporate/components/sustainability-admin";
-export { CustomerLogosAdmin } from "@/features/admin-corporate/components/customer-logos-admin";
-export { CaseStudiesAdmin } from "@/features/admin-corporate/components/case-studies-admin";
-export { TestimonialsAdmin } from "@/features/admin-corporate/components/testimonials-admin";
-export { ExpansionAdmin } from "@/features/admin-corporate/components/expansion-admin";

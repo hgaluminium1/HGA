@@ -19,7 +19,10 @@ import {
   loadIndustrySegments,
   MarketsSection,
 } from "@/features/public-site/components/markets-section";
-import { PageHero } from "@/features/public-site/components/page-hero";
+import {
+  PAGE_HERO_IMAGES,
+  PageHero,
+} from "@/features/public-site/components/page-hero";
 import {
   PresentProductsGrid,
   UpcomingProductsStrip,
@@ -38,6 +41,7 @@ export async function AboutPage({ locale }: { locale: string }) {
         description="HG Aluminium Smelters Limited — extrusion, homogenised billets and remelt capacity from Kadi / Mahesana, Gujarat."
         secondaryLabel="View products"
         secondaryHref="products"
+        imageSrc={PAGE_HERO_IMAGES.about}
       />
       <Section>
         <Container>
@@ -90,17 +94,18 @@ export async function JourneyPage({ locale }: { locale: string }) {
         description="From incorporation to a growing extrusion and remelt platform in Gujarat."
         secondaryLabel="Expansion"
         secondaryHref="expansion"
+        imageSrc={PAGE_HERO_IMAGES.journey}
       />
       <Section>
         <Container>
-          <ol className="relative space-y-8 border-l border-line pl-6 md:pl-8">
+          <ol className="relative max-w-3xl space-y-10 border-l-2 border-brand-blue/25 pl-8 md:pl-10">
             {milestones.map((m) => (
               <li key={m.title} className="relative">
-                <span className="bg-brand-accent absolute top-1.5 -left-[1.6rem] size-2.5 rounded-full md:-left-[2.1rem]" />
-                <p className="text-xs font-bold tracking-[0.12em] text-brand-accent uppercase">
+                <span className="bg-brand-blue absolute top-1.5 -left-[2.15rem] size-3 rounded-full ring-4 ring-white md:-left-[2.65rem]" />
+                <p className="text-xs font-bold tracking-[0.12em] text-brand-blue uppercase">
                   {m.year}
                 </p>
-                <h2 className="font-display mt-1 text-xl font-semibold">
+                <h2 className="font-display mt-1 text-xl font-semibold text-ink">
                   {m.title}
                 </h2>
                 <p className="text-muted-foreground mt-2 max-w-2xl text-sm leading-relaxed">
@@ -126,23 +131,26 @@ export async function IndustriesPage({ locale }: { locale: string }) {
         description="Markets where HG extrusion, billets and remelt alloys are specified — sector focus, not prospective brand claims."
         secondaryLabel="Products"
         secondaryHref="products"
+        imageSrc={PAGE_HERO_IMAGES.industries}
       />
       <Section>
         <Container>
-          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {segments.map((s) => (
-              <li
-                key={s.key}
-                className="border-line bg-surface rounded-[var(--radius-lg)] border p-6"
-              >
-                <h2 className="font-display text-xl font-semibold">{s.label}</h2>
+              <li key={s.key} className="flex flex-col border-t-2 border-brand-blue/60 pt-4">
+                <h2 className="font-display text-xl font-semibold text-ink">
+                  {s.label}
+                </h2>
                 <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
                   {s.description}
                 </p>
-                <ul className="mt-4 space-y-1">
+                <ul className="mt-4 space-y-1.5">
                   {s.applications.map((a) => (
-                    <li key={a} className="text-text-faint text-xs">
-                      · {a}
+                    <li
+                      key={a}
+                      className="text-text-faint text-xs leading-snug"
+                    >
+                      {a}
                     </li>
                   ))}
                 </ul>
@@ -183,19 +191,17 @@ export async function ManufacturingPage({ locale }: { locale: string }) {
         description="Integrated melting, casting and extrusion at our Gujarat plant."
         secondaryLabel="Capacity"
         secondaryHref="capacity"
+        imageSrc={PAGE_HERO_IMAGES.manufacturing}
       />
       <Section>
         <Container>
-          <ol className="grid gap-5 sm:grid-cols-2">
+          <ol className="grid gap-8 sm:grid-cols-2">
             {steps.map((s, i) => (
-              <li
-                key={s.title}
-                className="border-line rounded-[var(--radius-lg)] border p-6"
-              >
-                <p className="text-brand-accent text-sm font-bold">
+              <li key={s.title} className="border-t border-black/[0.08] pt-5">
+                <p className="text-brand-blue text-sm font-bold tabular-nums">
                   0{i + 1}
                 </p>
-                <h2 className="font-display mt-2 text-xl font-semibold">
+                <h2 className="font-display mt-2 text-xl font-semibold text-ink">
                   {s.title}
                 </h2>
                 <p className="text-muted-foreground mt-2 text-sm">{s.body}</p>
@@ -220,6 +226,7 @@ export async function QualityPage({ locale }: { locale: string }) {
         description="Process control, mill certificates and ISO-aligned practices for every lot."
         secondaryLabel="Resources"
         secondaryHref="resources"
+        imageSrc={PAGE_HERO_IMAGES.quality}
       />
       <Section>
         <Container className="max-w-3xl">
@@ -244,6 +251,7 @@ export async function SustainabilityPage({ locale }: { locale: string }) {
         locale={locale}
         title="Sustainability"
         description="Secondary aluminium pathways, responsible operations and transparent disclosure tiers."
+        imageSrc={PAGE_HERO_IMAGES.sustainability}
       />
       <Section>
         <Container className="max-w-3xl">
@@ -270,6 +278,7 @@ export async function ProcurementPage({ locale }: { locale: string }) {
         description="Buyer path for domestic programmes and export enquiries — clear contacts, clear next steps."
         ctaLabel="Send RFQ"
         ctaHref="contact"
+        imageSrc={PAGE_HERO_IMAGES.procurement}
       />
       <Section>
         <Container>
@@ -347,6 +356,7 @@ export async function CareersPage({ locale }: { locale: string }) {
         description="Build aluminium programmes with a growing Gujarat manufacturer — roles open through HR, not placeholder job boards."
         ctaLabel="Contact HR"
         ctaHref="contact"
+        imageSrc={PAGE_HERO_IMAGES.careers}
       />
       <Section>
         <Container className="max-w-3xl">
@@ -380,10 +390,11 @@ export async function ResourcesPage({ locale }: { locale: string }) {
         locale={locale}
         title="Resources"
         description="Request datasheets, certificates and technical packs for your RFQ."
+        imageSrc={PAGE_HERO_IMAGES.resources}
       />
       <Section>
         <Container>
-          <ul className="grid gap-4 sm:grid-cols-2">
+          <ul className="grid gap-1 sm:grid-cols-2">
             {[
               "Mill test certificate samples",
               "Alloy / temper capability note",
@@ -392,12 +403,12 @@ export async function ResourcesPage({ locale }: { locale: string }) {
             ].map((item) => (
               <li
                 key={item}
-                className="border-line flex items-center justify-between gap-4 rounded-[var(--radius-lg)] border p-5"
+                className="flex items-center justify-between gap-4 border-b border-black/[0.08] py-4"
               >
-                <span className="font-medium">{item}</span>
+                <span className="font-medium text-ink">{item}</span>
                 <Link
                   href={localePath(locale, "contact")}
-                  className="text-brand-accent shrink-0 text-sm font-semibold hover:underline"
+                  className="text-brand-blue shrink-0 text-sm font-semibold hover:underline"
                 >
                   Request
                 </Link>
@@ -454,6 +465,7 @@ export async function ContactPage({
         description="Tell us alloy, geometry and volume — sales will respond with feasibility and lead time."
         ctaLabel="View products"
         ctaHref="products"
+        imageSrc={PAGE_HERO_IMAGES.contact}
       />
       <Section>
         <Container>

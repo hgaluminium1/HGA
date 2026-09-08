@@ -70,12 +70,10 @@ test.describe("Phase 5 corporate + CSV", () => {
     expect([401, 403]).toContain(res.status());
   });
 
-  test("admin media and corporate routes require auth", async ({ page }) => {
-    await page.goto("/admin/media");
+  test("admin desk routes require auth", async ({ page }) => {
+    await page.goto("/admin/pages");
     await expect(page).toHaveURL(/\/admin\/login/, { timeout: 15_000 });
-    await page.goto("/admin/corporate/people");
-    await expect(page).toHaveURL(/\/admin\/login/, { timeout: 15_000 });
-    await page.goto("/admin/import");
+    await page.goto("/admin/pages/home/hero");
     await expect(page).toHaveURL(/\/admin\/login/, { timeout: 15_000 });
   });
 });
