@@ -2,12 +2,12 @@ import { z } from "zod";
 
 import { ConflictError } from "@/lib/http/conflict";
 import { dbConnect } from "@/lib/db/connect";
-import { CareerOpening } from "@/modules/careers/repositories/mongo/opening.model";
-import type { CareerOpeningDTO } from "@/modules/careers/types";
+import { CareerOpening } from "../repositories/mongo/opening.model";
+import type { CareerOpeningDTO } from "../types";
 import {
   createOpeningSchema,
   updateOpeningSchema,
-} from "@/modules/careers/validators/career.validators";
+} from "../validators/career.validators";
 
 function toDTO(doc: {
   _id: { toString(): string };

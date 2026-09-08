@@ -44,7 +44,7 @@ function str(v: unknown, fallback = "") {
   return typeof v === "string" ? v : fallback;
 }
 
-function num(v: unknown, fallback = 0) {
+function _num(v: unknown, fallback = 0) {
   return typeof v === "number" && !Number.isNaN(v) ? v : fallback;
 }
 

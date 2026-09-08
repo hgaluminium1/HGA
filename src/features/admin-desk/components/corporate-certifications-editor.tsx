@@ -166,7 +166,7 @@ export function CorporateCertificationsEditor({
     setMessage(null);
     setError(null);
     try {
-      let currentId = id;
+      const currentId = id;
       let currentVersion = version;
       if (!currentId) {
         const created = await createCertificationApi(payload("published"));

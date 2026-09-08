@@ -1220,7 +1220,14 @@ async function seedProducts() {
     });
     const published = await publishProduct(created.id, created.version);
     if ("error" in published) throw new Error(JSON.stringify(published));
-    ids.push(published.product.id);
+    // Re-attach category after publish — older publish path wiped categoryIds via Zod defaults.
+    const linked = await updateProduct(published.product.id, {
+      version: published.product.version,
+      categoryIds,
+      imageUrl: p.imageUrl,
+    });
+    if ("error" in linked) throw new Error(JSON.stringify(linked));
+    ids.push(linked.product.id);
     console.log(`  + product ${p.slug}`);
   }
   return ids;

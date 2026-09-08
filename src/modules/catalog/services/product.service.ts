@@ -198,6 +198,10 @@ export async function updateProduct(
   id: string,
   input: z.infer<typeof updateProductSchema>,
 ) {
+  // Zod `.default()` on createProductSchema still fires under `.partial()` —
+  // so publish({ status }) would wipe categoryIds to []. Only apply keys
+  // the caller actually sent.
+  const providedKeys = new Set(Object.keys(input));
   const data = updateProductSchema.parse(input);
   await requireDb();
   const existing = await Product.findOne({ _id: id, deletedAt: null });
@@ -213,15 +217,15 @@ export async function updateProduct(
   } = data;
 
   for (const [key, value] of Object.entries(fields)) {
-    if (value !== undefined) {
-      if (key === "scheduledPublishAt") {
-        existing.scheduledPublishAt = value
-          ? new Date(value as string)
-          : null;
-        continue;
-      }
-      (existing as unknown as Record<string, unknown>)[key] = value;
+    if (value === undefined) continue;
+    if (!providedKeys.has(key)) continue;
+    if (key === "scheduledPublishAt") {
+      existing.scheduledPublishAt = value
+        ? new Date(value as string)
+        : null;
+      continue;
     }
+    (existing as unknown as Record<string, unknown>)[key] = value;
   }
 
   if (data.status === "published") {

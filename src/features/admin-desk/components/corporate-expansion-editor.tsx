@@ -197,7 +197,7 @@ export function CorporateExpansionEditor({
     setMessage(null);
     setError(null);
     try {
-      let currentId = id;
+      const currentId = id;
       let currentVersion = version;
       if (!currentId) {
         const created = await createExpansionProjectApi(payload("published"));

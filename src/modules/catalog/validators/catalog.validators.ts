@@ -89,6 +89,27 @@ export const createProductSchema = z.object({
 });
 
 export const updateProductSchema = createProductSchema
+  .omit({
+    // Defaults on create must not apply during partial updates (publish wipe bug).
+    categoryIds: true,
+    alloyGrades: true,
+    tempers: true,
+    surfaceFinishes: true,
+    anodizingColors: true,
+    ralColors: true,
+    toleranceStandards: true,
+    packaging: true,
+  })
+  .extend({
+    categoryIds: z.array(z.string()).optional(),
+    alloyGrades: z.array(z.string()).optional(),
+    tempers: z.array(z.string()).optional(),
+    surfaceFinishes: z.array(z.string()).optional(),
+    anodizingColors: z.array(z.string()).optional(),
+    ralColors: z.array(z.string()).optional(),
+    toleranceStandards: z.array(z.string()).optional(),
+    packaging: z.array(z.string()).optional(),
+  })
   .partial()
   .extend({
     version: z.number().int(),

@@ -176,7 +176,7 @@ export function CorporateCapacityEditor({
     setMessage(null);
     setError(null);
     try {
-      let currentId = id;
+      const currentId = id;
       let currentVersion = version;
       if (!currentId) {
         const created = await createCapacityMetricApi(payload("published"));
