@@ -17,11 +17,8 @@ import {
   useCallback,
   useEffect,
   useId,
-  useLayoutEffect,
   useRef,
   useState,
-  type CSSProperties,
-  type ReactNode,
 } from "react";
 
 import { BrandLockup } from "@/components/molecules/brand-lockup";
@@ -76,182 +73,125 @@ const navIconMap = {
   handshake: Handshake,
 } as const;
 
-const MEGA_VIEWPORT_GUTTER = 16;
-
-/**
- * Viewport-aware mega panel placement (Floating UI / Radix collision pattern):
- * prefer trigger-aligned start, flip/shift horizontally so the panel never
- * clips the viewport; cap width to available space.
- */
-function computeMegaPanelStyle(
-  triggerEl: HTMLElement,
-  panelEl: HTMLElement,
-): CSSProperties {
-  const gutter = MEGA_VIEWPORT_GUTTER;
-  const trigger = triggerEl.getBoundingClientRect();
-  const vw = window.innerWidth;
-  const available = Math.max(240, vw - gutter * 2);
-
-  // Measure intrinsic width without our previous clamp fighting the layout.
-  const prevMax = panelEl.style.maxWidth;
-  const prevWidth = panelEl.style.width;
-  panelEl.style.maxWidth = "none";
-  panelEl.style.width = "max-content";
-  const intrinsic = Math.ceil(panelEl.getBoundingClientRect().width);
-  panelEl.style.maxWidth = prevMax;
-  panelEl.style.width = prevWidth;
-
-  const panelWidth = Math.min(Math.max(intrinsic, 240), available);
-
-  // Prefer aligning panel start with trigger start; if that overflows, shift.
-  let absoluteLeft = trigger.left;
-  if (absoluteLeft + panelWidth > vw - gutter) {
-    absoluteLeft = vw - gutter - panelWidth;
-  }
-  if (absoluteLeft < gutter) {
-    absoluteLeft = gutter;
-  }
-
-  return {
-    left: absoluteLeft - trigger.left,
-    right: "auto",
-    width: panelWidth,
-    maxWidth: available,
-  };
+function isFinePointerHover() {
+  return (
+    typeof window !== "undefined" &&
+    window.matchMedia("(hover: hover) and (pointer: fine)").matches
+  );
 }
 
-function NavDisclosure({
+/** Compact trigger — panel is rendered full-bleed on the header (Apple / Microsoft / Adobe). */
+function NavTrigger({
   id,
   label,
   open,
-  onOpenChange,
-  panelClassName,
-  children,
+  onOpen,
+  onToggle,
 }: {
   id: string;
   label: string;
   open: boolean;
-  onOpenChange: (next: boolean) => void;
-  panelClassName?: string;
-  children: ReactNode;
+  onOpen: () => void;
+  onToggle: () => void;
 }) {
-  const rootRef = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
-  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const panelId = `${id}-panel`;
-  const [panelStyle, setPanelStyle] = useState<CSSProperties>({
-    left: 0,
-    right: "auto",
-  });
-
-  const clearCloseTimer = () => {
-    if (closeTimer.current) {
-      clearTimeout(closeTimer.current);
-      closeTimer.current = null;
-    }
-  };
-
-  const scheduleClose = () => {
-    clearCloseTimer();
-    closeTimer.current = setTimeout(() => onOpenChange(false), 200);
-  };
-
-  const isFinePointerHover = () =>
-    typeof window !== "undefined" &&
-    window.matchMedia("(hover: hover) and (pointer: fine)").matches;
-
-  const reposition = useCallback(() => {
-    const root = rootRef.current;
-    const panel = panelRef.current;
-    if (!root || !panel || !open) return;
-    setPanelStyle(computeMegaPanelStyle(root, panel));
-  }, [open]);
-
-  useLayoutEffect(() => {
-    if (!open) return;
-    reposition();
-    const panel = panelRef.current;
-    const ro =
-      typeof ResizeObserver !== "undefined" && panel
-        ? new ResizeObserver(() => {
-            reposition();
-          })
-        : null;
-    if (panel && ro) ro.observe(panel);
-    const onWin = () => reposition();
-    window.addEventListener("resize", onWin);
-    window.addEventListener("scroll", onWin, true);
-    return () => {
-      ro?.disconnect();
-      window.removeEventListener("resize", onWin);
-      window.removeEventListener("scroll", onWin, true);
-    };
-  }, [open, reposition, children]);
-
-  useEffect(() => () => clearCloseTimer(), []);
-
   return (
-    <div
-      ref={rootRef}
-      className="relative"
+    <button
+      type="button"
+      id={id}
+      className={cn(
+        "inline-flex min-h-11 items-center gap-1 rounded-full px-3.5 py-2.5 text-[0.92rem] font-semibold transition-colors",
+        open
+          ? "bg-bg-alt text-brand-blue"
+          : "hover:bg-bg-alt hover:text-brand-blue",
+      )}
+      aria-expanded={open}
+      aria-controls={`${id}-panel`}
       onMouseEnter={() => {
-        if (!isFinePointerHover()) return;
-        clearCloseTimer();
-        onOpenChange(true);
+        if (isFinePointerHover()) onOpen();
       }}
-      onMouseLeave={() => {
-        if (!isFinePointerHover()) return;
-        scheduleClose();
-      }}
-      onFocusCapture={() => clearCloseTimer()}
-      onBlurCapture={(e) => {
-        const next = e.relatedTarget as Node | null;
-        if (next && rootRef.current?.contains(next)) return;
-        onOpenChange(false);
-      }}
+      onClick={onToggle}
     >
-      <button
-        type="button"
+      {label}
+      <ChevronDown
         className={cn(
-          "inline-flex min-h-11 items-center gap-1 rounded-full px-3.5 py-2.5 text-[0.92rem] font-semibold transition-colors",
-          open
-            ? "bg-bg-alt text-brand-blue"
-            : "hover:bg-bg-alt hover:text-brand-blue",
+          "size-3.5 transition-transform duration-200",
+          open && "rotate-180",
         )}
-        aria-expanded={open}
-        aria-controls={panelId}
-        onClick={() => onOpenChange(!open)}
-      >
-        {label}
-        <ChevronDown
-          className={cn(
-            "size-3.5 transition-transform duration-200",
-            open && "rotate-180",
-          )}
-          aria-hidden
-        />
-      </button>
-      <div
-        ref={panelRef}
-        id={panelId}
-        hidden={!open}
-        style={panelStyle}
-        className={cn(
-          "absolute top-full z-50 mt-2 overflow-hidden rounded-[var(--radius-lg)] border border-line bg-surface shadow-brand-lg",
-          panelClassName,
-        )}
-        onMouseEnter={() => {
-          if (!isFinePointerHover()) return;
-          clearCloseTimer();
-        }}
-      >
-        {children}
-      </div>
-    </div>
+        aria-hidden
+      />
+    </button>
   );
 }
 
-function CategoryLink({
+function MegaSectionLabel({
+  title,
+  href,
+  locale,
+  onNavigate,
+}: {
+  title: string;
+  href?: string;
+  locale: string;
+  onNavigate: () => void;
+}) {
+  if (href) {
+    return (
+      <Link
+        href={localePath(locale, href)}
+        onClick={onNavigate}
+        className="text-text-faint hover:text-brand-blue mb-2 flex items-center gap-1 text-[0.65rem] font-semibold tracking-[0.14em] uppercase transition-colors"
+      >
+        {title}
+        <ArrowRight className="size-3 opacity-60" aria-hidden />
+      </Link>
+    );
+  }
+  return (
+    <p className="text-text-faint mb-2 text-[0.65rem] font-semibold tracking-[0.14em] uppercase">
+      {title}
+    </p>
+  );
+}
+
+function CompactLink({
+  locale,
+  item,
+  onNavigate,
+  badge,
+  showDescription = true,
+}: {
+  locale: string;
+  item: NavLink;
+  onNavigate: () => void;
+  badge?: string;
+  showDescription?: boolean;
+}) {
+  return (
+    <Link
+      href={localePath(locale, item.href)}
+      onClick={onNavigate}
+      className="group -mx-1.5 flex items-start justify-between gap-2 rounded-md px-1.5 py-1.5 transition-colors hover:bg-bg-alt"
+    >
+      <span className="min-w-0">
+        <span className="block text-[0.875rem] font-medium text-ink group-hover:text-brand-blue">
+          {item.label}
+        </span>
+        {showDescription && item.description ? (
+          <span className="text-muted-foreground mt-0.5 line-clamp-1 block text-[0.7rem] leading-snug">
+            {item.description}
+          </span>
+        ) : null}
+      </span>
+      {badge ? (
+        <span className="mt-0.5 shrink-0 text-[0.6rem] font-bold tracking-[0.08em] text-brand-red uppercase">
+          {badge}
+        </span>
+      ) : null}
+    </Link>
+  );
+}
+
+function CategoryCompactLink({
   locale,
   item,
   onNavigate,
@@ -265,17 +205,17 @@ function CategoryLink({
     <Link
       href={localePath(locale, item.href)}
       onClick={onNavigate}
-      className="hover:bg-brand-blue-light group flex gap-3 rounded-[var(--radius-md)] px-2.5 py-2.5 transition-colors"
+      className="group -mx-1.5 flex items-center gap-2.5 rounded-md px-1.5 py-1.5 transition-colors hover:bg-bg-alt"
     >
-      <span className="bg-brand-blue-light text-brand-blue flex size-9 shrink-0 items-center justify-center rounded-[10px] transition-colors group-hover:bg-brand-blue group-hover:text-white">
-        <Icon className="size-4" aria-hidden />
+      <span className="text-brand-blue flex size-7 shrink-0 items-center justify-center rounded-md bg-brand-blue-light">
+        <Icon className="size-3.5" aria-hidden />
       </span>
       <span className="min-w-0">
-        <span className="block text-[0.95rem] font-semibold text-ink group-hover:text-brand-blue">
+        <span className="block text-[0.875rem] font-medium text-ink group-hover:text-brand-blue">
           {item.label}
         </span>
         {item.description ? (
-          <span className="text-muted-foreground mt-0.5 block text-xs leading-snug">
+          <span className="text-muted-foreground mt-0.5 line-clamp-1 block text-[0.7rem] leading-snug">
             {item.description}
           </span>
         ) : null}
@@ -284,38 +224,40 @@ function CategoryLink({
   );
 }
 
-function SkuLink({
+function MegaFeatureTile({
   locale,
-  item,
+  feature,
   onNavigate,
-  badge,
 }: {
   locale: string;
-  item: NavLink;
+  feature: NonNullable<NavGroup["feature"]>;
   onNavigate: () => void;
-  badge?: string;
 }) {
   return (
     <Link
-      href={localePath(locale, item.href)}
+      href={localePath(locale, feature.href)}
       onClick={onNavigate}
-      className="hover:bg-brand-blue-light group block rounded-lg px-2.5 py-2 transition-colors"
+      className="group relative block aspect-[5/4] w-full overflow-hidden rounded-[var(--radius-md)] bg-ink min-[900px]:aspect-auto min-[900px]:min-h-[11.5rem] min-[900px]:h-full"
     >
-      <span className="flex items-start justify-between gap-2">
-        <span className="min-w-0 text-sm font-semibold text-ink group-hover:text-brand-blue">
-          {item.label}
+      <Image
+        src={feature.imageSrc}
+        alt={feature.imageAlt}
+        fill
+        sizes="20rem"
+        className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+      />
+      <span
+        className="absolute inset-0 bg-[linear-gradient(180deg,transparent_20%,rgb(0_18_47_/_0.88)_100%)]"
+        aria-hidden
+      />
+      <span className="absolute inset-x-0 bottom-0 z-[1] p-3.5 text-white">
+        <span className="text-[0.6rem] font-bold tracking-[0.14em] text-brand-red uppercase">
+          {feature.eyebrow}
         </span>
-        {badge ? (
-          <span className="shrink-0 rounded-full bg-ink/90 px-1.5 py-0.5 text-[0.6rem] font-bold tracking-wide text-brand-red uppercase">
-            {badge}
-          </span>
-        ) : null}
+        <span className="mt-1 block text-[0.875rem] font-semibold leading-snug">
+          {feature.title}
+        </span>
       </span>
-      {item.description ? (
-        <span className="text-muted-foreground mt-0.5 block text-xs leading-snug">
-          {item.description}
-        </span>
-      ) : null}
     </Link>
   );
 }
@@ -341,229 +283,244 @@ function ProductMegaPanel({
     s.title.toLowerCase().includes("coming"),
   );
   const otherSections = sections.filter(
-    (s) => s !== categorySection && s !== presentSection && s !== upcomingSection,
+    (s) =>
+      s !== categorySection && s !== presentSection && s !== upcomingSection,
   );
 
   return (
-    <div className="w-full min-w-[min(100%,20rem)] max-w-[56rem]">
-      <div className="grid min-[900px]:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)_minmax(0,0.95fr)]">
-        <div className="border-line p-4 min-[720px]:p-5 min-[900px]:border-r">
-          {categorySection ? (
-            <>
-              {categorySection.href ? (
-                <Link
-                  href={localePath(locale, categorySection.href)}
-                  onClick={onNavigate}
-                  className="text-brand-blue mb-3 flex items-center gap-1 text-[0.7rem] font-bold tracking-[0.12em] uppercase hover:underline"
-                >
-                  {categorySection.title}
-                  <ArrowRight className="size-3" aria-hidden />
-                </Link>
-              ) : (
-                <p className="text-text-faint mb-3 text-[0.7rem] font-bold tracking-[0.12em] uppercase">
-                  {categorySection.title}
-                </p>
-              )}
-              <ul className="space-y-0.5">
-                {categorySection.items.map((item) => (
-                  <li key={item.href + item.label}>
-                    <CategoryLink
+    <div className="w-full">
+      <div
+        className={cn(
+          "grid gap-6 py-5 min-[720px]:gap-8 min-[720px]:py-6",
+          "grid-cols-1 min-[720px]:grid-cols-2",
+          upcomingSection && feature
+            ? "min-[960px]:grid-cols-[1.1fr_1.2fr_1.1fr_0.95fr]"
+            : feature
+              ? "min-[960px]:grid-cols-[1.15fr_1.25fr_0.95fr]"
+              : "min-[960px]:grid-cols-3",
+        )}
+      >
+        {categorySection ? (
+          <div className="min-w-0">
+            <MegaSectionLabel
+              title={categorySection.title}
+              href={categorySection.href}
+              locale={locale}
+              onNavigate={onNavigate}
+            />
+            <ul>
+              {categorySection.items.map((item) => (
+                <li key={item.href + item.label}>
+                  <CategoryCompactLink
+                    locale={locale}
+                    item={item}
+                    onNavigate={onNavigate}
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
+
+        {presentSection ? (
+          <div className="min-w-0">
+            <MegaSectionLabel
+              title={presentSection.title}
+              href={presentSection.href}
+              locale={locale}
+              onNavigate={onNavigate}
+            />
+            <ul>
+              {presentSection.items.map((item) => (
+                <li key={item.href + item.label}>
+                  <CompactLink
+                    locale={locale}
+                    item={item}
+                    onNavigate={onNavigate}
+                  />
+                </li>
+              ))}
+            </ul>
+            {!upcomingSection
+              ? otherSections.map((section) => (
+                  <div key={section.title} className="mt-5">
+                    <MegaSectionLabel
+                      title={section.title}
+                      href={section.href}
                       locale={locale}
-                      item={item}
                       onNavigate={onNavigate}
                     />
-                  </li>
-                ))}
-              </ul>
-            </>
-          ) : null}
-        </div>
+                    <ul>
+                      {section.items.map((item) => (
+                        <li key={item.href + item.label}>
+                          <CompactLink
+                            locale={locale}
+                            item={item}
+                            onNavigate={onNavigate}
+                          />
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ))
+              : null}
+          </div>
+        ) : null}
 
-        <div className="border-line flex flex-col gap-5 p-4 min-[720px]:p-5 min-[900px]:border-r">
-          {presentSection ? (
-            <div>
-              {presentSection.href ? (
-                <Link
-                  href={localePath(locale, presentSection.href)}
-                  onClick={onNavigate}
-                  className="text-brand-blue mb-2.5 flex items-center gap-1 text-[0.7rem] font-bold tracking-[0.12em] uppercase hover:underline"
-                >
-                  {presentSection.title}
-                  <ArrowRight className="size-3" aria-hidden />
-                </Link>
-              ) : (
-                <p className="text-text-faint mb-2.5 text-[0.7rem] font-bold tracking-[0.12em] uppercase">
-                  {presentSection.title}
-                </p>
-              )}
-              <ul className="space-y-0.5">
-                {presentSection.items.map((item) => (
-                  <li key={item.href + item.label}>
-                    <SkuLink
-                      locale={locale}
-                      item={item}
-                      onNavigate={onNavigate}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
+        {upcomingSection ? (
+          <div className="min-w-0">
+            <MegaSectionLabel
+              title={upcomingSection.title}
+              href={upcomingSection.href}
+              locale={locale}
+              onNavigate={onNavigate}
+            />
+            <ul>
+              {upcomingSection.items.map((item) => (
+                <li key={item.href + item.label}>
+                  <CompactLink
+                    locale={locale}
+                    item={item}
+                    onNavigate={onNavigate}
+                    badge="Soon"
+                  />
+                </li>
+              ))}
+            </ul>
+            {otherSections.map((section) => (
+              <div key={section.title} className="mt-5">
+                <MegaSectionLabel
+                  title={section.title}
+                  href={section.href}
+                  locale={locale}
+                  onNavigate={onNavigate}
+                />
+                <ul>
+                  {section.items.map((item) => (
+                    <li key={item.href + item.label}>
+                      <CompactLink
+                        locale={locale}
+                        item={item}
+                        onNavigate={onNavigate}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        ) : null}
 
-          {upcomingSection ? (
-            <div>
-              {upcomingSection.href ? (
-                <Link
-                  href={localePath(locale, upcomingSection.href)}
-                  onClick={onNavigate}
-                  className="text-brand-blue mb-2.5 flex items-center gap-1 text-[0.7rem] font-bold tracking-[0.12em] uppercase hover:underline"
-                >
-                  {upcomingSection.title}
-                  <ArrowRight className="size-3" aria-hidden />
-                </Link>
-              ) : (
-                <p className="text-text-faint mb-2.5 text-[0.7rem] font-bold tracking-[0.12em] uppercase">
-                  {upcomingSection.title}
-                </p>
-              )}
-              <ul className="space-y-0.5">
-                {upcomingSection.items.map((item) => (
-                  <li key={item.href + item.label}>
-                    <SkuLink
-                      locale={locale}
-                      item={item}
-                      onNavigate={onNavigate}
-                      badge="Soon"
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
+        {feature ? (
+          <div className="min-w-0 min-[960px]:pl-2">
+            <MegaFeatureTile
+              locale={locale}
+              feature={feature}
+              onNavigate={onNavigate}
+            />
+          </div>
+        ) : null}
+      </div>
 
-          {otherSections.map((section) => (
-            <div key={section.title}>
-              <p className="text-text-faint mb-2.5 text-[0.7rem] font-bold tracking-[0.12em] uppercase">
-                {section.title}
-              </p>
-              <ul className="space-y-0.5">
-                {section.items.map((item) => (
-                  <li key={item.href + item.label}>
-                    <SkuLink
-                      locale={locale}
-                      item={item}
-                      onNavigate={onNavigate}
-                    />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-
+      <div className="border-line flex flex-wrap items-center justify-between gap-3 border-t py-3">
         {feature ? (
           <Link
             href={localePath(locale, feature.href)}
             onClick={onNavigate}
-            className="group relative hidden min-h-[14rem] overflow-hidden bg-ink min-[900px]:block"
+            className="text-brand-blue inline-flex items-center gap-1.5 text-[0.8125rem] font-semibold hover:underline"
           >
-            <Image
-              src={feature.imageSrc}
-              alt={feature.imageAlt}
-              fill
-              sizes="18rem"
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-            <span
-              className="absolute inset-0 bg-[linear-gradient(180deg,rgb(0_18_47_/_0.25)_0%,rgb(0_18_47_/_0.88)_100%)]"
-              aria-hidden
-            />
-            <span className="absolute inset-x-0 bottom-0 z-[1] p-4 text-white">
-              <span className="text-[0.65rem] font-bold tracking-[0.14em] text-brand-red uppercase">
-                {feature.eyebrow}
-              </span>
-              <span className="font-display mt-1.5 block text-[0.98rem] font-semibold leading-snug">
-                {feature.title}
-              </span>
-            </span>
-          </Link>
-        ) : null}
-      </div>
-
-      {feature ? (
-        <div className="border-line bg-bg-alt flex items-center justify-between gap-3 border-t px-5 py-3 min-[900px]:hidden">
-          <Link
-            href={localePath(locale, feature.href)}
-            onClick={onNavigate}
-            className="text-brand-blue inline-flex items-center gap-1.5 text-sm font-semibold hover:underline"
-          >
-            {feature.title}
+            View full catalogue
             <ArrowRight className="size-3.5" aria-hidden />
           </Link>
-        </div>
-      ) : null}
+        ) : (
+          <span />
+        )}
+        <Link
+          href={localePath(locale, "contact")}
+          onClick={onNavigate}
+          className="text-ink hover:text-brand-blue inline-flex items-center gap-1.5 text-[0.8125rem] font-semibold transition-colors"
+        >
+          Request a quote
+          <ArrowRight className="size-3.5" aria-hidden />
+        </Link>
+      </div>
     </div>
   );
 }
 
-function MegaSections({
+function CompanyMegaPanel({
   locale,
   sections,
+  feature,
   onNavigate,
 }: {
   locale: string;
   sections: NavSection[];
+  feature?: NavGroup["feature"];
   onNavigate: () => void;
 }) {
   return (
-    <div
-      className={cn(
-        "grid w-full gap-5 p-4 min-[900px]:gap-6 min-[900px]:p-5",
-        sections.length >= 3
-          ? "min-w-[min(100%,20rem)] max-w-[48rem] grid-cols-1 min-[720px]:grid-cols-3"
-          : sections.length === 2
-            ? "min-w-[min(100%,18rem)] max-w-[36rem] grid-cols-1 min-[560px]:grid-cols-2"
-            : "min-w-[14rem] max-w-[22rem] grid-cols-1",
-      )}
-    >
-      {sections.map((section) => (
-        <div key={section.title} className="min-w-0">
-          {section.href ? (
-            <Link
-              href={localePath(locale, section.href)}
-              onClick={onNavigate}
-              className="text-brand-blue mb-3 flex items-center gap-1 text-[0.7rem] font-bold tracking-[0.12em] uppercase hover:underline"
-            >
-              {section.title}
-              <ArrowRight className="size-3" aria-hidden />
-            </Link>
-          ) : (
-            <p className="text-text-faint mb-3 text-[0.7rem] font-bold tracking-[0.12em] uppercase">
-              {section.title}
-            </p>
-          )}
-          <ul className="space-y-0.5">
-            {section.items.map((item) => (
-              <li key={item.href + item.label}>
-                <Link
-                  href={localePath(locale, item.href)}
-                  onClick={onNavigate}
-                  className="hover:bg-brand-blue-light group block rounded-lg px-2.5 py-2 transition-colors"
-                >
-                  <span className="block text-sm font-semibold break-words text-ink group-hover:text-brand-blue">
-                    {item.label}
-                  </span>
-                  {item.description ? (
-                    <span className="text-muted-foreground mt-0.5 block text-xs leading-snug">
-                      {item.description}
-                    </span>
-                  ) : null}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
+    <div className="w-full">
+      <div
+        className={cn(
+          "grid gap-6 py-5 min-[720px]:gap-8 min-[720px]:py-6",
+          "grid-cols-1 min-[640px]:grid-cols-2",
+          feature
+            ? "min-[960px]:grid-cols-[1fr_1fr_1fr_0.95fr]"
+            : "min-[960px]:grid-cols-3",
+        )}
+      >
+        {sections.map((section) => (
+          <div key={section.title} className="min-w-0">
+            <MegaSectionLabel
+              title={section.title}
+              href={section.href}
+              locale={locale}
+              onNavigate={onNavigate}
+            />
+            <ul>
+              {section.items.map((item) => (
+                <li key={item.href + item.label}>
+                  <CompactLink
+                    locale={locale}
+                    item={item}
+                    onNavigate={onNavigate}
+                    showDescription
+                  />
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+
+        {feature ? (
+          <div className="min-w-0 min-[960px]:pl-2">
+            <MegaFeatureTile
+              locale={locale}
+              feature={feature}
+              onNavigate={onNavigate}
+            />
+          </div>
+        ) : null}
+      </div>
+
+      <div className="border-line flex flex-wrap items-center justify-between gap-3 border-t py-3">
+        <Link
+          href={localePath(locale, "careers")}
+          onClick={onNavigate}
+          className="text-ink hover:text-brand-blue text-[0.8125rem] font-semibold transition-colors"
+        >
+          Careers
+        </Link>
+        <Link
+          href={localePath(locale, "contact")}
+          onClick={onNavigate}
+          className="text-brand-blue inline-flex items-center gap-1.5 text-[0.8125rem] font-semibold hover:underline"
+        >
+          Contact / RFQ
+          <ArrowRight className="size-3.5" aria-hidden />
+        </Link>
+      </div>
     </div>
   );
 }
@@ -578,6 +535,27 @@ export function SiteHeader({
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const clearCloseTimer = useCallback(() => {
+    if (closeTimer.current) {
+      clearTimeout(closeTimer.current);
+      closeTimer.current = null;
+    }
+  }, []);
+
+  const scheduleClose = useCallback(() => {
+    clearCloseTimer();
+    closeTimer.current = setTimeout(() => setOpenMenu(null), 160);
+  }, [clearCloseTimer]);
+
+  const setMenu = useCallback(
+    (key: MenuKey | null) => {
+      clearCloseTimer();
+      setOpenMenu(key);
+    },
+    [clearCloseTimer],
+  );
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -587,9 +565,7 @@ export function SiteHeader({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
-  const setMenu = useCallback((key: MenuKey | null) => {
-    setOpenMenu(key);
-  }, []);
+  useEffect(() => () => clearCloseTimer(), [clearCloseTimer]);
 
   const home = localePath(locale);
   const productSections = productNav.sections?.length
@@ -610,105 +586,156 @@ export function SiteHeader({
     return rank(a.title) - rank(b.title);
   });
 
+  const closeMega = () => setMenu(null);
+
   return (
     <>
-      <header className="sticky top-0 z-50 h-14 border-b border-line bg-surface/95 backdrop-blur-md min-[400px]:h-16">
-        <Container className="flex h-full min-w-0 items-center justify-between gap-2 min-[400px]:gap-3 min-[68.75rem]:gap-4">
-          <BrandLockup href={home} />
+      <header
+        className="relative sticky top-0 z-50 border-b border-line bg-surface/95 backdrop-blur-md"
+        onMouseEnter={clearCloseTimer}
+        onMouseLeave={() => {
+          if (isFinePointerHover()) scheduleClose();
+        }}
+      >
+        <div className="relative h-14 min-[400px]:h-16">
+          <Container className="flex h-full min-w-0 items-center justify-between gap-2 min-[400px]:gap-3 min-[68.75rem]:gap-4">
+            <BrandLockup href={home} />
 
-          <nav
-            className="hidden items-center gap-0.5 min-[68.75rem]:flex"
-            aria-label="Primary"
-          >
-            <NavDisclosure
-              id={`${navId}-products`}
-              label={productNav.label}
-              open={openMenu === "products"}
-              onOpenChange={(next) => setMenu(next ? "products" : null)}
-              panelClassName="overflow-hidden p-0"
+            <nav
+              className="hidden items-center gap-0.5 min-[68.75rem]:flex"
+              aria-label="Primary"
             >
-              <ProductMegaPanel
-                locale={locale}
-                sections={productSections}
-                feature={productNav.feature}
-                onNavigate={() => setMenu(null)}
+              <NavTrigger
+                id={`${navId}-products`}
+                label={productNav.label}
+                open={openMenu === "products"}
+                onOpen={() => setMenu("products")}
+                onToggle={() =>
+                  setMenu(openMenu === "products" ? null : "products")
+                }
               />
-            </NavDisclosure>
 
-            <Link
-              href={localePath(locale, "industries")}
-              className="hover:bg-bg-alt hover:text-brand-blue min-h-11 rounded-full px-3.5 py-2.5 text-[0.92rem] font-semibold transition-colors"
-            >
-              Industries
-            </Link>
-
-            <NavDisclosure
-              id={`${navId}-company`}
-              label={companyNav.label}
-              open={openMenu === "company"}
-              onOpenChange={(next) => setMenu(next ? "company" : null)}
-              panelClassName="overflow-hidden p-0"
-            >
-              <MegaSections
-                locale={locale}
-                sections={companySections}
-                onNavigate={() => setMenu(null)}
-              />
-            </NavDisclosure>
-
-            {siteConfig.flags.investorsSection ? (
               <Link
-                href={localePath(locale, "about")}
-                className="hover:bg-bg-alt hover:text-brand-blue min-h-11 rounded-full px-3.5 py-2.5 text-[0.92rem] font-semibold"
+                href={localePath(locale, "industries")}
+                className="hover:bg-bg-alt hover:text-brand-blue min-h-11 rounded-full px-3.5 py-2.5 text-[0.92rem] font-semibold transition-colors"
+                onMouseEnter={() => {
+                  if (isFinePointerHover()) setMenu(null);
+                }}
               >
-                Investor Relations
+                Industries
               </Link>
-            ) : null}
 
-            {primaryNavLinks
-              .filter((l) => l.href === "contact")
-              .map((link) => (
+              <NavTrigger
+                id={`${navId}-company`}
+                label={companyNav.label}
+                open={openMenu === "company"}
+                onOpen={() => setMenu("company")}
+                onToggle={() =>
+                  setMenu(openMenu === "company" ? null : "company")
+                }
+              />
+
+              {siteConfig.flags.investorsSection ? (
                 <Link
-                  key={link.href}
-                  href={localePath(locale, link.href)}
+                  href={localePath(locale, "about")}
                   className="hover:bg-bg-alt hover:text-brand-blue min-h-11 rounded-full px-3.5 py-2.5 text-[0.92rem] font-semibold"
+                  onMouseEnter={() => {
+                    if (isFinePointerHover()) setMenu(null);
+                  }}
                 >
-                  {link.label}
+                  Investor Relations
                 </Link>
-              ))}
-          </nav>
+              ) : null}
 
-          <div className="flex shrink-0 items-center gap-1 min-[400px]:gap-1.5 min-[560px]:gap-2">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="size-9 min-[400px]:size-10"
-              aria-label="Open search"
-              onClick={() => setSearchOpen(true)}
-            >
-              <Search className="size-[18px] min-[400px]:size-[19px]" />
-            </Button>
-            <Button
-              className="hidden min-[720px]:inline-flex"
-              size="sm"
-              render={<Link href={localePath(locale, "contact")} />}
-            >
-              Inquire Now
-            </Button>
-            <button
-              type="button"
-              className="hover:bg-muted inline-flex size-9 items-center justify-center rounded-full min-[400px]:size-10 min-[68.75rem]:hidden"
-              aria-label={drawerOpen ? "Close menu" : "Open menu"}
-              aria-expanded={drawerOpen}
-              aria-controls={`${navId}-mobile-drawer`}
-              onClick={() => setDrawerOpen(true)}
-            >
-              <Menu className="size-5" />
-            </button>
+              {primaryNavLinks
+                .filter((l) => l.href === "contact")
+                .map((link) => (
+                  <Link
+                    key={link.href}
+                    href={localePath(locale, link.href)}
+                    className="hover:bg-bg-alt hover:text-brand-blue min-h-11 rounded-full px-3.5 py-2.5 text-[0.92rem] font-semibold"
+                    onMouseEnter={() => {
+                      if (isFinePointerHover()) setMenu(null);
+                    }}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+            </nav>
+
+            <div className="flex shrink-0 items-center gap-1 min-[400px]:gap-1.5 min-[560px]:gap-2">
+              <Button
+                type="button"
+                variant="ghost"
+                size="icon"
+                className="size-9 min-[400px]:size-10"
+                aria-label="Open search"
+                onClick={() => setSearchOpen(true)}
+              >
+                <Search className="size-[18px] min-[400px]:size-[19px]" />
+              </Button>
+              <Button
+                className="hidden min-[720px]:inline-flex"
+                size="sm"
+                render={<Link href={localePath(locale, "contact")} />}
+              >
+                Inquire Now
+              </Button>
+              <button
+                type="button"
+                className="hover:bg-muted inline-flex size-9 items-center justify-center rounded-full min-[400px]:size-10 min-[68.75rem]:hidden"
+                aria-label={drawerOpen ? "Close menu" : "Open menu"}
+                aria-expanded={drawerOpen}
+                aria-controls={`${navId}-mobile-drawer`}
+                onClick={() => setDrawerOpen(true)}
+              >
+                <Menu className="size-5" />
+              </button>
+            </div>
+          </Container>
+        </div>
+
+        {/* Full-bleed mega — Apple / Microsoft / Adobe pattern */}
+        {openMenu ? (
+          <div
+            id={
+              openMenu === "products"
+                ? `${navId}-products-panel`
+                : `${navId}-company-panel`
+            }
+            className="border-line absolute inset-x-0 top-full z-50 hidden border-b bg-surface shadow-[0_18px_40px_-28px_rgb(0_18_47_/_0.45)] min-[68.75rem]:block"
+            role="region"
+            aria-label={openMenu === "products" ? "Products menu" : "Company menu"}
+          >
+            <Container>
+              {openMenu === "products" ? (
+                <ProductMegaPanel
+                  locale={locale}
+                  sections={productSections}
+                  feature={productNav.feature}
+                  onNavigate={closeMega}
+                />
+              ) : (
+                <CompanyMegaPanel
+                  locale={locale}
+                  sections={companySections}
+                  feature={companyNav.feature}
+                  onNavigate={closeMega}
+                />
+              )}
+            </Container>
           </div>
-        </Container>
+        ) : null}
       </header>
+
+      {openMenu ? (
+        <button
+          type="button"
+          aria-label="Close menu"
+          className="fixed inset-x-0 bottom-0 top-14 z-40 hidden bg-ink/30 min-[400px]:top-16 min-[68.75rem]:block"
+          onClick={closeMega}
+        />
+      ) : null}
 
       <Sheet open={drawerOpen} onOpenChange={setDrawerOpen}>
         <SheetContent
@@ -742,7 +769,7 @@ export function SiteHeader({
                           >
                             <span className="font-medium">{item.label}</span>
                             {item.description ? (
-                              <span className="text-muted-foreground mt-0.5 block text-xs">
+                              <span className="text-muted-foreground mt-0.5 line-clamp-2 block text-xs">
                                 {item.description}
                               </span>
                             ) : null}
@@ -772,7 +799,12 @@ export function SiteHeader({
                             className="hover:bg-brand-blue-light rounded-lg px-3 py-2.5 text-sm"
                             onClick={() => setDrawerOpen(false)}
                           >
-                            {item.label}
+                            <span className="font-medium">{item.label}</span>
+                            {item.description ? (
+                              <span className="text-muted-foreground mt-0.5 line-clamp-2 block text-xs">
+                                {item.description}
+                              </span>
+                            ) : null}
                           </Link>
                         ))}
                       </div>

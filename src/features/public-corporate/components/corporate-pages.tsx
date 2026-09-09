@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Container } from "@/components/atoms/container";
 import { Section } from "@/components/atoms/section";
 import { InquireBand } from "@/features/public-site/components/inquire-band";
+import { LogoMarquee } from "@/features/public-site/components/logo-marquee";
 import { PageHero } from "@/features/public-site/components/page-hero";
 import { PublicEmptyState } from "@/features/public-site/components/cms-empty-state";
 import {
@@ -529,7 +530,7 @@ export async function ExpansionRoadmapBlock({
   );
 }
 
-/** Name tiles only — for CMS logo-strip / gallery embeds (no page H1). */
+/** Logo marquee — CMS logo-strip / gallery embeds (no page H1). */
 export async function CustomerLogoStripBlock({
   locale = "en",
 }: {
@@ -543,8 +544,8 @@ export async function CustomerLogoStripBlock({
           <PublicEmptyState
             locale={locale}
             density="section"
-            title="No customer names published yet."
-            description="Approved organisation tiles appear after permission and publish."
+            title="No customer logos published yet."
+            description="Upload approved logos in Admin → Customers, then publish with website approval."
             primary={{ label: "Customers", href: "customers" }}
             secondary={{ label: "Contact", href: "contact", variant: "outline" }}
           />
@@ -553,26 +554,15 @@ export async function CustomerLogoStripBlock({
     );
   }
   return (
-    <Section>
+    <Section alt>
       <Container>
-        <ul
-          className="grid gap-px overflow-hidden rounded-[var(--radius-md)] bg-black/[0.06] ring-1 ring-black/[0.06]"
-          style={{
-            gridTemplateColumns:
-              "repeat(auto-fit, minmax(min(100%, 10rem), 1fr))",
-          }}
-        >
-          {logos.map((l) => (
-            <li
-              key={l.id}
-              className="flex min-h-[3.75rem] items-center justify-center bg-white px-3 py-4 text-center"
-            >
-              <span className="font-display text-sm font-semibold text-ink/50">
-                {l.name}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <LogoMarquee
+          items={logos.map((l) => ({
+            id: l.id,
+            name: l.name,
+            imageUrl: l.imageUrl,
+          }))}
+        />
       </Container>
     </Section>
   );

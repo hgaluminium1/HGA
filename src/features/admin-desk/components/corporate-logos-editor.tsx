@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { CloudinaryPicker } from "@/features/admin-desk/components/cloudinary-picker";
 import { DeskBackLink } from "@/features/admin-desk/components/desk-back-link";
 import { DeskSaveBar } from "@/features/admin-desk/components/desk-save-bar";
 import {
@@ -23,6 +24,7 @@ import type { CustomerLogoDTO } from "@/modules/corporate/browser";
 type Draft = {
   name: string;
   logoId: string;
+  imageUrl: string;
   approvedForWebsite: boolean;
   permissionNote: string;
   sortOrder: number;
@@ -32,6 +34,7 @@ function fromLogo(l: CustomerLogoDTO): Draft {
   return {
     name: l.name,
     logoId: l.logoId ?? "",
+    imageUrl: l.imageUrl ?? "",
     approvedForWebsite: l.approvedForWebsite,
     permissionNote: l.permissionNote,
     sortOrder: l.sortOrder,
@@ -41,6 +44,7 @@ function fromLogo(l: CustomerLogoDTO): Draft {
 const emptyDraft = (): Draft => ({
   name: "",
   logoId: "",
+  imageUrl: "",
   approvedForWebsite: false,
   permissionNote: "",
   sortOrder: 0,
@@ -65,7 +69,8 @@ export function CorporateLogosEditor({ logoId }: { logoId: string | "new" }) {
     () => JSON.stringify(draft) !== baseline,
     [draft, baseline],
   );
-  const canPublish = Boolean(draft.name.trim());
+  const canPublish =
+    Boolean(draft.name.trim()) && Boolean(draft.approvedForWebsite);
   const patch = (partial: Partial<Draft>) =>
     setDraft((d) => ({ ...d, ...partial }));
 
@@ -100,6 +105,7 @@ export function CorporateLogosEditor({ logoId }: { logoId: string | "new" }) {
     return {
       name: draft.name.trim(),
       logoId: draft.logoId.trim() || null,
+      imageUrl: draft.imageUrl.trim() || null,
       approvedForWebsite: draft.approvedForWebsite,
       permissionNote: draft.permissionNote.trim(),
       sortOrder: draft.sortOrder,
@@ -108,10 +114,19 @@ export function CorporateLogosEditor({ logoId }: { logoId: string | "new" }) {
   }
 
   async function persist(publish?: "draft" | "published") {
+    if (!draft.name.trim()) {
+      setError("Customer name is required.");
+      return;
+    }
+    if (publish === "published" && !draft.approvedForWebsite) {
+      setError("Mark “Approved for website” before publish.");
+      return;
+    }
     setSaving(true);
     setMessage(null);
     setError(null);
     try {
+      // Always send full payload — never status-only (Zod wipe bug).
       if (!id) {
         const created = await createCustomerLogoApi(
           payload(publish ?? "draft"),
@@ -126,37 +141,16 @@ export function CorporateLogosEditor({ logoId }: { logoId: string | "new" }) {
         setMessage(publish === "published" ? "Published." : "Logo created.");
         return;
       }
-      let currentVersion = version;
-      if (dirty) {
-        const updated = await updateCustomerLogoApi(id, {
-          ...payload(),
-          version: currentVersion,
-        });
-        currentVersion = updated.version;
-      }
-      if (publish === "published") {
-        const published = await updateCustomerLogoApi(id, {
-          publishStatus: "published",
-          version: currentVersion,
-        });
-        setVersion(published.version);
-        setPublishStatus(published.publishStatus);
-        const d = fromLogo(published);
-        setDraft(d);
-        setBaseline(JSON.stringify(d));
-        setMessage("Published.");
-      } else {
-        const updated = await updateCustomerLogoApi(id, {
-          ...payload(),
-          version: currentVersion,
-        });
-        setVersion(updated.version);
-        setPublishStatus(updated.publishStatus);
-        const d = fromLogo(updated);
-        setDraft(d);
-        setBaseline(JSON.stringify(d));
-        setMessage("Draft saved.");
-      }
+      const updated = await updateCustomerLogoApi(id, {
+        ...payload(publish),
+        version,
+      });
+      setVersion(updated.version);
+      setPublishStatus(updated.publishStatus);
+      const d = fromLogo(updated);
+      setDraft(d);
+      setBaseline(JSON.stringify(d));
+      setMessage(publish === "published" ? "Published." : "Draft saved.");
     } catch (err) {
       if (err instanceof ApiClientError && err.code === "CONFLICT") {
         setError("Someone else saved first. Reload and try again.");
@@ -179,7 +173,15 @@ export function CorporateLogosEditor({ logoId }: { logoId: string | "new" }) {
         <h1 className="font-display text-xl font-semibold tracking-tight">
           {isNew && !id ? "New customer logo" : draft.name || "Logo"}
         </h1>
+        <p className="text-muted-foreground text-[0.8125rem]">
+          Upload a logo to show the mark on the site. Without a file, only the
+          name appears in the marquee.
+        </p>
       </header>
+
+      {error && !message ? (
+        <p className="mb-3 text-sm text-destructive">{error}</p>
+      ) : null}
 
       <div className="overflow-hidden rounded-[10px] border border-[#d2d2d7] bg-white">
         <div className="grid gap-2.5 p-3 sm:grid-cols-2">
@@ -190,13 +192,20 @@ export function CorporateLogosEditor({ logoId }: { logoId: string | "new" }) {
               onChange={(e) => patch({ name: e.target.value })}
             />
           </CorporateField>
-          <CorporateField label="Logo media ID" className="sm:col-span-2">
-            <input
-              className={corporateInputClass}
-              value={draft.logoId}
-              onChange={(e) => patch({ logoId: e.target.value })}
+          <div className="sm:col-span-2">
+            <CloudinaryPicker
+              kind="image"
+              label="Logo image"
+              help="Transparent PNG preferred. Shown in the customers marquee."
+              valueUrl={draft.imageUrl}
+              onChange={({ url, mediaId }) =>
+                patch({
+                  imageUrl: url,
+                  logoId: mediaId ?? draft.logoId,
+                })
+              }
             />
-          </CorporateField>
+          </div>
           <CorporateField label="Sort order">
             <input
               type="number"
@@ -212,6 +221,7 @@ export function CorporateLogosEditor({ logoId }: { logoId: string | "new" }) {
               className={corporateInputClass}
               value={draft.permissionNote}
               onChange={(e) => patch({ permissionNote: e.target.value })}
+              placeholder="Permission source / date"
             />
           </CorporateField>
           <div className="sm:col-span-2">
@@ -251,7 +261,11 @@ export function CorporateLogosEditor({ logoId }: { logoId: string | "new" }) {
         dirty={dirty || !id}
         canPublish={canPublish}
         publishBlockedReason={
-          canPublish ? undefined : "Add a customer name before publish."
+          !draft.name.trim()
+            ? "Add a customer name before publish."
+            : !draft.approvedForWebsite
+              ? "Mark approved for website before publish."
+              : undefined
         }
         statusLabel={publishStatus}
         onSave={() => void persist()}

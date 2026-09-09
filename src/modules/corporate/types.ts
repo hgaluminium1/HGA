@@ -126,6 +126,7 @@ export type CustomerLogoDTO = {
   id: string;
   name: string;
   logoId: string | null;
+  imageUrl: string | null;
   approvedForWebsite: boolean;
   permissionNote: string;
   publishStatus: "draft" | "published";

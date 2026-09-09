@@ -108,16 +108,36 @@ function parseUpcomingCopy(data: unknown): {
 
 async function hydrateCustomersBlock(
   content: HomeContent["customers"],
-): Promise<HomeContent["customers"]> {
+): Promise<{
+  content: HomeContent["customers"];
+  items: Array<{ id: string; name: string; imageUrl: string | null }>;
+}> {
   const logos = await getCachedPublishedLogos();
-  if (!logos.length) return content;
+  if (!logos.length) {
+    return {
+      content,
+      items: (content.logos ?? []).map((name, i) => ({
+        id: `fallback-${i}`,
+        name,
+        imageUrl: null,
+      })),
+    };
+  }
+  const items = logos.map((l) => ({
+    id: l.id,
+    name: l.name,
+    imageUrl: l.imageUrl,
+  }));
   return {
-    eyebrow: content.eyebrow || "Customers",
-    title: content.title || "Organisations we serve",
-    description:
-      content.description ||
-      "Name tiles from approved customer records — logos only with permission.",
-    logos: logos.map((l) => l.name),
+    content: {
+      eyebrow: content.eyebrow || "Customers",
+      title: content.title || "Organisations we serve",
+      description:
+        content.description ||
+        "Approved partners — brand marks when permission is on file; names otherwise.",
+      logos: logos.map((l) => l.name),
+    },
+    items,
   };
 }
 
@@ -202,15 +222,18 @@ export async function renderCmsBlock(
           />,
         );
       }
-      case "customers":
+      case "customers": {
+        const hydrated = await hydrateCustomersBlock(
+          block.data as HomeContent["customers"],
+        );
         return wrap(
           <CustomersLogoStrip
             locale={locale}
-            content={await hydrateCustomersBlock(
-              block.data as HomeContent["customers"],
-            )}
+            content={hydrated.content}
+            items={hydrated.items}
           />,
         );
+      }
       case "testimonials":
         return wrap(
           <TestimonialsCarousel

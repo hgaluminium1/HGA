@@ -78,7 +78,21 @@ export const createPersonSchema = z.object({
   showOnChairmansPage: z.boolean().optional().default(false),
 });
 
-export const updatePersonSchema = createPersonSchema.partial().extend({
+export const updatePersonSchema = z.object({
+  name: localizedStringSchema.optional(),
+  slug: z.string().min(1).optional(),
+  role: z
+    .enum(["director", "chairman", "md", "company_secretary", "executive"])
+    .optional(),
+  boardDesignation: z.string().optional(),
+  yearsExperience: z.number().optional(),
+  bio: z.object({ en: z.string() }).optional(),
+  photoId: z.string().nullable().optional(),
+  photoUrl: z.string().nullable().optional(),
+  sortOrder: z.number().int().optional(),
+  status: z.enum(["draft", "published"]).optional(),
+  showOnInvestorPage: z.boolean().optional(),
+  showOnChairmansPage: z.boolean().optional(),
   version: z.number().int(),
 });
 
@@ -142,15 +156,24 @@ export const updateSustainabilityMetricSchema =
 export const createCustomerLogoSchema = z.object({
   name: z.string().min(1),
   logoId: z.string().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
   approvedForWebsite: z.boolean().default(false),
   permissionNote: z.string().default(""),
   publishStatus: z.enum(["draft", "published"]).default("draft"),
   sortOrder: z.number().int().default(0),
 });
 
-export const updateCustomerLogoSchema = createCustomerLogoSchema
-  .partial()
-  .extend({ version: z.number().int() });
+/** No Zod defaults — publish-only PATCH must not wipe approvedForWebsite. */
+export const updateCustomerLogoSchema = z.object({
+  name: z.string().min(1).optional(),
+  logoId: z.string().nullable().optional(),
+  imageUrl: z.string().nullable().optional(),
+  approvedForWebsite: z.boolean().optional(),
+  permissionNote: z.string().optional(),
+  publishStatus: z.enum(["draft", "published"]).optional(),
+  sortOrder: z.number().int().optional(),
+  version: z.number().int(),
+});
 
 export const createCaseStudySchema = z.object({
   title: localizedStringSchema,

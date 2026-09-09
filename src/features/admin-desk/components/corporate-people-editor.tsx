@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { CloudinaryPicker } from "@/features/admin-desk/components/cloudinary-picker";
 import { DeskBackLink } from "@/features/admin-desk/components/desk-back-link";
 import { DeskSaveBar } from "@/features/admin-desk/components/desk-save-bar";
 import {
@@ -42,6 +43,7 @@ type Draft = {
   yearsExperience: number;
   bioEn: string;
   photoUrl: string;
+  photoId: string | null;
   sortOrder: number;
   showOnInvestorPage: boolean;
   showOnChairmansPage: boolean;
@@ -56,6 +58,7 @@ function fromPerson(p: PersonDTO): Draft {
     yearsExperience: p.yearsExperience,
     bioEn: p.bio.en,
     photoUrl: p.photoUrl ?? "",
+    photoId: p.photoId,
     sortOrder: p.sortOrder,
     showOnInvestorPage: p.showOnInvestorPage,
     showOnChairmansPage: p.showOnChairmansPage,
@@ -70,6 +73,7 @@ const emptyDraft = (): Draft => ({
   yearsExperience: 0,
   bioEn: "",
   photoUrl: "",
+  photoId: null,
   sortOrder: 0,
   showOnInvestorPage: false,
   showOnChairmansPage: false,
@@ -139,6 +143,7 @@ export function CorporatePeopleEditor({
       yearsExperience: draft.yearsExperience,
       bio: { en: draft.bioEn.trim() },
       photoUrl: draft.photoUrl.trim() || null,
+      photoId: draft.photoId,
       sortOrder: draft.sortOrder,
       showOnInvestorPage: draft.showOnInvestorPage,
       showOnChairmansPage: draft.showOnChairmansPage,
@@ -147,6 +152,10 @@ export function CorporatePeopleEditor({
   }
 
   async function onSave() {
+    if (!draft.nameEn.trim() || !draft.slug.trim()) {
+      setError("Name and slug are required.");
+      return;
+    }
     setSaving(true);
     setMessage(null);
     setError(null);
@@ -190,11 +199,9 @@ export function CorporatePeopleEditor({
     setMessage(null);
     setError(null);
     try {
-      let currentId = id;
-      let currentVersion = version;
-      if (!currentId) {
+      // Single full payload — never status-only PATCH (Zod wipe bug).
+      if (!id) {
         const created = await createPersonApi(payload("published"));
-        currentId = created.id;
         setId(created.id);
         setVersion(created.version);
         setStatus(created.status);
@@ -205,16 +212,9 @@ export function CorporatePeopleEditor({
         setMessage("Published.");
         return;
       }
-      if (dirty) {
-        const updated = await updatePersonApi(currentId, {
-          ...payload(),
-          version: currentVersion,
-        });
-        currentVersion = updated.version;
-      }
-      const published = await updatePersonApi(currentId, {
-        status: "published",
-        version: currentVersion,
+      const published = await updatePersonApi(id, {
+        ...payload("published"),
+        version,
       });
       setVersion(published.version);
       setStatus(published.status);
@@ -314,14 +314,20 @@ export function CorporatePeopleEditor({
               }
             />
           </CorporateField>
-          <CorporateField label="Photo URL" className="sm:col-span-2">
-            <input
-              className={corporateInputClass}
-              value={draft.photoUrl}
-              onChange={(e) => patch({ photoUrl: e.target.value })}
-              placeholder="https://…"
+          <div className="sm:col-span-2">
+            <CloudinaryPicker
+              kind="image"
+              label="Photo"
+              help="Upload a portrait. Replaces any previous photo URL."
+              valueUrl={draft.photoUrl}
+              onChange={({ url, mediaId }) =>
+                patch({
+                  photoUrl: url,
+                  photoId: mediaId ?? draft.photoId,
+                })
+              }
             />
-          </CorporateField>
+          </div>
           <CorporateField label="Bio" className="sm:col-span-2">
             <textarea
               className={cn(

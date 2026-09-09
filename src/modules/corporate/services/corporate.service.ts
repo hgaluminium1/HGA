@@ -280,13 +280,22 @@ export async function updatePerson(
   input: z.infer<typeof updatePersonSchema>,
 ) {
   try {
+    const providedKeys = new Set(Object.keys(input));
     const data = updatePersonSchema.parse(input);
     await requireDb();
     const existing = await Person.findOne({ _id: id, deletedAt: null });
     if (!existing) return { error: "NOT_FOUND" as const };
     assertVersionMatch(existing.version, data.version);
     const { version: _v, ...fields } = data;
-    Object.assign(existing, fields);
+    for (const [key, value] of Object.entries(fields)) {
+      if (value === undefined) continue;
+      if (!providedKeys.has(key)) continue;
+      if (key === "name" || key === "bio") {
+        (existing as unknown as Record<string, unknown>)[key] = value;
+        continue;
+      }
+      (existing as unknown as Record<string, unknown>)[key] = value;
+    }
     existing.version = (existing.version ?? 1) + 1;
     await existing.save();
     return { person: toPersonDTO(existing.toObject() as Record<string, unknown>) };
@@ -645,6 +654,7 @@ function toLogoDTO(doc: Record<string, unknown>): CustomerLogoDTO {
     id: String(doc._id),
     name: String(doc.name),
     logoId: (doc.logoId as string | null) ?? null,
+    imageUrl: (doc.imageUrl as string | null) ?? null,
     approvedForWebsite: Boolean(doc.approvedForWebsite),
     permissionNote: String(doc.permissionNote ?? ""),
     publishStatus:
@@ -701,22 +711,30 @@ export async function updateCustomerLogo(
   input: z.infer<typeof updateCustomerLogoSchema>,
 ) {
   try {
+    const providedKeys = new Set(Object.keys(input));
     const data = updateCustomerLogoSchema.parse(input);
     await requireDb();
     const existing = await CustomerLogo.findOne({ _id: id, deletedAt: null });
     if (!existing) return { error: "NOT_FOUND" as const };
     assertVersionMatch(existing.version, data.version);
-    const nextApproved =
-      data.approvedForWebsite ?? existing.approvedForWebsite;
-    const nextPub = data.publishStatus ?? existing.publishStatus;
+    const nextApproved = providedKeys.has("approvedForWebsite")
+      ? Boolean(data.approvedForWebsite)
+      : existing.approvedForWebsite;
+    const nextPub = providedKeys.has("publishStatus")
+      ? (data.publishStatus ?? existing.publishStatus)
+      : existing.publishStatus;
     if (nextPub === "published" && !nextApproved) {
       return {
         error: "VALIDATION_ERROR" as const,
-        message: "approvedForWebsite required to publish",
+        message: "Mark “Approved for website” before publish.",
       };
     }
     const { version: _v, ...fields } = data;
-    Object.assign(existing, fields);
+    for (const [key, value] of Object.entries(fields)) {
+      if (value === undefined) continue;
+      if (!providedKeys.has(key)) continue;
+      (existing as unknown as Record<string, unknown>)[key] = value;
+    }
     existing.version = (existing.version ?? 1) + 1;
     await existing.save();
     return { logo: toLogoDTO(existing.toObject() as Record<string, unknown>) };

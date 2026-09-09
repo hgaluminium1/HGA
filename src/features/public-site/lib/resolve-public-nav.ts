@@ -1,5 +1,6 @@
 import {
   companyNavAllowlist,
+  companyNavFeatureDefault,
   footerCompanyAllowlist,
   footerContactFallback,
   footerUtilityAllowlist,
@@ -51,6 +52,7 @@ async function publishedSlugs(slugs: string[], locale: string) {
         "products",
         "chairmans-message",
         "contact",
+        "careers",
       ]);
       if (corporateOnly.has(slug)) return slug;
       const page = await getCachedPublishedPage(slug, locale);
@@ -93,6 +95,17 @@ const COMPANY_SECTIONS: { title: string; hrefs: string[] }[] = [
     hrefs: ["procurement", "careers", "resources"],
   },
 ];
+
+/** Nav copy must stay scannable — Stripe/Linear pattern, not CMS essays. */
+function navSnippet(
+  text: string | null | undefined,
+  max = 64,
+): string | undefined {
+  const t = text?.replace(/\s+/g, " ").trim();
+  if (!t) return undefined;
+  if (t.length <= max) return t;
+  return `${t.slice(0, max - 1).trimEnd()}…`;
+}
 
 /**
  * Resolve header + footer nav from allowlists ∩ published content.
@@ -151,7 +164,8 @@ export async function resolvePublicNav(
     .map((c) => ({
       label: c.name.en,
       href: categoryLandingHref(c.slug),
-      description: c.description?.en,
+      description: navSnippet(c.description?.en, 56),
+      icon: "ingot" as const,
     }));
 
   const categoriesForNav = liveCategoryLinks.length
@@ -161,13 +175,13 @@ export async function resolvePublicNav(
   const presentLinks: NavLink[] = present.items.slice(0, 4).map((p) => ({
     label: p.name.en,
     href: `products/${p.slug}`,
-    description: p.description?.slice(0, 80) || undefined,
+    description: navSnippet(p.description, 56),
   }));
 
   const upcomingLinks: NavLink[] = upcoming.items.slice(0, 3).map((p) => ({
     label: p.name.en,
     href: `products/${p.slug}`,
-    description: "Coming soon",
+    description: "In development",
   }));
 
   const productSections: NavSection[] = [
@@ -263,6 +277,14 @@ export async function resolvePublicNav(
       label: "Company",
       items: companyItems,
       sections: companySections,
+      feature: {
+        ...companyNavFeatureDefault,
+        href: live.has("about")
+          ? "about"
+          : live.has("leadership")
+            ? "leadership"
+            : companyNavFeatureDefault.href,
+      },
     },
     primaryNavLinks,
     footer,

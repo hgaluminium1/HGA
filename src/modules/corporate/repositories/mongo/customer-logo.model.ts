@@ -4,6 +4,7 @@ const customerLogoSchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
     logoId: { type: String, default: null },
+    imageUrl: { type: String, default: null },
     approvedForWebsite: { type: Boolean, default: false },
     permissionNote: { type: String, default: "" },
     publishStatus: {

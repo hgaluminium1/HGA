@@ -7,6 +7,7 @@ import {
   SectionIntro,
 } from "@/features/public-site/components/corp-kit";
 import { InquireBand } from "@/features/public-site/components/inquire-band";
+import { LogoMarquee } from "@/features/public-site/components/logo-marquee";
 import { PageHero } from "@/features/public-site/components/page-hero";
 import {
   getCachedPublishedCaseStudies,
@@ -43,31 +44,22 @@ export async function CustomersPage({ locale }: { locale: string }) {
       ) : (
         <>
           {logos.length ? (
-            <Section>
+            <Section alt>
               <Container>
                 <SectionIntro
                   eyebrow="Organisations"
                   title="Teams we supply"
-                  body="Name tiles until logo permission is on file — the Apple pattern of restraint over decorative marquees."
+                  body="Brand marks when permission is on file — names until then. Pause the strip on hover."
                 />
-                <ul
-                  className="mt-10 grid gap-px overflow-hidden rounded-[var(--radius-lg)] bg-black/[0.06] ring-1 ring-black/[0.06]"
-                  style={{
-                    gridTemplateColumns:
-                      "repeat(auto-fit, minmax(min(100%, 11rem), 1fr))",
-                  }}
-                >
-                  {logos.map((l) => (
-                    <li
-                      key={l.id}
-                      className="flex min-h-[4.5rem] items-center justify-center bg-white px-3 py-5 text-center"
-                    >
-                      <span className="font-display text-[0.875rem] font-semibold text-ink/50 transition-colors hover:text-ink">
-                        {l.name}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="mt-10">
+                  <LogoMarquee
+                    items={logos.map((l) => ({
+                      id: l.id,
+                      name: l.name,
+                      imageUrl: l.imageUrl,
+                    }))}
+                  />
+                </div>
               </Container>
             </Section>
           ) : null}

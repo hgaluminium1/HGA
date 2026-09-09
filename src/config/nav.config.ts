@@ -119,8 +119,7 @@ export const productNavAllowlist: NavLink[] = [
   {
     label: "Aluminium",
     href: "products/category/aluminium",
-    description:
-      "Billets, extrusion profiles, ingots and specialised aluminium products",
+    description: "Billets, profiles, ingots & specialised lines",
     icon: "ingot",
   },
   {
@@ -132,13 +131,13 @@ export const productNavAllowlist: NavLink[] = [
   {
     label: "Homogenised Billets",
     href: "products/aluminium-homogenized-billets",
-    description: "Extrusion-ready billets for profile manufacturers",
+    description: "Extrusion-ready billets for profile makers",
     icon: "billet",
   },
   {
     label: "Aluminium Ingots",
     href: "products/aluminium-ingots",
-    description: "Secondary remelt and alloy ingots for foundries",
+    description: "Remelt and alloy ingots for foundries",
     icon: "drop",
   },
 ];
@@ -147,8 +146,16 @@ export const productNavFeatureDefault = {
   href: "products",
   imageSrc: "/products/aluminium-ingots.jpg",
   imageAlt: "Stacked aluminium ingots at HG plant",
-  eyebrow: "Full Catalogue",
-  title: "Explore every alloy grade & spec sheet →",
+  eyebrow: "Catalogue",
+  title: "View all products & specs →",
+} as const;
+
+export const companyNavFeatureDefault = {
+  href: "about",
+  imageSrc: "/products/extrusion-profiles.jpg",
+  imageAlt: "Aluminium extrusion profiles from HG plant",
+  eyebrow: "Company",
+  title: "People, plant and programme discipline →",
 } as const;
 
 /** @deprecated use resolvePublicNav — kept for Storybook fallbacks */
@@ -161,19 +168,71 @@ export const productNav: NavGroup = {
 
 /** Company mega-menu allowlist — built company routes only. */
 export const companyNavAllowlist: NavLink[] = [
-  { label: "About Us", href: "about" },
-  { label: "Our Journey", href: "journey" },
-  { label: "Chairman’s Message", href: "chairmans-message" },
-  { label: "Leadership", href: "leadership" },
-  { label: "Capacity", href: "capacity" },
-  { label: "Customers", href: "customers" },
-  { label: "Expansion", href: "expansion" },
-  { label: "Quality", href: "quality" },
-  { label: "Infrastructure", href: "manufacturing" },
-  { label: "Sustainability", href: "sustainability" },
-  { label: "Procurement & Export", href: "procurement" },
-  { label: "Careers", href: "careers" },
-  { label: "Resources", href: "resources" },
+  {
+    label: "About Us",
+    href: "about",
+    description: "Who we are and how we operate",
+  },
+  {
+    label: "Our Journey",
+    href: "journey",
+    description: "Milestones from casting to campus",
+  },
+  {
+    label: "Chairman’s Message",
+    href: "chairmans-message",
+    description: "Direction from the chair",
+  },
+  {
+    label: "Leadership",
+    href: "leadership",
+    description: "Board and executive team",
+  },
+  {
+    label: "Customers",
+    href: "customers",
+    description: "Programmes we support",
+  },
+  {
+    label: "Capacity",
+    href: "capacity",
+    description: "Press, melt and dispatch scale",
+  },
+  {
+    label: "Expansion",
+    href: "expansion",
+    description: "Roadmap and growth investments",
+  },
+  {
+    label: "Quality",
+    href: "quality",
+    description: "Systems, labs and certificates",
+  },
+  {
+    label: "Infrastructure",
+    href: "manufacturing",
+    description: "Plant and process capability",
+  },
+  {
+    label: "Sustainability",
+    href: "sustainability",
+    description: "ESG and responsible operations",
+  },
+  {
+    label: "Procurement & Export",
+    href: "procurement",
+    description: "Sourcing and global dispatch",
+  },
+  {
+    label: "Careers",
+    href: "careers",
+    description: "Roles across melt, press and QC",
+  },
+  {
+    label: "Resources",
+    href: "resources",
+    description: "Specs, downloads and documents",
+  },
 ];
 
 /** @deprecated use resolvePublicNav */
@@ -181,6 +240,7 @@ export const companyNav: NavGroup = {
   id: "company",
   label: "Company",
   items: companyNavAllowlist,
+  feature: { ...companyNavFeatureDefault },
 };
 
 export const primaryNavAllowlist: NavLink[] = [
