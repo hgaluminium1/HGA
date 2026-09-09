@@ -4,6 +4,7 @@ import { BackToTop } from "@/components/organisms/back-to-top";
 import { SiteFooter } from "@/components/organisms/site-footer";
 import { SiteHeader } from "@/components/organisms/site-header";
 import { PwaInstallPrompt } from "@/features/public-site/components/pwa-install-prompt";
+import { PwaInstallProvider } from "@/features/public-site/components/pwa-install-provider";
 import { resolvePublicNav } from "@/features/public-site/lib/resolve-public-nav";
 
 type PublicLocaleLayoutProps = {
@@ -23,7 +24,7 @@ export default async function PublicLocaleLayout({
   const nav = await resolvePublicNav(locale);
 
   return (
-    <>
+    <PwaInstallProvider>
       <a
         href="#main"
         className="bg-ink text-on-dark focus:top-4 absolute top-[-48px] left-4 z-[100] rounded-[var(--radius-sm)] px-5 py-3 transition-[top]"
@@ -35,6 +36,8 @@ export default async function PublicLocaleLayout({
         productNav={nav.productNav}
         companyNav={nav.companyNav}
         primaryNavLinks={nav.primaryNavLinks}
+        brandLogoSrc={nav.brand.logoSrc}
+        brandLogoHeightPx={nav.brand.logoHeightPx}
       />
       <main id="main">{children}</main>
       <SiteFooter
@@ -43,9 +46,11 @@ export default async function PublicLocaleLayout({
         company={nav.footer.company}
         support={nav.footer.support}
         contact={nav.footer.contact}
+        brandLogoSrc={nav.brand.logoSrc}
+        brandLogoHeightPx={nav.brand.logoHeightPx}
       />
       <BackToTop />
       <PwaInstallPrompt />
-    </>
+    </PwaInstallProvider>
   );
 }

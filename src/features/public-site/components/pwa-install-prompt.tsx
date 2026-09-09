@@ -1,146 +1,58 @@
 "use client";
 
-import {
-  useCallback,
-  useEffect,
-  useId,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from "react";
+import { useId } from "react";
 import { Download, Share, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { siteConfig } from "@/config/site.config";
-import {
-  bumpSessionPageViews,
-  detectPwaPlatform,
-  dismissInstallPrompt,
-  isPwaStandalone,
-  PWA_ENGAGE_MS,
-  PWA_ENGAGE_SCROLL,
-  scrollEngagementRatio,
-  wasInstallDismissed,
-  type BeforeInstallPromptEvent,
-  type PwaPlatform,
-} from "@/features/public-site/lib/pwa-install";
+import { usePwaInstall } from "@/features/public-site/components/pwa-install-provider";
 import { cn } from "@/lib/utils";
 
-type Surface = "hidden" | "chromium" | "ios-safari" | "ios-other";
+/** Compact header Install — shown as soon as Chromium BIP is ready. */
+export function PwaHeaderInstallButton({
+  className,
+}: {
+  className?: string;
+}) {
+  const ctx = usePwaInstall();
+  if (!ctx?.showHeaderInstall) return null;
 
-function subscribeOnline(cb: () => void) {
-  window.addEventListener("online", cb);
-  window.addEventListener("offline", cb);
-  return () => {
-    window.removeEventListener("online", cb);
-    window.removeEventListener("offline", cb);
-  };
+  return (
+    <Button
+      type="button"
+      variant="ghost"
+      size="sm"
+      data-pwa-install-ui
+      className={cn(
+        "text-brand-blue hidden h-9 gap-1.5 px-2.5 text-[0.8125rem] font-semibold min-[560px]:inline-flex",
+        className,
+      )}
+      disabled={ctx.installing}
+      onClick={() => void ctx.promptInstall()}
+    >
+      <Download className="size-3.5" aria-hidden />
+      {ctx.installing ? "Installing…" : "Install"}
+    </Button>
+  );
 }
 
 /**
- * FAANG-grade install promotion (public site only):
- * - Chromium: capture beforeinstallprompt → branded CTA → native prompt()
- * - iOS Safari: instructional Add to Home Screen sheet (no API exists)
- * - Never on first paint; engagement-gated; dismissible 30d; hidden in standalone
+ * Bottom card after light engagement (3.5s / 80px scroll / interaction).
+ * Chromium: install CTA. iOS: A2HS instructions.
  */
 export function PwaInstallPrompt() {
   const titleId = useId();
-  const deferred = useRef<BeforeInstallPromptEvent | null>(null);
-  const [platform, setPlatform] = useState<PwaPlatform>("unsupported");
-  const [engaged, setEngaged] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [installing, setInstalling] = useState(false);
-  const [chromiumReady, setChromiumReady] = useState(false);
+  const ctx = usePwaInstall();
+  if (!ctx?.cardOpen) return null;
 
-  const online = useSyncExternalStore(
-    subscribeOnline,
-    () => navigator.onLine,
-    () => true,
-  );
-
-  const close = useCallback((persistDismiss: boolean) => {
-    setOpen(false);
-    if (persistDismiss) dismissInstallPrompt();
-  }, []);
-
-  useEffect(() => {
-    if (isPwaStandalone() || wasInstallDismissed()) return;
-
-    const p = detectPwaPlatform();
-    setPlatform(p);
-    bumpSessionPageViews();
-
-    const engageTimer = window.setTimeout(() => setEngaged(true), PWA_ENGAGE_MS);
-    const onScroll = () => {
-      if (scrollEngagementRatio() >= PWA_ENGAGE_SCROLL) setEngaged(true);
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    onScroll();
-
-    const onBip = (e: Event) => {
-      e.preventDefault();
-      deferred.current = e as BeforeInstallPromptEvent;
-      setChromiumReady(true);
-    };
-    const onInstalled = () => {
-      deferred.current = null;
-      setChromiumReady(false);
-      setOpen(false);
-      dismissInstallPrompt();
-    };
-
-    window.addEventListener("beforeinstallprompt", onBip);
-    window.addEventListener("appinstalled", onInstalled);
-
-    return () => {
-      window.clearTimeout(engageTimer);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("beforeinstallprompt", onBip);
-      window.removeEventListener("appinstalled", onInstalled);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!engaged || !online || isPwaStandalone() || wasInstallDismissed()) {
-      return;
-    }
-
-    let surface: Surface = "hidden";
-    if (platform === "chromium" && chromiumReady) surface = "chromium";
-    else if (platform === "ios-safari") surface = "ios-safari";
-    else if (platform === "ios-other") surface = "ios-other";
-
-    if (surface === "hidden") return;
-
-    // Slight delay after engagement so it doesn’t collide with nav mega-open.
-    const t = window.setTimeout(() => setOpen(true), 700);
-    return () => window.clearTimeout(t);
-  }, [engaged, online, platform, chromiumReady]);
-
-  async function onInstallClick() {
-    const bip = deferred.current;
-    if (!bip) return;
-    setInstalling(true);
-    try {
-      await bip.prompt();
-      await bip.userChoice;
-    } finally {
-      deferred.current = null;
-      setChromiumReady(false);
-      setInstalling(false);
-      setOpen(false);
-      dismissInstallPrompt();
-    }
-  }
-
-  if (!open) return null;
-
+  const { platform, installing, promptInstall, dismissCard } = ctx;
   const isIos = platform === "ios-safari" || platform === "ios-other";
 
   return (
     <div
       className="pointer-events-none fixed inset-x-0 bottom-0 z-[60] flex justify-center p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] min-[720px]:p-4"
       role="presentation"
+      data-pwa-install-ui
     >
       <div
         role="dialog"
@@ -182,7 +94,7 @@ export function PwaInstallPrompt() {
             type="button"
             className="text-text-faint hover:bg-bg-alt hover:text-ink -mr-1 -mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full transition-colors"
             aria-label="Dismiss"
-            onClick={() => close(true)}
+            onClick={() => dismissCard(true)}
           >
             <X className="size-4" aria-hidden />
           </button>
@@ -195,7 +107,7 @@ export function PwaInstallPrompt() {
               variant="ghost"
               size="sm"
               className="text-muted-foreground"
-              onClick={() => close(true)}
+              onClick={() => dismissCard(true)}
             >
               Not now
             </Button>
@@ -203,7 +115,7 @@ export function PwaInstallPrompt() {
               type="button"
               size="sm"
               disabled={installing}
-              onClick={() => void onInstallClick()}
+              onClick={() => void promptInstall()}
             >
               {installing ? "Installing…" : "Install"}
             </Button>
@@ -252,7 +164,7 @@ export function PwaInstallPrompt() {
               variant="outline"
               size="sm"
               className="w-full"
-              onClick={() => close(true)}
+              onClick={() => dismissCard(true)}
             >
               Got it
             </Button>

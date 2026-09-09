@@ -39,6 +39,7 @@ export const companyProfileSchema = z.object({
       pdf: z.string().nullable().optional(),
     })
     .optional(),
+  logoDisplayHeightPx: z.number().int().min(28).max(64).optional().default(40),
   brandColors: z
     .object({
       primary: z.string().optional(),

@@ -52,6 +52,7 @@ import {
   type NavSection,
 } from "@/config/nav.config";
 import { siteConfig } from "@/config/site.config";
+import { PwaHeaderInstallButton } from "@/features/public-site/components/pwa-install-prompt";
 import { cn } from "@/lib/utils";
 
 type SiteHeaderProps = {
@@ -59,6 +60,8 @@ type SiteHeaderProps = {
   productNav?: NavGroup;
   companyNav?: NavGroup;
   primaryNavLinks?: NavLink[];
+  brandLogoSrc?: string | null;
+  brandLogoHeightPx?: number;
 };
 
 type MenuKey = "products" | "company";
@@ -530,6 +533,8 @@ export function SiteHeader({
   productNav = defaultProductNav,
   companyNav = defaultCompanyNav,
   primaryNavLinks = defaultPrimaryNavLinks,
+  brandLogoSrc = null,
+  brandLogoHeightPx,
 }: SiteHeaderProps) {
   const navId = useId();
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
@@ -599,7 +604,11 @@ export function SiteHeader({
       >
         <div className="relative h-14 min-[400px]:h-16">
           <Container className="flex h-full min-w-0 items-center justify-between gap-2 min-[400px]:gap-3 min-[68.75rem]:gap-4">
-            <BrandLockup href={home} />
+            <BrandLockup
+              href={home}
+              src={brandLogoSrc}
+              heightPx={brandLogoHeightPx}
+            />
 
             <nav
               className="hidden items-center gap-0.5 min-[68.75rem]:flex"
@@ -664,6 +673,7 @@ export function SiteHeader({
             </nav>
 
             <div className="flex shrink-0 items-center gap-1 min-[400px]:gap-1.5 min-[560px]:gap-2">
+              <PwaHeaderInstallButton />
               <Button
                 type="button"
                 variant="ghost"
@@ -745,7 +755,11 @@ export function SiteHeader({
         >
           <SheetHeader className="border-b border-line px-4 py-3">
             <SheetTitle className="sr-only">Site menu</SheetTitle>
-            <BrandLockup href={home} />
+            <BrandLockup
+              href={home}
+              src={brandLogoSrc}
+              heightPx={brandLogoHeightPx}
+            />
           </SheetHeader>
           <div className="flex min-h-0 flex-1 flex-col">
             <div className="flex-1 overflow-y-auto overscroll-contain px-2 py-3">
@@ -838,7 +852,10 @@ export function SiteHeader({
                 Contact Us
               </Link>
             </div>
-            <div className="border-t border-line p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <div className="border-t border-line flex flex-col gap-2 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+              <div className="flex justify-center min-[560px]:hidden">
+                <PwaHeaderInstallButton className="inline-flex" />
+              </div>
               <Button
                 className="w-full"
                 render={<Link href={localePath(locale, "contact")} />}

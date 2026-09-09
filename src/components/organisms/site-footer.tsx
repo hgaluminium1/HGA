@@ -28,6 +28,8 @@ type SiteFooterProps = {
   /** @deprecated Prefer products/company/support columns. */
   quickLinks?: NavLink[];
   blurb?: string;
+  brandLogoSrc?: string | null;
+  brandLogoHeightPx?: number;
 };
 
 function FooterColumn({
@@ -74,6 +76,8 @@ export function SiteFooter({
   contact = footerContactFallback,
   quickLinks,
   blurb = "Aluminium extrusion, billets and remelt alloys from Kadi, Gujarat — serving architectural, industrial and solar markets across India.",
+  brandLogoSrc = null,
+  brandLogoHeightPx,
 }: SiteFooterProps) {
   const year = new Date().getFullYear();
 
@@ -87,7 +91,12 @@ export function SiteFooter({
     <footer id="site-footer" className="bg-ink text-on-dark">
       <Container className="grid gap-10 py-[var(--section-pad)] max-[640px]:grid-cols-1 min-[640px]:grid-cols-2 min-[980px]:grid-cols-4">
         <div className="space-y-4">
-          <BrandLockup href={localePath(locale)} inverted />
+          <BrandLockup
+            href={localePath(locale)}
+            inverted
+            src={brandLogoSrc}
+            heightPx={brandLogoHeightPx}
+          />
           <p className="text-on-dark-muted text-sm leading-relaxed">{blurb}</p>
         </div>
 

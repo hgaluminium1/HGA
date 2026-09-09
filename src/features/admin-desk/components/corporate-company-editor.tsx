@@ -2,6 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 
+import { BrandLockup } from "@/components/molecules/brand-lockup";
+import { CloudinaryPicker } from "@/features/admin-desk/components/cloudinary-picker";
 import { DeskBackLink } from "@/features/admin-desk/components/desk-back-link";
 import { DeskSaveBar } from "@/features/admin-desk/components/desk-save-bar";
 import {
@@ -14,6 +16,7 @@ import {
   updateCompanyApi,
 } from "@/features/admin-desk/lib/corporate-api";
 import type { Address, CompanyProfileDTO } from "@/modules/corporate/browser";
+import { cn } from "@/lib/utils";
 
 type Draft = {
   legalName: string;
@@ -156,21 +159,23 @@ export function CorporateCompanyEditor() {
     [],
   );
   const [logo, setLogo] = useState<CompanyProfileDTO["logo"]>({});
+  const [logoDisplayHeightPx, setLogoDisplayHeightPx] = useState(40);
   const [brandColors, setBrandColors] = useState<
     CompanyProfileDTO["brandColors"]
   >({});
   const [locale, setLocale] = useState("en");
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [baseline, setBaseline] = useState("");
+  const [logoBaseline, setLogoBaseline] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const dirty = useMemo(
-    () => JSON.stringify(draft) !== baseline,
-    [draft, baseline],
-  );
+  const dirty = useMemo(() => {
+    const logoSnap = JSON.stringify({ logo, logoDisplayHeightPx });
+    return JSON.stringify(draft) !== baseline || logoSnap !== logoBaseline;
+  }, [draft, baseline, logo, logoDisplayHeightPx, logoBaseline]);
 
   const canPublish =
     Boolean(draft.legalName.trim()) && Boolean(draft.displayPrimary.trim());
@@ -195,7 +200,11 @@ export function CorporateCompanyEditor() {
       setBaseline(JSON.stringify(d));
       setVersion(profile.version);
       setLocations(profile.locations ?? []);
-      setLogo(profile.logo ?? {});
+      const nextLogo = profile.logo ?? {};
+      const nextH = profile.logoDisplayHeightPx ?? 40;
+      setLogo(nextLogo);
+      setLogoDisplayHeightPx(nextH);
+      setLogoBaseline(JSON.stringify({ logo: nextLogo, logoDisplayHeightPx: nextH }));
       setBrandColors(profile.brandColors ?? {});
       setLocale(profile.locale || "en");
     } catch (err) {
@@ -247,6 +256,7 @@ export function CorporateCompanyEditor() {
           quality: draft.emailQuality.trim(),
         },
         logo,
+        logoDisplayHeightPx,
         brandColors,
         locations,
         locale,
@@ -257,6 +267,14 @@ export function CorporateCompanyEditor() {
       setBaseline(JSON.stringify(d));
       setVersion(updated.version);
       setLocations(updated.locations ?? []);
+      setLogo(updated.logo ?? {});
+      setLogoDisplayHeightPx(updated.logoDisplayHeightPx ?? 40);
+      setLogoBaseline(
+        JSON.stringify({
+          logo: updated.logo ?? {},
+          logoDisplayHeightPx: updated.logoDisplayHeightPx ?? 40,
+        }),
+      );
       setMessage("Company profile saved.");
     } catch (err) {
       if (err instanceof ApiClientError && err.code === "CONFLICT") {
@@ -388,6 +406,54 @@ export function CorporateCompanyEditor() {
               onChange={(e) => patch({ emailQuality: e.target.value })}
             />
           </CorporateField>
+
+          <div className="col-span-full mt-2 border-t border-[#e8e8ed] pt-3">
+            <p className="mb-2 text-[11px] font-semibold tracking-tight text-[#86868b]">
+              Brand logo
+            </p>
+            <p className="text-muted-foreground mb-3 text-[0.75rem]">
+              Used in the site header and footer. Upload anytime; height adjusts
+              the public lockup (28–64px).
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <CloudinaryPicker
+                kind="image"
+                label="Logo image"
+                help="PNG or SVG preferred. Transparent backgrounds work best."
+                valueUrl={logo.png ?? ""}
+                onChange={({ url }) =>
+                  setLogo((prev) => ({ ...prev, png: url || null }))
+                }
+              />
+              <div className="flex flex-col gap-3">
+                <CorporateField label={`Display height (${logoDisplayHeightPx}px)`}>
+                  <input
+                    type="range"
+                    min={28}
+                    max={64}
+                    step={1}
+                    className="w-full accent-[#0342ab]"
+                    value={logoDisplayHeightPx}
+                    onChange={(e) =>
+                      setLogoDisplayHeightPx(Number(e.target.value) || 40)
+                    }
+                  />
+                </CorporateField>
+                <div
+                  className={cn(
+                    "flex items-center justify-center rounded-lg border border-dashed border-[#d2d2d7] bg-[#f5f5f7] p-4",
+                  )}
+                >
+                  <BrandLockup
+                    href="#"
+                    src={logo.png}
+                    heightPx={logoDisplayHeightPx}
+                    className="pointer-events-none"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

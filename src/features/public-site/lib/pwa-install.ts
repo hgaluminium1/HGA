@@ -7,15 +7,21 @@ export const PWA_DISMISS_KEY = "hg.pwa.install.dismissedAt";
 export const PWA_SESSION_PAGES_KEY = "hg.pwa.session.pages";
 /** Don’t resurface for 30 days after dismiss. */
 export const PWA_DISMISS_MS = 30 * 24 * 60 * 60 * 1000;
-/** Wait for real engagement before any install surface. */
-export const PWA_ENGAGE_MS = 16_000;
-export const PWA_ENGAGE_SCROLL = 0.32;
+/** Light engagement — web.dev snackbar timing, not a long idle wait. */
+export const PWA_ENGAGE_MS = 3_500;
+/** Absolute scroll (px) — first content scroll counts. */
+export const PWA_ENGAGE_SCROLL_PX = 80;
+/** Post-engage delay before bottom card (avoid nav collision). */
+export const PWA_CARD_DELAY_MS = 150;
 
 export type PwaPlatform = "chromium" | "ios-safari" | "ios-other" | "unsupported";
 
 export type BeforeInstallPromptEvent = Event & {
   readonly platforms: string[];
-  readonly userChoice: Promise<{ outcome: "accepted" | "dismissed"; platform: string }>;
+  readonly userChoice: Promise<{
+    outcome: "accepted" | "dismissed";
+    platform: string;
+  }>;
   prompt: () => Promise<void>;
 };
 
@@ -39,12 +45,10 @@ export function detectPwaPlatform(): PwaPlatform {
       window.navigator.maxTouchPoints > 1);
 
   if (isIos) {
-    // Chrome/Firefox/Edge on iOS cannot install PWAs — Safari only.
     if (/CriOS|FxiOS|EdgiOS|OPiOS/i.test(ua)) return "ios-other";
     return "ios-safari";
   }
 
-  // Chromium family (Android + desktop Chrome/Edge) can fire beforeinstallprompt.
   if (/Chrome|Chromium|Edg|SamsungBrowser/i.test(ua) && !/OPR\//i.test(ua)) {
     return "chromium";
   }
@@ -74,7 +78,8 @@ export function dismissInstallPrompt(now = Date.now()) {
 
 export function bumpSessionPageViews(): number {
   try {
-    const next = Number(sessionStorage.getItem(PWA_SESSION_PAGES_KEY) ?? "0") + 1;
+    const next =
+      Number(sessionStorage.getItem(PWA_SESSION_PAGES_KEY) ?? "0") + 1;
     sessionStorage.setItem(PWA_SESSION_PAGES_KEY, String(next));
     return next;
   } catch {
@@ -82,9 +87,6 @@ export function bumpSessionPageViews(): number {
   }
 }
 
-export function scrollEngagementRatio(): number {
-  const doc = document.documentElement;
-  const scrollable = doc.scrollHeight - window.innerHeight;
-  if (scrollable <= 0) return 1;
-  return window.scrollY / scrollable;
+export function hasScrollEngagement(): boolean {
+  return window.scrollY >= PWA_ENGAGE_SCROLL_PX;
 }

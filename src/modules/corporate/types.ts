@@ -37,6 +37,8 @@ export type CompanyProfileDTO = {
     quality: string;
   };
   logo: { png?: string | null; svg?: string | null; pdf?: string | null };
+  /** Header / footer lockup height in px (28–64). */
+  logoDisplayHeightPx: number;
   brandColors: { primary?: string; secondary?: string; accent?: string };
   locations: CompanyLocationDTO[];
   locale: string;

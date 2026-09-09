@@ -43,6 +43,7 @@ const companyProfileSchema = new Schema(
       svg: { type: String, default: null },
       pdf: { type: String, default: null },
     },
+    logoDisplayHeightPx: { type: Number, default: 40 },
     brandColors: {
       primary: { type: String },
       secondary: { type: String },

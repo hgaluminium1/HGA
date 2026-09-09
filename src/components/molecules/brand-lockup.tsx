@@ -3,18 +3,36 @@ import Link from "next/link";
 
 import { cn } from "@/lib/utils";
 
+const FALLBACK_LOGO = "/HGLogo.jpeg";
+const DEFAULT_HEIGHT = 40;
+
 type BrandLockupProps = {
   href: string;
   className?: string;
   inverted?: boolean;
+  /** CMS logo URL; falls back to packaged mark. */
+  src?: string | null;
+  /** Display height in px (28–64). */
+  heightPx?: number;
 };
 
-/** Fixed-height lockup — width is fluid so it never crowds actions on narrow screens. */
+function clampHeight(n: number | undefined): number {
+  if (n == null || !Number.isFinite(n)) return DEFAULT_HEIGHT;
+  return Math.min(64, Math.max(28, Math.round(n)));
+}
+
+/** Fluid-width lockup — height from CMS so it never crowds header actions. */
 export function BrandLockup({
   href,
   className,
   inverted = false,
+  src,
+  heightPx,
 }: BrandLockupProps) {
+  const h = clampHeight(heightPx);
+  const imageSrc = src?.trim() || FALLBACK_LOGO;
+  const maxW = Math.round(h * 2.75);
+
   return (
     <Link
       href={href}
@@ -23,19 +41,21 @@ export function BrandLockup({
     >
       <span
         className={cn(
-          "relative inline-flex h-10 items-center justify-center overflow-hidden bg-white min-[400px]:h-11",
+          "relative inline-flex items-center justify-center overflow-hidden bg-white",
           inverted
             ? "rounded-[var(--radius-md)] px-2 py-1 shadow-[inset_0_0_0_1px_rgb(255_255_255_/_0.12)]"
             : "rounded-sm",
         )}
+        style={{ height: h }}
       >
         <Image
-          src="/HGLogo.jpeg"
+          src={imageSrc}
           alt=""
-          width={603}
-          height={619}
+          width={maxW * 2}
+          height={h * 2}
           priority
-          className="h-full w-auto max-w-[min(9.5rem,46vw)] object-contain min-[400px]:max-w-[min(11rem,42vw)]"
+          className="h-full w-auto object-contain"
+          style={{ maxWidth: `min(${maxW}px, 46vw)` }}
         />
       </span>
     </Link>

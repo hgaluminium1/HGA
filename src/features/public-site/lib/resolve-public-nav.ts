@@ -36,10 +36,23 @@ export type PublicNavResolved = {
   companyNav: NavGroup;
   primaryNavLinks: NavLink[];
   footer: PublicNavFooter;
+  /** Site brand mark for header / footer lockup. */
+  brand: {
+    logoSrc: string | null;
+    logoHeightPx: number;
+  };
   /** @deprecated Prefer `footer` columns — flat list for legacy callers. */
   footerQuickLinks: NavLink[];
   footerContact: PublicNavFooter["contact"];
 };
+
+const DEFAULT_LOGO_HEIGHT = 40;
+
+function clampLogoHeight(n: unknown): number {
+  const v = Number(n);
+  if (!Number.isFinite(v)) return DEFAULT_LOGO_HEIGHT;
+  return Math.min(64, Math.max(28, Math.round(v)));
+}
 
 async function publishedSlugs(slugs: string[], locale: string) {
   const results = await Promise.all(
@@ -288,6 +301,13 @@ export async function resolvePublicNav(
     },
     primaryNavLinks,
     footer,
+    brand: {
+      logoSrc:
+        company?.logo?.png?.trim() ||
+        company?.logo?.svg?.trim() ||
+        null,
+      logoHeightPx: clampLogoHeight(company?.logoDisplayHeightPx),
+    },
     footerQuickLinks: [
       ...footer.products,
       ...footer.company,
