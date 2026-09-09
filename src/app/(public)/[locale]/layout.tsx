@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { BackToTop } from "@/components/organisms/back-to-top";
 import { SiteFooter } from "@/components/organisms/site-footer";
 import { SiteHeader } from "@/components/organisms/site-header";
+import { PwaInstallPrompt } from "@/features/public-site/components/pwa-install-prompt";
 import { resolvePublicNav } from "@/features/public-site/lib/resolve-public-nav";
 
 type PublicLocaleLayoutProps = {
@@ -44,6 +45,7 @@ export default async function PublicLocaleLayout({
         contact={nav.footer.contact}
       />
       <BackToTop />
+      <PwaInstallPrompt />
     </>
   );
 }

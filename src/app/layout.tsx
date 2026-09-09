@@ -1,6 +1,8 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
+
+import { siteConfig } from "@/config/site.config";
 
 const inter = Inter({
   variable: "--font-body",
@@ -14,13 +16,48 @@ const spaceGrotesk = Space_Grotesk({
   weight: ["500", "600", "700"],
 });
 
+const APP_DESCRIPTION =
+  "HG Aluminium Smelters Ltd. — extrusion profiles, homogenised billets and remelt alloys from Kadi, Gujarat.";
+
 export const metadata: Metadata = {
+  applicationName: siteConfig.shortName,
   title: {
-    default: "HG Aluminium Smelters",
-    template: "%s | HG Aluminium Smelters",
+    default: siteConfig.name,
+    template: `%s | ${siteConfig.name}`,
   },
-  description:
-    "HG Aluminium Smelters Ltd. is India's largest producer of recycled aluminium and zinc die-casting alloys, serving the country's leading automotive and engineering manufacturers.",
+  description: APP_DESCRIPTION,
+  manifest: "/manifest.webmanifest",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: siteConfig.shortName,
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  icons: {
+    icon: [
+      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: "/icons/icon-192x192.png", sizes: "192x192" }],
+  },
+  openGraph: {
+    type: "website",
+    siteName: siteConfig.name,
+    title: {
+      default: siteConfig.name,
+      template: `%s | ${siteConfig.name}`,
+    },
+    description: APP_DESCRIPTION,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#0342ab" },
+    { media: "(prefers-color-scheme: dark)", color: "#00122f" },
+  ],
 };
 
 export default function RootLayout({
