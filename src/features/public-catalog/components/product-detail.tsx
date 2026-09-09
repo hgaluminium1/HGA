@@ -200,6 +200,8 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
             <EnquiryForm
               locale={locale}
               defaultProduct={product.name.en}
+              productSlug={product.slug}
+              source="product"
               className="mt-6"
             />
           </div>

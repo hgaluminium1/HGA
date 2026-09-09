@@ -81,6 +81,11 @@ const NAV_GROUPS = [
         label: "Open roles",
         match: "/admin/careers",
       },
+      {
+        href: "/admin/leads",
+        label: "Leads",
+        match: "/admin/leads",
+      },
     ],
   },
 ] as const;

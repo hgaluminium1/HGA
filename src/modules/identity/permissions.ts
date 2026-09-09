@@ -25,6 +25,8 @@ export type Permission =
   | "corporate.write"
   | "corporate.publish"
   | "corporate.delete"
+  | "leads.read"
+  | "leads.write"
   | "import.write";
 
 const ALL_WRITE: Permission[] = [
@@ -50,6 +52,8 @@ const ALL_WRITE: Permission[] = [
   "corporate.write",
   "corporate.publish",
   "corporate.delete",
+  "leads.read",
+  "leads.write",
   "import.write",
 ];
 
@@ -63,6 +67,7 @@ const ROLE_PERMISSIONS: Record<Role, readonly Permission[]> = {
     "dictionaries.read",
     "media.read",
     "corporate.read",
+    "leads.read",
   ],
 };
 

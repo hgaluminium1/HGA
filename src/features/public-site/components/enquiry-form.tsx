@@ -8,16 +8,21 @@ import { cn } from "@/lib/utils";
 type EnquiryFormProps = {
   locale: string;
   defaultProduct?: string;
+  /** Optional catalogue slug when form is embedded on a product page. */
+  productSlug?: string;
+  source?: "contact" | "product" | "header";
   className?: string;
 };
 
 /**
  * Industrial RFQ form — alloy / temper / tonnage / destination + contact.
- * Matches CMR / Hindalco-style enquiry density without retail fluff.
+ * Persists to Admin → Leads and notifies sales via Resend.
  */
 export function EnquiryForm({
   locale,
   defaultProduct = "",
+  productSlug,
+  source = "contact",
   className,
 }: EnquiryFormProps) {
   const [pending, startTransition] = useTransition();
@@ -41,12 +46,15 @@ export function EnquiryForm({
             email: String(data.get("email") ?? ""),
             phone: String(data.get("phone") ?? ""),
             productInterest: String(data.get("productInterest") ?? ""),
+            productSlug: productSlug ?? null,
             alloy: String(data.get("alloy") ?? ""),
             temper: String(data.get("temper") ?? ""),
             monthlyTonnage: String(data.get("monthlyTonnage") ?? ""),
             destination: String(data.get("destination") ?? ""),
             message: String(data.get("message") ?? ""),
             locale,
+            source: productSlug ? "product" : source,
+            website: String(data.get("website") ?? ""),
           }),
         });
         if (!res.ok) {
@@ -69,7 +77,23 @@ export function EnquiryForm({
   const label = "block text-[0.8125rem] font-medium text-ink";
 
   return (
-    <form onSubmit={onSubmit} className={cn(className)}>
+    <form onSubmit={onSubmit} className={cn("relative", className)}>
+      {/* Honeypot — hidden from users; bots that fill it are dropped server-side. */}
+      <div
+        className="absolute -left-[9999px] top-auto h-0 w-0 overflow-hidden"
+        aria-hidden
+      >
+        <label>
+          Website
+          <input
+            type="text"
+            name="website"
+            tabIndex={-1}
+            autoComplete="off"
+          />
+        </label>
+      </div>
+
       <div className="grid gap-4 min-[640px]:grid-cols-2">
         <label className={label}>
           Name *
@@ -155,7 +179,8 @@ export function EnquiryForm({
         </Button>
         {status === "ok" ? (
           <p className="text-sm text-teal-700">
-            Received — sales will respond with feasibility and lead time.
+            Received — check your email for confirmation. Sales will follow up
+            with feasibility and lead time.
           </p>
         ) : null}
         {status === "error" ? (
