@@ -2,6 +2,7 @@
   "$schema": "https://unpkg.com/knip@5/schema.json",
   "entry": [
     "src/app/**/{page,layout,route,loading,error,not-found,default,template}.{ts,tsx}",
+    "src/app/sw.ts",
     "scripts/**/*.ts",
     "vitest.config.ts",
     "src/config/*.ts",
@@ -61,7 +62,9 @@
     "vite",
     "@vitest/browser-playwright",
     "@vitest/coverage-v8",
-    "playwright"
+    "playwright",
+    "@types/serviceworker",
+    "sharp"
   ],
   "rules": {
     "exports": "off",

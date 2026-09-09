@@ -3,7 +3,10 @@ import { notFound } from "next/navigation";
 import { BackToTop } from "@/components/organisms/back-to-top";
 import { SiteFooter } from "@/components/organisms/site-footer";
 import { SiteHeader } from "@/components/organisms/site-header";
-import { PwaInstallPrompt } from "@/features/public-site/components/pwa-install-prompt";
+import {
+  PwaHeaderInstallButton,
+  PwaInstallPrompt,
+} from "@/features/public-site/components/pwa-install-prompt";
 import { PwaInstallProvider } from "@/features/public-site/components/pwa-install-provider";
 import { resolvePublicNav } from "@/features/public-site/lib/resolve-public-nav";
 
@@ -38,6 +41,8 @@ export default async function PublicLocaleLayout({
         primaryNavLinks={nav.primaryNavLinks}
         brandLogoSrc={nav.brand.logoSrc}
         brandLogoHeightPx={nav.brand.logoHeightPx}
+        toolbarExtra={<PwaHeaderInstallButton />}
+        drawerExtra={<PwaHeaderInstallButton className="inline-flex" />}
       />
       <main id="main">{children}</main>
       <SiteFooter

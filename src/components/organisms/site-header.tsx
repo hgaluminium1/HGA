@@ -19,6 +19,7 @@ import {
   useId,
   useRef,
   useState,
+  type ReactNode,
 } from "react";
 
 import { BrandLockup } from "@/components/molecules/brand-lockup";
@@ -52,7 +53,6 @@ import {
   type NavSection,
 } from "@/config/nav.config";
 import { siteConfig } from "@/config/site.config";
-import { PwaHeaderInstallButton } from "@/features/public-site/components/pwa-install-prompt";
 import { cn } from "@/lib/utils";
 
 type SiteHeaderProps = {
@@ -62,6 +62,9 @@ type SiteHeaderProps = {
   primaryNavLinks?: NavLink[];
   brandLogoSrc?: string | null;
   brandLogoHeightPx?: number;
+  /** Injected by app/features (e.g. PWA Install) — keeps organisms free of feature imports. */
+  toolbarExtra?: ReactNode;
+  drawerExtra?: ReactNode;
 };
 
 type MenuKey = "products" | "company";
@@ -535,6 +538,8 @@ export function SiteHeader({
   primaryNavLinks = defaultPrimaryNavLinks,
   brandLogoSrc = null,
   brandLogoHeightPx,
+  toolbarExtra,
+  drawerExtra,
 }: SiteHeaderProps) {
   const navId = useId();
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
@@ -673,7 +678,7 @@ export function SiteHeader({
             </nav>
 
             <div className="flex shrink-0 items-center gap-1 min-[400px]:gap-1.5 min-[560px]:gap-2">
-              <PwaHeaderInstallButton />
+              {toolbarExtra}
               <Button
                 type="button"
                 variant="ghost"
@@ -853,9 +858,11 @@ export function SiteHeader({
               </Link>
             </div>
             <div className="border-t border-line flex flex-col gap-2 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
-              <div className="flex justify-center min-[560px]:hidden">
-                <PwaHeaderInstallButton className="inline-flex" />
-              </div>
+              {drawerExtra ? (
+                <div className="flex justify-center min-[560px]:hidden">
+                  {drawerExtra}
+                </div>
+              ) : null}
               <Button
                 className="w-full"
                 render={<Link href={localePath(locale, "contact")} />}
