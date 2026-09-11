@@ -46,11 +46,10 @@ function formatKg(n: number | null | undefined, suffix = "kg") {
   return `${n.toLocaleString("en-IN", { maximumFractionDigits: 2 })} ${suffix}`;
 }
 
-/** DigiKey-style dense label|value rows. */
 function SpecTable({ rows }: { rows: { label: string; value: string }[] }) {
   if (!rows.length) return null;
   return (
-    <table className="w-full border-collapse text-left text-[0.8125rem]">
+    <table className="pdp-spec-table w-full border-collapse text-left">
       <tbody>
         {rows.map((row, i) => (
           <tr
@@ -62,11 +61,11 @@ function SpecTable({ rows }: { rows: { label: string; value: string }[] }) {
           >
             <th
               scope="row"
-              className="w-[36%] max-w-[10.5rem] px-3 py-2 align-top font-medium text-ink sm:w-[10.5rem]"
+              className="pdp-spec-table__label w-[min(38%,9.5rem)] align-top font-medium text-ink"
             >
               {row.label}
             </th>
-            <td className="text-muted-foreground px-3 py-2 align-top">
+            <td className="pdp-spec-table__value text-muted-foreground align-top">
               {row.value}
             </td>
           </tr>
@@ -142,12 +141,38 @@ function buildSpecRows(product: ProductDTO): { label: string; value: string }[] 
   return rows;
 }
 
+function Panel({
+  title,
+  id,
+  hint,
+  children,
+}: {
+  title: string;
+  id: string;
+  hint?: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <section aria-labelledby={id} className="min-w-0">
+      <h2
+        id={id}
+        className="font-display pdp-section-title font-semibold text-ink"
+      >
+        {title}
+      </h2>
+      {hint ? (
+        <p className="text-text-faint mt-0.5 text-[0.7rem] leading-snug">{hint}</p>
+      ) : null}
+      <div className="border-line mt-1.5 overflow-hidden rounded-[var(--radius-md)] border bg-surface">
+        {children}
+      </div>
+    </section>
+  );
+}
+
 /**
- * Strict enterprise PDP (DigiKey / McMaster procurement pattern):
- * - Tiny identification thumb — not a hero collage
- * - Dense specs left; ONE conversion surface (sticky RFQ rail)
- * - No second form, no “enquire” button cluster, no page-level inquire band
- * Site header “Enquire” stays as global chrome only.
+ * Industrial datasheet PDP — McMaster utility + DigiKey supporting pane.
+ * Layout owned by @container (available width), not device breakpoints.
  */
 export async function ProductDetail({ locale, slug }: ProductDetailProps) {
   const product = await getCachedPublishedProductBySlug(slug);
@@ -185,220 +210,223 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
   const specRows = buildSpecRows(product);
   const formLabel = FORM_LABEL[product.formType] || FORM_LABEL.other;
   const rfqTitle = upcoming ? "Register interest" : "Request quote";
+  const hasSpecs = specRows.length > 0;
+  const hasChem = product.chemicalComposition.length > 0;
+  const pairDocs = hasSpecs && hasChem;
 
   return (
-    <div className="bg-bg pb-[4.25rem] min-[900px]:pb-0">
-      <Container className="py-4 sm:py-5">
-        <CatalogueBreadcrumbs locale={locale} items={crumbs} className="mb-3" />
+    <div className="bg-bg">
+      <Container className="py-[clamp(0.85rem,0.6rem+1vw,1.35rem)]">
+        <div className="pdp has-dock">
+          <CatalogueBreadcrumbs
+            locale={locale}
+            items={crumbs}
+            className="mb-[clamp(0.65rem,0.45rem+0.6cqw,1rem)]"
+          />
 
-        {/* Compact identity — thumb + copy. Zero enquire buttons here. */}
-        <header className="border-line flex gap-3.5 border-b pb-4 min-[640px]:gap-5">
-          <div className="relative aspect-square w-[4.75rem] shrink-0 overflow-hidden rounded-[var(--radius-md)] bg-bg-alt ring-1 ring-black/[0.06] min-[640px]:w-[5.5rem]">
-            <Image
-              src={image}
-              alt=""
-              fill
-              className="object-cover"
-              sizes="88px"
-              priority
-            />
-          </div>
+          <div className="pdp-shell">
+            {/* Identity — continuous thumb/type resize via cqw */}
+            <header className="pdp-identity border-line border-b pb-[clamp(0.85rem,0.6rem+0.8cqw,1.25rem)]">
+              <div className="pdp-identity__row">
+                <div className="pdp-identity__media">
+                  <Image
+                    src={image}
+                    alt=""
+                    fill
+                    className="object-cover"
+                    sizes="(min-width: 52.5rem) 100px, 12vw"
+                    priority
+                  />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                    <span className="text-[0.65rem] font-bold tracking-[0.12em] text-brand-blue uppercase">
+                      {upcoming ? "Coming soon" : formLabel}
+                    </span>
+                    {product.sku ? (
+                      <span className="text-text-faint font-mono text-[0.7rem]">
+                        {product.sku}
+                      </span>
+                    ) : null}
+                    {categoryHref && primaryCategory ? (
+                      <>
+                        <span className="text-text-faint text-[0.7rem]" aria-hidden>
+                          ·
+                        </span>
+                        <Link
+                          href={localePath(locale, categoryHref)}
+                          className="text-muted-foreground hover:text-brand-blue text-[0.75rem] font-medium hover:underline"
+                        >
+                          {primaryCategory.name.en}
+                        </Link>
+                      </>
+                    ) : null}
+                  </div>
+                  <h1 className="pdp-identity__title font-display mt-1 font-semibold text-ink">
+                    {product.name.en}
+                  </h1>
+                  {product.description ? (
+                    <p className="text-muted-foreground pdp-lede mt-1.5 max-w-[40rem] leading-relaxed">
+                      {product.description}
+                    </p>
+                  ) : null}
+                  {product.alloyGrades.length ? (
+                    <p className="text-muted-foreground mt-2 text-[0.75rem] leading-snug">
+                      <span className="font-semibold text-ink">Grades </span>
+                      {product.alloyGrades.join(" · ")}
+                    </p>
+                  ) : null}
+                </div>
+              </div>
+            </header>
 
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-              <span className="text-[0.65rem] font-bold tracking-[0.12em] text-brand-blue uppercase">
-                {upcoming ? "Coming soon" : formLabel}
-              </span>
-              {product.sku ? (
-                <span className="text-text-faint font-mono text-[0.7rem]">
-                  {product.sku}
-                </span>
-              ) : null}
-              {categoryHref && primaryCategory ? (
-                <>
-                  <span className="text-text-faint text-[0.7rem]" aria-hidden>
-                    ·
-                  </span>
-                  <Link
-                    href={localePath(locale, categoryHref)}
-                    className="text-muted-foreground hover:text-brand-blue text-[0.75rem] font-medium hover:underline"
+            {/* Specs body — pairs when pdp-body container ≥ 40rem */}
+            <div className="pdp-body space-y-[var(--pdp-gap)]">
+              <div
+                className={cn("pdp-docs", pairDocs && "pdp-docs--pair")}
+              >
+                {hasSpecs ? (
+                  <Panel title="Specifications" id="specs-heading">
+                    <SpecTable rows={specRows} />
+                  </Panel>
+                ) : null}
+
+                {hasChem ? (
+                  <Panel
+                    title="Chemical composition"
+                    id="chem-heading"
+                    hint="Typical / agreed ranges (wt%). Lot values on mill certificate."
                   >
-                    {primaryCategory.name.en}
-                  </Link>
-                </>
+                    <div className="overflow-x-auto">
+                      <table className="pdp-spec-table w-full min-w-[12rem] border-collapse text-left">
+                        <thead>
+                          <tr className="bg-bg-alt text-text-faint text-[0.65rem] tracking-wide uppercase">
+                            <th className="px-3 py-1.5 font-semibold">Element</th>
+                            <th className="px-3 py-1.5 font-semibold">Range</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {product.chemicalComposition.map((row, i) => (
+                            <tr
+                              key={row.element}
+                              className={cn(
+                                "border-t border-black/[0.06]",
+                                i % 2 === 0 ? "bg-surface" : "bg-bg-alt/40",
+                              )}
+                            >
+                              <td className="px-3 py-1.5 font-medium text-ink">
+                                {row.element}
+                              </td>
+                              <td className="text-muted-foreground px-3 py-1.5">
+                                {row.range || "—"}
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </Panel>
+                ) : null}
+              </div>
+
+              {product.applications.length ? (
+                <section aria-labelledby="apps-heading">
+                  <h2
+                    id="apps-heading"
+                    className="font-display pdp-section-title font-semibold text-ink"
+                  >
+                    Applications
+                  </h2>
+                  <ul className="mt-1.5 flex flex-wrap gap-1.5">
+                    {product.applications.map((app) => (
+                      <li
+                        key={app}
+                        className="border-line rounded-full border bg-bg-alt px-2.5 py-1 text-[0.75rem] text-ink"
+                      >
+                        {app}
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              ) : null}
+
+              {product.highlights.length ? (
+                <section aria-labelledby="why-heading">
+                  <h2
+                    id="why-heading"
+                    className="font-display pdp-section-title font-semibold text-ink"
+                  >
+                    Programme notes
+                  </h2>
+                  <ul className="text-muted-foreground mt-1.5 list-disc space-y-1 pl-4 text-[0.8125rem] leading-relaxed">
+                    {product.highlights.map((h) => (
+                      <li key={h}>{h}</li>
+                    ))}
+                  </ul>
+                </section>
               ) : null}
             </div>
-            <h1 className="font-display mt-1 text-[clamp(1.25rem,1.1rem+0.7vw,1.65rem)] font-semibold leading-tight tracking-tight text-ink">
-              {product.name.en}
-            </h1>
-            {product.description ? (
-              <p className="text-muted-foreground mt-1.5 max-w-[36rem] text-[0.8125rem] leading-relaxed">
-                {product.description}
+
+            {/* Single conversion surface — sticky rail when pane expands */}
+            <aside
+              id="rfq"
+              className="pdp-rfq border-line scroll-mt-24 rounded-[var(--radius-md)] border bg-surface p-[clamp(0.85rem,0.7rem+0.5cqw,1.1rem)] shadow-[var(--shadow-sm)]"
+            >
+              <h2 className="font-display text-[0.875rem] font-semibold text-ink">
+                {rfqTitle}
+              </h2>
+              <p className="text-muted-foreground mt-1 text-[0.72rem] leading-snug">
+                Alloy, tonnage, destination — sales confirms lead time.
               </p>
-            ) : null}
-            {product.alloyGrades.length ? (
-              <p className="text-muted-foreground mt-2 text-[0.75rem] leading-snug">
-                <span className="font-semibold text-ink">Grades </span>
-                {product.alloyGrades.join(" · ")}
-              </p>
-            ) : null}
-          </div>
-        </header>
+              <EnquiryForm
+                locale={locale}
+                defaultProduct={product.name.en}
+                productSlug={product.slug}
+                source="product"
+                density="compact"
+                className="mt-3 @container"
+              />
+            </aside>
 
-        {/* Specs + single RFQ rail — the only conversion surface on this page */}
-        <div className="mt-4 grid gap-5 min-[900px]:grid-cols-[minmax(0,1fr)_minmax(15.5rem,17.5rem)] min-[900px]:items-start min-[900px]:gap-6">
-          <div className="min-w-0 space-y-5">
-            {specRows.length ? (
-              <section aria-labelledby="specs-heading">
-                <h2
-                  id="specs-heading"
-                  className="font-display text-[0.9rem] font-semibold text-ink"
-                >
-                  Specifications
-                </h2>
-                <div className="border-line mt-1.5 overflow-hidden rounded-[var(--radius-md)] border">
-                  <SpecTable rows={specRows} />
+            {related.length ? (
+              <section className="pdp-related border-line border-t pt-[clamp(1rem,0.75rem+0.8cqw,1.5rem)]">
+                <div className="mb-3 flex items-baseline justify-between gap-3">
+                  <h2 className="font-display text-[0.9rem] font-semibold text-ink">
+                    Related
+                  </h2>
+                  <Link
+                    href={localePath(
+                      locale,
+                      categoryHref ??
+                        (upcoming ? "products#upcoming" : "products"),
+                    )}
+                    className="text-brand-blue text-[0.75rem] font-semibold hover:underline"
+                  >
+                    Catalogue →
+                  </Link>
                 </div>
-              </section>
-            ) : null}
-
-            {product.chemicalComposition.length ? (
-              <section aria-labelledby="chem-heading">
-                <h2
-                  id="chem-heading"
-                  className="font-display text-[0.9rem] font-semibold text-ink"
-                >
-                  Chemical composition
-                </h2>
-                <p className="text-text-faint mt-0.5 text-[0.7rem]">
-                  Typical / agreed ranges (wt%). Lot values on mill certificate.
-                </p>
-                <div className="border-line mt-1.5 overflow-x-auto rounded-[var(--radius-md)] border">
-                  <table className="w-full min-w-[14rem] border-collapse text-left text-[0.8125rem]">
-                    <thead>
-                      <tr className="bg-bg-alt text-text-faint text-[0.65rem] tracking-wide uppercase">
-                        <th className="px-3 py-1.5 font-semibold">Element</th>
-                        <th className="px-3 py-1.5 font-semibold">Range</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {product.chemicalComposition.map((row, i) => (
-                        <tr
-                          key={row.element}
-                          className={cn(
-                            "border-t border-black/[0.06]",
-                            i % 2 === 0 ? "bg-surface" : "bg-bg-alt/40",
-                          )}
-                        >
-                          <td className="px-3 py-1.5 font-medium text-ink">
-                            {row.element}
-                          </td>
-                          <td className="text-muted-foreground px-3 py-1.5">
-                            {row.range || "—"}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </section>
-            ) : null}
-
-            {product.applications.length ? (
-              <section aria-labelledby="apps-heading">
-                <h2
-                  id="apps-heading"
-                  className="font-display text-[0.9rem] font-semibold text-ink"
-                >
-                  Applications
-                </h2>
-                <ul className="mt-1.5 flex flex-wrap gap-1.5">
-                  {product.applications.map((app) => (
-                    <li
-                      key={app}
-                      className="border-line rounded-full border bg-bg-alt px-2.5 py-1 text-[0.75rem] text-ink"
-                    >
-                      {app}
+                <ul className="pdp-related__grid">
+                  {related.map((item) => (
+                    <li key={item.id} className="min-w-0">
+                      <ProductCard locale={locale} product={item} />
                     </li>
                   ))}
                 </ul>
               </section>
             ) : null}
-
-            {product.highlights.length ? (
-              <section aria-labelledby="why-heading">
-                <h2
-                  id="why-heading"
-                  className="font-display text-[0.9rem] font-semibold text-ink"
-                >
-                  Programme notes
-                </h2>
-                <ul className="text-muted-foreground mt-1.5 list-disc space-y-1 pl-4 text-[0.8125rem] leading-relaxed">
-                  {product.highlights.map((h) => (
-                    <li key={h}>{h}</li>
-                  ))}
-                </ul>
-              </section>
-            ) : null}
           </div>
 
-          <aside
-            id="rfq"
-            className="border-line scroll-mt-24 rounded-[var(--radius-md)] border bg-surface p-3.5 shadow-[var(--shadow-sm)] min-[900px]:sticky min-[900px]:top-20"
-          >
-            <h2 className="font-display text-[0.875rem] font-semibold text-ink">
+          {/* Compact only: replace sticky rail with dock jump (hidden via @container) */}
+          <div className="pdp-dock">
+            <a
+              href="#rfq"
+              className="bg-brand-red text-primary-foreground flex min-h-11 w-full items-center justify-center rounded-[var(--radius-md)] text-[0.8125rem] font-semibold"
+            >
               {rfqTitle}
-            </h2>
-            <p className="text-muted-foreground mt-1 text-[0.72rem] leading-snug">
-              Alloy, tonnage, destination — sales confirms lead time.
-            </p>
-            <EnquiryForm
-              locale={locale}
-              defaultProduct={product.name.en}
-              productSlug={product.slug}
-              source="product"
-              density="compact"
-              className="mt-3"
-            />
-          </aside>
+            </a>
+          </div>
         </div>
-
-        {related.length ? (
-          <section className="border-line mt-7 border-t pt-5">
-            <div className="mb-3 flex items-baseline justify-between gap-3">
-              <h2 className="font-display text-[0.9rem] font-semibold text-ink">
-                Related
-              </h2>
-              <Link
-                href={localePath(
-                  locale,
-                  categoryHref ?? (upcoming ? "products#upcoming" : "products"),
-                )}
-                className="text-brand-blue text-[0.75rem] font-semibold hover:underline"
-              >
-                Catalogue →
-              </Link>
-            </div>
-            <ul className="grid gap-3 min-[560px]:grid-cols-2 min-[900px]:grid-cols-3">
-              {related.map((item) => (
-                <li key={item.id}>
-                  <ProductCard locale={locale} product={item} />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
       </Container>
-
-      {/* Mobile only: jump to the one RFQ rail — not a second form */}
-      <div className="border-line bg-surface/95 fixed inset-x-0 bottom-0 z-40 border-t p-2.5 backdrop-blur-md min-[900px]:hidden">
-        <a
-          href="#rfq"
-          className="bg-brand-red text-brand-red-fg flex min-h-10 w-full items-center justify-center rounded-[var(--radius-md)] text-[0.8125rem] font-semibold"
-        >
-          {rfqTitle}
-        </a>
-      </div>
     </div>
   );
 }

@@ -106,7 +106,9 @@ export function EnquiryForm({
       <div
         className={cn(
           "grid",
-          compact ? "gap-2.5" : "gap-4 min-[640px]:grid-cols-2",
+          compact
+            ? "gap-2.5 @min-[16rem]:grid-cols-2"
+            : "gap-4 @container @min-[28rem]:grid-cols-2 min-[640px]:grid-cols-2",
         )}
       >
         <label className={label}>

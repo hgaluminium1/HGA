@@ -171,6 +171,167 @@
       order: 1;
     }
   }
+
+  /**
+   * Product datasheet (PDP) — McMaster / DigiKey utility pattern.
+   * Macro: supporting-pane re-architects at container width (not device name).
+   * Micro: identity / docs / form reflow via nested containers + clamp.
+   * Techniques: reposition (stack↔pane), resize (thumb/gaps), reflow (docs),
+   * replace (dock ↔ sticky rail).
+   */
+  .pdp {
+    --pdp-gap: clamp(0.875rem, 0.55rem + 1.2cqw, 1.5rem);
+    --pdp-rail: clamp(15.5rem, 28%, 18.75rem);
+    --pdp-thumb: clamp(3.75rem, 2.8rem + 4cqw, 6.25rem);
+    --pdp-title: clamp(1.2rem, 1.05rem + 0.85cqw, 1.75rem);
+    container-type: inline-size;
+    container-name: pdp;
+  }
+
+  .pdp-shell {
+    display: grid;
+    gap: var(--pdp-gap);
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "identity"
+      "body"
+      "rfq"
+      "related";
+    align-items: start;
+  }
+
+  .pdp-identity {
+    grid-area: identity;
+  }
+  .pdp-body {
+    grid-area: body;
+    container-type: inline-size;
+    container-name: pdp-body;
+    min-width: 0;
+  }
+  .pdp-rfq {
+    grid-area: rfq;
+    min-width: 0;
+  }
+  .pdp-related {
+    grid-area: related;
+  }
+
+  /* Expanded: primary + supporting pane (Material list–detail / DigiKey buy box) */
+  @container pdp (min-width: 52.5rem) {
+    .pdp-shell {
+      grid-template-columns: minmax(0, 1fr) var(--pdp-rail);
+      grid-template-areas:
+        "identity identity"
+        "body rfq"
+        "related related";
+      column-gap: clamp(1.25rem, 1rem + 1.5cqw, 2rem);
+      row-gap: clamp(1rem, 0.75rem + 1cqw, 1.5rem);
+    }
+
+    .pdp-rfq {
+      position: sticky;
+      top: calc(4.5rem + env(safe-area-inset-top, 0px));
+      align-self: start;
+    }
+
+    .pdp-dock {
+      display: none;
+    }
+  }
+
+  /* Extra-wide body: pair specs + chemistry when the *main column* allows */
+  .pdp-docs {
+    display: grid;
+    gap: var(--pdp-gap);
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @container pdp-body (min-width: 40rem) {
+    .pdp-docs--pair {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+  }
+
+  .pdp-identity__row {
+    display: flex;
+    gap: clamp(0.75rem, 0.5rem + 1.2cqw, 1.35rem);
+    align-items: flex-start;
+  }
+
+  .pdp-identity__media {
+    position: relative;
+    width: var(--pdp-thumb);
+    aspect-ratio: 1;
+    flex-shrink: 0;
+    overflow: hidden;
+    border-radius: var(--radius-md);
+    background: var(--bg-alt);
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 6%);
+  }
+
+  .pdp-identity__title {
+    font-size: var(--pdp-title);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+
+  .pdp-lede {
+    font-size: clamp(0.8rem, 0.75rem + 0.2cqw, 0.875rem);
+  }
+
+  .pdp-section-title {
+    font-size: clamp(0.85rem, 0.8rem + 0.25cqw, 0.95rem);
+  }
+
+  .pdp-spec-table {
+    font-size: clamp(0.75rem, 0.7rem + 0.2cqw, 0.8125rem);
+  }
+
+  .pdp-spec-table__label,
+  .pdp-spec-table__value {
+    padding-inline: clamp(0.55rem, 0.4rem + 0.4cqw, 0.85rem);
+    padding-block: clamp(0.4rem, 0.3rem + 0.25cqw, 0.55rem);
+  }
+
+  .pdp-related__grid {
+    display: grid;
+    gap: clamp(0.75rem, 0.5rem + 1cqw, 1.15rem);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 14.5rem), 1fr));
+  }
+
+  /* Compact: dock replaces sticky rail (Microsoft “replace”) */
+  .pdp-dock {
+    position: fixed;
+    inset-inline: 0;
+    bottom: 0;
+    z-index: 40;
+    padding: 0.625rem
+      max(var(--pad-inline), env(safe-area-inset-right, 0px))
+      calc(0.625rem + env(safe-area-inset-bottom, 0px))
+      max(var(--pad-inline), env(safe-area-inset-left, 0px));
+    border-top: 1px solid var(--line);
+    background: color-mix(in srgb, var(--surface) 92%, transparent);
+    backdrop-filter: blur(12px);
+  }
+
+  .pdp.has-dock {
+    padding-bottom: calc(4.25rem + env(safe-area-inset-bottom, 0px));
+  }
+
+  @container pdp (min-width: 52.5rem) {
+    .pdp.has-dock {
+      padding-bottom: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pdp-dock {
+      backdrop-filter: none;
+      background: var(--surface);
+    }
+  }
 }
 
 @keyframes pulse-ring {
