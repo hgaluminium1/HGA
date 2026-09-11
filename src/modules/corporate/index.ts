@@ -8,6 +8,8 @@ export type {
   ExpansionProjectDTO,
   ExpansionProjectPublicDTO,
   PersonDTO,
+  SocialLinkDTO,
+  SocialPlatform,
   SustainabilityMetricDTO,
   TestimonialDTO,
 } from "./types";

@@ -1,6 +1,7 @@
 import { Container } from "@/components/atoms/container";
 import { Reveal } from "@/components/atoms/reveal";
 import { Section } from "@/components/atoms/section";
+import { SocialLinks } from "@/components/molecules/social-links";
 import { CompanyFactsBlock } from "@/features/public-corporate/components/corporate-pages";
 import { getCachedCompanyProfile } from "@/features/public-corporate/lib/public-cache";
 import {
@@ -18,6 +19,7 @@ export async function ContactPage({
   defaultProduct?: string;
 }) {
   const profile = await getCachedCompanyProfile();
+  const socialLinks = profile?.socialLinks ?? [];
   const locations =
     profile?.locations?.filter((l) => l.embedUrl || l.mapsUrl || l.address) ??
     [];
@@ -86,6 +88,18 @@ export async function ContactPage({
                   <CompanyFactsBlock embedded />
                 </div>
               </div>
+              {socialLinks.length > 0 ? (
+                <div>
+                  <SectionIntro
+                    eyebrow="Connect"
+                    title="Follow us"
+                    body="Official profiles for news, careers and company updates."
+                  />
+                  <Reveal className="mt-6">
+                    <SocialLinks links={socialLinks} variant="onLight" />
+                  </Reveal>
+                </div>
+              ) : null}
               <div>
                 <SectionIntro eyebrow="Find us" title="Campus location" />
                 <div className="mt-6 space-y-6">

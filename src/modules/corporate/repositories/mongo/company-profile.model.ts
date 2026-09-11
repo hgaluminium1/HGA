@@ -60,6 +60,28 @@ const companyProfileSchema = new Schema(
         _id: false,
       },
     ],
+    socialLinks: [
+      {
+        id: { type: String, required: true },
+        platform: {
+          type: String,
+          enum: [
+            "linkedin",
+            "facebook",
+            "instagram",
+            "youtube",
+            "x",
+            "whatsapp",
+            "other",
+          ],
+          required: true,
+        },
+        url: { type: String, required: true },
+        label: { type: String },
+        order: { type: Number, default: 0 },
+        _id: false,
+      },
+    ],
     locale: { type: String, default: "en" },
     version: { type: Number, default: 1 },
   },

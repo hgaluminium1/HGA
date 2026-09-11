@@ -8,7 +8,9 @@ import {
   PwaInstallPrompt,
 } from "@/features/public-site/components/pwa-install-prompt";
 import { PwaInstallProvider } from "@/features/public-site/components/pwa-install-provider";
+import { OrganizationJsonLd } from "@/features/public-site/components/organization-json-ld";
 import { resolvePublicNav } from "@/features/public-site/lib/resolve-public-nav";
+import { localePath } from "@/config/nav.config";
 
 type PublicLocaleLayoutProps = {
   children: React.ReactNode;
@@ -28,6 +30,11 @@ export default async function PublicLocaleLayout({
 
   return (
     <PwaInstallProvider>
+      <OrganizationJsonLd
+        name={nav.organizationName}
+        url={localePath(locale)}
+        socialLinks={nav.socialLinks}
+      />
       <a
         href="#main"
         className="bg-ink text-on-dark focus:top-4 absolute top-[-48px] left-4 z-[100] rounded-[var(--radius-sm)] px-5 py-3 transition-[top]"
@@ -41,6 +48,7 @@ export default async function PublicLocaleLayout({
         primaryNavLinks={nav.primaryNavLinks}
         brandLogoSrc={nav.brand.logoSrc}
         brandLogoHeightPx={nav.brand.logoHeightPx}
+        socialLinks={nav.socialLinks}
         toolbarExtra={<PwaHeaderInstallButton />}
         drawerExtra={<PwaHeaderInstallButton className="inline-flex" />}
       />
@@ -51,6 +59,7 @@ export default async function PublicLocaleLayout({
         company={nav.footer.company}
         support={nav.footer.support}
         contact={nav.footer.contact}
+        socialLinks={nav.socialLinks}
         brandLogoSrc={nav.brand.logoSrc}
         brandLogoHeightPx={nav.brand.logoHeightPx}
       />

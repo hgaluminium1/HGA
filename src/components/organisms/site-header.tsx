@@ -23,6 +23,7 @@ import {
 } from "react";
 
 import { BrandLockup } from "@/components/molecules/brand-lockup";
+import { SocialLinks } from "@/components/molecules/social-links";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -54,6 +55,7 @@ import {
 } from "@/config/nav.config";
 import { siteConfig } from "@/config/site.config";
 import { cn } from "@/lib/utils";
+import type { SocialLinkDTO } from "@/modules/corporate/types";
 
 type SiteHeaderProps = {
   locale: string;
@@ -65,6 +67,7 @@ type SiteHeaderProps = {
   /** Injected by app/features (e.g. PWA Install) — keeps organisms free of feature imports. */
   toolbarExtra?: ReactNode;
   drawerExtra?: ReactNode;
+  socialLinks?: Pick<SocialLinkDTO, "id" | "platform" | "url" | "label">[];
 };
 
 type MenuKey = "products" | "company";
@@ -540,6 +543,7 @@ export function SiteHeader({
   brandLogoHeightPx,
   toolbarExtra,
   drawerExtra,
+  socialLinks = [],
 }: SiteHeaderProps) {
   const navId = useId();
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
@@ -857,11 +861,18 @@ export function SiteHeader({
                 Contact Us
               </Link>
             </div>
-            <div className="border-t border-line flex flex-col gap-2 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
+            <div className="border-t border-line flex flex-col gap-3 p-4 pb-[max(1rem,env(safe-area-inset-bottom))]">
               {drawerExtra ? (
                 <div className="flex justify-center min-[560px]:hidden">
                   {drawerExtra}
                 </div>
+              ) : null}
+              {socialLinks.length > 0 ? (
+                <SocialLinks
+                  links={socialLinks}
+                  variant="onLight"
+                  className="justify-center"
+                />
               ) : null}
               <Button
                 className="w-full"

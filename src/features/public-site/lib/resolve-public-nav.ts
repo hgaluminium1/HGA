@@ -18,6 +18,20 @@ import { getCachedPublishedProducts } from "@/features/public-site/lib/public-ca
 import { getPublishedNavMenu } from "@/modules/navigation";
 import { listCategoriesFlat } from "@/modules/catalog";
 
+export type PublicSocialLink = {
+  id: string;
+  platform:
+    | "linkedin"
+    | "facebook"
+    | "instagram"
+    | "youtube"
+    | "x"
+    | "whatsapp"
+    | "other";
+  url: string;
+  label?: string;
+};
+
 export type PublicNavFooter = {
   /** Category landings + View full catalogue — never individual SKUs. */
   products: NavLink[];
@@ -29,6 +43,7 @@ export type PublicNavFooter = {
     phone: string;
     mapsUrl: string;
   };
+  socialLinks: PublicSocialLink[];
 };
 
 export type PublicNavResolved = {
@@ -41,6 +56,9 @@ export type PublicNavResolved = {
     logoSrc: string | null;
     logoHeightPx: number;
   };
+  /** Legal / display name for Organization JSON-LD. */
+  organizationName: string;
+  socialLinks: PublicSocialLink[];
   /** @deprecated Prefer `footer` columns — flat list for legacy callers. */
   footerQuickLinks: NavLink[];
   footerContact: PublicNavFooter["contact"];
@@ -265,11 +283,21 @@ export async function resolvePublicNav(
     mapsUrl: `https://www.google.com/maps/search/?api=1&query=${mapsQuery}`,
   };
 
+  const socialLinks: PublicSocialLink[] = (company?.socialLinks ?? [])
+    .filter((l) => l.url?.trim())
+    .map((l) => ({
+      id: l.id,
+      platform: l.platform,
+      url: l.url.trim(),
+      label: l.label,
+    }));
+
   const footer: PublicNavFooter = {
     products: footerProducts,
     company: footerCompany,
     support: footerSupport,
     contact: footerContact,
+    socialLinks,
   };
 
   return {
@@ -308,6 +336,11 @@ export async function resolvePublicNav(
         null,
       logoHeightPx: clampLogoHeight(company?.logoDisplayHeightPx),
     },
+    organizationName:
+      company?.legalName?.trim() ||
+      company?.displayNames?.primary?.trim() ||
+      "HG Aluminium Smelters",
+    socialLinks,
     footerQuickLinks: [
       ...footer.products,
       ...footer.company,

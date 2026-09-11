@@ -3,6 +3,7 @@ import { Mail, MapPin, Phone } from "lucide-react";
 
 import { Container } from "@/components/atoms/container";
 import { BrandLockup } from "@/components/molecules/brand-lockup";
+import { SocialLinks } from "@/components/molecules/social-links";
 import {
   footerCompanyAllowlist,
   footerContactFallback,
@@ -11,6 +12,7 @@ import {
   productNavAllowlist,
   type NavLink,
 } from "@/config/nav.config";
+import type { SocialLinkDTO } from "@/modules/corporate/types";
 
 type FooterContact = {
   address: string;
@@ -25,6 +27,7 @@ type SiteFooterProps = {
   company?: NavLink[];
   support?: NavLink[];
   contact?: FooterContact;
+  socialLinks?: Pick<SocialLinkDTO, "id" | "platform" | "url" | "label">[];
   /** @deprecated Prefer products/company/support columns. */
   quickLinks?: NavLink[];
   blurb?: string;
@@ -74,6 +77,7 @@ export function SiteFooter({
   company = footerCompanyAllowlist,
   support = footerUtilityAllowlist,
   contact = footerContactFallback,
+  socialLinks = [],
   quickLinks,
   blurb = "Aluminium extrusion, billets and remelt alloys from Kadi, Gujarat — serving architectural, industrial and solar markets across India.",
   brandLogoSrc = null,
@@ -98,6 +102,7 @@ export function SiteFooter({
             heightPx={brandLogoHeightPx}
           />
           <p className="text-on-dark-muted text-sm leading-relaxed">{blurb}</p>
+          <SocialLinks links={socialLinks} variant="onDark" />
         </div>
 
         <FooterColumn title="Products" links={productLinks} locale={locale} />

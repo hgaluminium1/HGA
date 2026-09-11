@@ -9,6 +9,8 @@ export type {
   ExpansionProjectDTO,
   LocalizedString,
   PersonDTO,
+  SocialLinkDTO,
+  SocialPlatform,
   SustainabilityMetricDTO,
   TestimonialDTO,
 } from "./types";

@@ -11,6 +11,41 @@ export const addressSchema = z.object({
   country: z.string().default("India"),
 });
 
+export const socialPlatformSchema = z.enum([
+  "linkedin",
+  "facebook",
+  "instagram",
+  "youtube",
+  "x",
+  "whatsapp",
+  "other",
+]);
+
+const httpsUrl = z
+  .string()
+  .url()
+  .refine((u) => u.startsWith("https://"), {
+    message: "URL must use https://",
+  });
+
+export const socialLinkSchema = z
+  .object({
+    id: z.string().min(1),
+    platform: socialPlatformSchema,
+    url: httpsUrl,
+    label: z.string().optional(),
+    order: z.number().int().default(0),
+  })
+  .superRefine((link, ctx) => {
+    if (link.platform === "other" && !link.label?.trim()) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Label is required for custom links",
+        path: ["label"],
+      });
+    }
+  });
+
 export const companyProfileSchema = z.object({
   legalName: z.string().min(1),
   displayNames: z.object({
@@ -60,6 +95,7 @@ export const companyProfileSchema = z.object({
     )
     .optional()
     .default([]),
+  socialLinks: z.array(socialLinkSchema).optional().default([]),
   locale: z.string().default("en"),
   version: z.number().int(),
 });

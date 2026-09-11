@@ -1,8 +1,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { ChevronDown, ChevronUp, Plus, X } from "lucide-react";
 
 import { BrandLockup } from "@/components/molecules/brand-lockup";
+import { Button } from "@/components/ui/button";
 import { CloudinaryPicker } from "@/features/admin-desk/components/cloudinary-picker";
 import { DeskBackLink } from "@/features/admin-desk/components/desk-back-link";
 import { DeskSaveBar } from "@/features/admin-desk/components/desk-save-bar";
@@ -15,7 +17,12 @@ import {
   fetchCompanyApi,
   updateCompanyApi,
 } from "@/features/admin-desk/lib/corporate-api";
-import type { Address, CompanyProfileDTO } from "@/modules/corporate/browser";
+import type {
+  Address,
+  CompanyProfileDTO,
+  SocialLinkDTO,
+  SocialPlatform,
+} from "@/modules/corporate/browser";
 import { cn } from "@/lib/utils";
 
 type Draft = {
@@ -35,6 +42,16 @@ type Draft = {
   emailHr: string;
   emailQuality: string;
 };
+
+const SOCIAL_PLATFORMS: { value: SocialPlatform; label: string }[] = [
+  { value: "linkedin", label: "LinkedIn" },
+  { value: "facebook", label: "Facebook" },
+  { value: "instagram", label: "Instagram" },
+  { value: "youtube", label: "YouTube" },
+  { value: "x", label: "X (Twitter)" },
+  { value: "whatsapp", label: "WhatsApp" },
+  { value: "other", label: "Other" },
+];
 
 function emptyAddress(): Address {
   return {
@@ -92,6 +109,19 @@ const emptyDraft = (): Draft => ({
   emailHr: "",
   emailQuality: "",
 });
+
+function newSocialLink(order: number): SocialLinkDTO {
+  return {
+    id:
+      typeof crypto !== "undefined" && "randomUUID" in crypto
+        ? crypto.randomUUID()
+        : `social-${Date.now()}-${order}`,
+    platform: "linkedin",
+    url: "",
+    label: "",
+    order,
+  };
+}
 
 function AddressFields({
   label,
@@ -158,6 +188,7 @@ export function CorporateCompanyEditor() {
   const [locations, setLocations] = useState<CompanyProfileDTO["locations"]>(
     [],
   );
+  const [socialLinks, setSocialLinks] = useState<SocialLinkDTO[]>([]);
   const [logo, setLogo] = useState<CompanyProfileDTO["logo"]>({});
   const [logoDisplayHeightPx, setLogoDisplayHeightPx] = useState(40);
   const [brandColors, setBrandColors] = useState<
@@ -167,6 +198,7 @@ export function CorporateCompanyEditor() {
   const [draft, setDraft] = useState<Draft>(emptyDraft);
   const [baseline, setBaseline] = useState("");
   const [logoBaseline, setLogoBaseline] = useState("");
+  const [socialBaseline, setSocialBaseline] = useState("[]");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -174,8 +206,20 @@ export function CorporateCompanyEditor() {
 
   const dirty = useMemo(() => {
     const logoSnap = JSON.stringify({ logo, logoDisplayHeightPx });
-    return JSON.stringify(draft) !== baseline || logoSnap !== logoBaseline;
-  }, [draft, baseline, logo, logoDisplayHeightPx, logoBaseline]);
+    return (
+      JSON.stringify(draft) !== baseline ||
+      logoSnap !== logoBaseline ||
+      JSON.stringify(socialLinks) !== socialBaseline
+    );
+  }, [
+    draft,
+    baseline,
+    logo,
+    logoDisplayHeightPx,
+    logoBaseline,
+    socialLinks,
+    socialBaseline,
+  ]);
 
   const canPublish =
     Boolean(draft.legalName.trim()) && Boolean(draft.displayPrimary.trim());
@@ -192,6 +236,8 @@ export function CorporateCompanyEditor() {
         const d = emptyDraft();
         setDraft(d);
         setBaseline(JSON.stringify(d));
+        setSocialLinks([]);
+        setSocialBaseline("[]");
         setVersion(1);
         return;
       }
@@ -200,11 +246,16 @@ export function CorporateCompanyEditor() {
       setBaseline(JSON.stringify(d));
       setVersion(profile.version);
       setLocations(profile.locations ?? []);
+      const nextSocial = profile.socialLinks ?? [];
+      setSocialLinks(nextSocial);
+      setSocialBaseline(JSON.stringify(nextSocial));
       const nextLogo = profile.logo ?? {};
       const nextH = profile.logoDisplayHeightPx ?? 40;
       setLogo(nextLogo);
       setLogoDisplayHeightPx(nextH);
-      setLogoBaseline(JSON.stringify({ logo: nextLogo, logoDisplayHeightPx: nextH }));
+      setLogoBaseline(
+        JSON.stringify({ logo: nextLogo, logoDisplayHeightPx: nextH }),
+      );
       setBrandColors(profile.brandColors ?? {});
       setLocale(profile.locale || "en");
     } catch (err) {
@@ -220,6 +271,24 @@ export function CorporateCompanyEditor() {
     void load();
   }, [load]);
 
+  function updateSocial(id: string, partial: Partial<SocialLinkDTO>) {
+    setSocialLinks((rows) =>
+      rows.map((row) => (row.id === id ? { ...row, ...partial } : row)),
+    );
+  }
+
+  function moveSocial(index: number, dir: -1 | 1) {
+    setSocialLinks((rows) => {
+      const next = [...rows];
+      const j = index + dir;
+      if (j < 0 || j >= next.length) return rows;
+      const tmp = next[index]!;
+      next[index] = next[j]!;
+      next[j] = tmp;
+      return next.map((row, order) => ({ ...row, order }));
+    });
+  }
+
   async function onSave() {
     setSaving(true);
     setMessage(null);
@@ -233,6 +302,17 @@ export function CorporateCompanyEditor() {
           ? [{ label: "Factory", number: draft.phoneFactory.trim() }]
           : []),
       ];
+      const payloadSocial = socialLinks
+        .filter((l) => l.url.trim())
+        .map((l, order) => ({
+          id: l.id,
+          platform: l.platform,
+          url: l.url.trim(),
+          ...(l.platform === "other" || l.label?.trim()
+            ? { label: (l.label ?? "").trim() }
+            : {}),
+          order,
+        }));
       const updated = await updateCompanyApi({
         legalName: draft.legalName.trim(),
         displayNames: {
@@ -259,6 +339,7 @@ export function CorporateCompanyEditor() {
         logoDisplayHeightPx,
         brandColors,
         locations,
+        socialLinks: payloadSocial,
         locale,
         version,
       });
@@ -267,6 +348,9 @@ export function CorporateCompanyEditor() {
       setBaseline(JSON.stringify(d));
       setVersion(updated.version);
       setLocations(updated.locations ?? []);
+      const nextSocial = updated.socialLinks ?? [];
+      setSocialLinks(nextSocial);
+      setSocialBaseline(JSON.stringify(nextSocial));
       setLogo(updated.logo ?? {});
       setLogoDisplayHeightPx(updated.logoDisplayHeightPx ?? 40);
       setLogoBaseline(
@@ -299,7 +383,7 @@ export function CorporateCompanyEditor() {
           Company profile
         </h1>
         <p className="text-muted-foreground text-[0.8125rem]">
-          Legal name, contacts and addresses used on Contact and company facts.
+          Legal name, contacts, social links and addresses used sitewide.
         </p>
       </header>
 
@@ -408,6 +492,120 @@ export function CorporateCompanyEditor() {
           </CorporateField>
 
           <div className="col-span-full mt-2 border-t border-[#e8e8ed] pt-3">
+            <p className="mb-1 text-[11px] font-semibold tracking-tight text-[#86868b]">
+              Social links
+            </p>
+            <p className="text-muted-foreground mb-3 text-[0.75rem]">
+              Shown in the site footer, mobile menu, and contact page. Use
+              https:// URLs only. Empty rows are ignored on save.
+            </p>
+            <div className="flex flex-col gap-2">
+              {socialLinks.map((link, i) => (
+                <div
+                  key={link.id}
+                  className="rounded-[8px] border border-[#e8e8ed] bg-[#fafafa] p-2.5"
+                >
+                  <div className="mb-2 flex items-center justify-between gap-2">
+                    <span className="text-[10px] font-semibold tracking-wide text-[#aeaeb2] uppercase">
+                      Link {i + 1}
+                    </span>
+                    <div className="flex items-center gap-0.5">
+                      <button
+                        type="button"
+                        className="inline-flex size-6 items-center justify-center rounded text-[#86868b] hover:bg-black/5 disabled:opacity-30"
+                        aria-label="Move up"
+                        disabled={i === 0}
+                        onClick={() => moveSocial(i, -1)}
+                      >
+                        <ChevronUp className="size-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        className="inline-flex size-6 items-center justify-center rounded text-[#86868b] hover:bg-black/5 disabled:opacity-30"
+                        aria-label="Move down"
+                        disabled={i === socialLinks.length - 1}
+                        onClick={() => moveSocial(i, 1)}
+                      >
+                        <ChevronDown className="size-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        className="inline-flex size-6 items-center justify-center rounded text-[#ff3b30] hover:bg-[#ff3b30]/10"
+                        aria-label="Remove social link"
+                        onClick={() =>
+                          setSocialLinks((rows) =>
+                            rows
+                              .filter((r) => r.id !== link.id)
+                              .map((r, order) => ({ ...r, order })),
+                          )
+                        }
+                      >
+                        <X className="size-3.5 stroke-[2.5]" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="grid gap-2 sm:grid-cols-2">
+                    <CorporateField label="Platform">
+                      <select
+                        className={corporateInputClass}
+                        value={link.platform}
+                        onChange={(e) =>
+                          updateSocial(link.id, {
+                            platform: e.target.value as SocialPlatform,
+                          })
+                        }
+                      >
+                        {SOCIAL_PLATFORMS.map((p) => (
+                          <option key={p.value} value={p.value}>
+                            {p.label}
+                          </option>
+                        ))}
+                      </select>
+                    </CorporateField>
+                    <CorporateField label="URL (https://)">
+                      <input
+                        className={corporateInputClass}
+                        type="url"
+                        placeholder="https://"
+                        value={link.url}
+                        onChange={(e) =>
+                          updateSocial(link.id, { url: e.target.value })
+                        }
+                      />
+                    </CorporateField>
+                    {link.platform === "other" ? (
+                      <CorporateField label="Label" className="sm:col-span-2">
+                        <input
+                          className={corporateInputClass}
+                          placeholder="e.g. Industry association"
+                          value={link.label ?? ""}
+                          onChange={(e) =>
+                            updateSocial(link.id, { label: e.target.value })
+                          }
+                        />
+                      </CorporateField>
+                    ) : null}
+                  </div>
+                </div>
+              ))}
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-8 justify-start px-2 text-[12px] font-medium text-[#0071e3] hover:bg-[#0071e3]/08 hover:text-[#0071e3]"
+                onClick={() =>
+                  setSocialLinks((rows) => [
+                    ...rows,
+                    newSocialLink(rows.length),
+                  ])
+                }
+              >
+                <Plus className="size-3.5" />
+                Add social link
+              </Button>
+            </div>
+          </div>
+
+          <div className="col-span-full mt-2 border-t border-[#e8e8ed] pt-3">
             <p className="mb-2 text-[11px] font-semibold tracking-tight text-[#86868b]">
               Brand logo
             </p>
@@ -426,7 +624,9 @@ export function CorporateCompanyEditor() {
                 }
               />
               <div className="flex flex-col gap-3">
-                <CorporateField label={`Display height (${logoDisplayHeightPx}px)`}>
+                <CorporateField
+                  label={`Display height (${logoDisplayHeightPx}px)`}
+                >
                   <input
                     type="range"
                     min={28}

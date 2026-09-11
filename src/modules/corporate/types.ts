@@ -19,6 +19,25 @@ export type CompanyLocationDTO = {
   order: number;
 };
 
+export type SocialPlatform =
+  | "linkedin"
+  | "facebook"
+  | "instagram"
+  | "youtube"
+  | "x"
+  | "whatsapp"
+  | "other";
+
+/** CMS-managed social profile link (footer, drawer, contact, sameAs). */
+export type SocialLinkDTO = {
+  id: string;
+  platform: SocialPlatform;
+  url: string;
+  /** Display / aria label; required when platform is `other`. */
+  label?: string;
+  order: number;
+};
+
 export type CompanyProfileDTO = {
   id: string;
   legalName: string;
@@ -41,6 +60,7 @@ export type CompanyProfileDTO = {
   logoDisplayHeightPx: number;
   brandColors: { primary?: string; secondary?: string; accent?: string };
   locations: CompanyLocationDTO[];
+  socialLinks: SocialLinkDTO[];
   locale: string;
   version: number;
   updatedAt: string;

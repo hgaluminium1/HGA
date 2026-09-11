@@ -142,6 +142,37 @@ function toCompanyDTO(doc: Record<string, unknown>): CompanyProfileDTO {
         order: l.order ?? 0,
       }))
       .sort((a, b) => a.order - b.order),
+    socialLinks: (
+      (doc.socialLinks as {
+        id: string;
+        platform: string;
+        url: string;
+        label?: string;
+        order?: number;
+      }[]) ?? []
+    )
+      .map((l) => ({
+        id: l.id,
+        platform: l.platform as CompanyProfileDTO["socialLinks"][number]["platform"],
+        url: String(l.url ?? "").trim(),
+        label: l.label,
+        order: l.order ?? 0,
+      }))
+      .filter(
+        (l) =>
+          l.id &&
+          l.url &&
+          [
+            "linkedin",
+            "facebook",
+            "instagram",
+            "youtube",
+            "x",
+            "whatsapp",
+            "other",
+          ].includes(l.platform),
+      )
+      .sort((a, b) => a.order - b.order),
     locale: String(doc.locale ?? "en"),
     version: Number(doc.version ?? 1),
     updatedAt: new Date(doc.updatedAt as Date).toISOString(),
