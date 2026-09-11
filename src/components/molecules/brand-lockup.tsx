@@ -9,7 +9,7 @@ const DEFAULT_HEIGHT = 40;
 type BrandLockupProps = {
   href: string;
   className?: string;
-  /** Kept for callers; no longer forces a white plate (transparent PNG-safe). */
+  /** Footer / dark chrome — light plate behind the mark for contrast. */
   inverted?: boolean;
   /** CMS logo URL; falls back to packaged mark. */
   src?: string | null;
@@ -26,6 +26,7 @@ function clampHeight(n: number | undefined): number {
 export function BrandLockup({
   href,
   className,
+  inverted = false,
   src,
   heightPx,
 }: BrandLockupProps) {
@@ -40,8 +41,12 @@ export function BrandLockup({
       aria-label="HG Aluminium Smelters Limited home"
     >
       <span
-        className="relative inline-flex items-center justify-center overflow-hidden"
-        style={{ height: h }}
+        className={cn(
+          "relative inline-flex items-center justify-center overflow-hidden",
+          inverted &&
+            "rounded-[var(--radius-md)] bg-white px-2 py-1 shadow-[inset_0_0_0_1px_rgb(255_255_255_/_0.12)]",
+        )}
+        style={{ height: inverted ? h + 8 : h }}
       >
         <Image
           src={imageSrc}
@@ -50,7 +55,10 @@ export function BrandLockup({
           height={h * 2}
           priority
           className="h-full w-auto object-contain"
-          style={{ maxWidth: `min(${maxW}px, 46vw)` }}
+          style={{
+            maxWidth: `min(${maxW}px, 46vw)`,
+            height: inverted ? h : "100%",
+          }}
         />
       </span>
     </Link>
