@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { Plus, X } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { CloudinaryPicker } from "@/features/admin-desk/components/cloudinary-picker";
@@ -18,20 +19,36 @@ import {
   publishProductApi,
   updateProductApi,
 } from "@/features/admin-desk/lib/catalog-api";
-import type { CategoryDTO, ProductDTO } from "@/modules/catalog/browser";
+import type {
+  CategoryDTO,
+  ChemicalCompositionRow,
+  ProductDTO,
+  ProductFormType,
+} from "@/modules/catalog/browser";
 import { cn } from "@/lib/utils";
 
 const inputClass =
   "h-8 w-full rounded-[6px] border border-[#d2d2d7] bg-white px-2.5 text-[13px] text-[#1d1d1f] outline-none focus:border-[#0071e3] focus:ring-2 focus:ring-[#0071e3]/20";
 
+const FORM_TYPES: { value: ProductFormType; label: string }[] = [
+  { value: "extrusion", label: "Extrusion profiles" },
+  { value: "billet", label: "Billets" },
+  { value: "ingot", label: "Ingots & alloys" },
+  { value: "remelt", label: "Remelt (cubes / shots)" },
+  { value: "deoxidizer", label: "Deoxidizer" },
+  { value: "other", label: "Other" },
+];
+
 function Field({
   label,
   children,
   className,
+  hint,
 }: {
   label: string;
   children: React.ReactNode;
   className?: string;
+  hint?: string;
 }) {
   return (
     <label className={cn("flex min-w-0 flex-col gap-1", className)}>
@@ -39,6 +56,9 @@ function Field({
         {label}
       </span>
       {children}
+      {hint ? (
+        <span className="text-[10px] leading-snug text-[#aeaeb2]">{hint}</span>
+      ) : null}
     </label>
   );
 }
@@ -51,6 +71,17 @@ function slugify(s: string) {
     .slice(0, 80);
 }
 
+function csvToList(s: string) {
+  return s
+    .split(/[,;\n]/)
+    .map((x) => x.trim())
+    .filter(Boolean);
+}
+
+function listToCsv(arr: string[]) {
+  return arr.join(", ");
+}
+
 type Draft = {
   sku: string;
   nameEn: string;
@@ -60,6 +91,25 @@ type Draft = {
   imageUrl: string;
   imageMediaId: string | null;
   isUpcoming: boolean;
+  formType: ProductFormType;
+  alloyGrades: string;
+  tempers: string;
+  surfaceFinishes: string;
+  anodizingColors: string;
+  ralColors: string;
+  toleranceStandards: string;
+  packaging: string;
+  applications: string;
+  highlights: string;
+  chemicalComposition: ChemicalCompositionRow[];
+  maxLengthMm: string;
+  minLengthMm: string;
+  maxWidthMm: string;
+  weightPerMeterKg: string;
+  typicalDiameterMm: string;
+  typicalPieceWeightKg: string;
+  standardsNote: string;
+  moqNote: string;
 };
 
 function fromProduct(p: ProductDTO): Draft {
@@ -72,6 +122,30 @@ function fromProduct(p: ProductDTO): Draft {
     imageUrl: p.imageUrl ?? "",
     imageMediaId: p.imageMediaId ?? null,
     isUpcoming: p.isUpcoming,
+    formType: p.formType || "other",
+    alloyGrades: listToCsv(p.alloyGrades),
+    tempers: listToCsv(p.tempers),
+    surfaceFinishes: listToCsv(p.surfaceFinishes),
+    anodizingColors: listToCsv(p.anodizingColors),
+    ralColors: listToCsv(p.ralColors),
+    toleranceStandards: listToCsv(p.toleranceStandards),
+    packaging: listToCsv(p.packaging),
+    applications: p.applications.join("\n"),
+    highlights: p.highlights.join("\n"),
+    chemicalComposition: p.chemicalComposition.length
+      ? p.chemicalComposition.map((r) => ({ ...r }))
+      : [],
+    maxLengthMm: p.maxLengthMm != null ? String(p.maxLengthMm) : "",
+    minLengthMm: p.minLengthMm != null ? String(p.minLengthMm) : "",
+    maxWidthMm: p.maxWidthMm != null ? String(p.maxWidthMm) : "",
+    weightPerMeterKg:
+      p.weightPerMeterKg != null ? String(p.weightPerMeterKg) : "",
+    typicalDiameterMm:
+      p.typicalDiameterMm != null ? String(p.typicalDiameterMm) : "",
+    typicalPieceWeightKg:
+      p.typicalPieceWeightKg != null ? String(p.typicalPieceWeightKg) : "",
+    standardsNote: p.standardsNote ?? "",
+    moqNote: p.moqNote ?? "",
   };
 }
 
@@ -84,7 +158,41 @@ const emptyDraft = (): Draft => ({
   imageUrl: "",
   imageMediaId: null,
   isUpcoming: false,
+  formType: "other",
+  alloyGrades: "",
+  tempers: "",
+  surfaceFinishes: "",
+  anodizingColors: "",
+  ralColors: "",
+  toleranceStandards: "",
+  packaging: "",
+  applications: "",
+  highlights: "",
+  chemicalComposition: [],
+  maxLengthMm: "",
+  minLengthMm: "",
+  maxWidthMm: "",
+  weightPerMeterKg: "",
+  typicalDiameterMm: "",
+  typicalPieceWeightKg: "",
+  standardsNote: "",
+  moqNote: "",
 });
+
+function numOrUndef(s: string) {
+  const t = s.trim();
+  if (!t) return undefined;
+  const n = Number(t);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <p className="col-span-full mt-2 border-t border-[#e8e8ed] pt-3 text-[11px] font-semibold tracking-tight text-[#86868b]">
+      {children}
+    </p>
+  );
+}
 
 export function CatalogueProductEditor({
   productId,
@@ -115,25 +223,28 @@ export function CatalogueProductEditor({
     Boolean(draft.categoryId) &&
     (draft.isUpcoming || Boolean(draft.imageUrl));
 
+  const patch = (partial: Partial<Draft>) =>
+    setDraft((d) => ({ ...d, ...partial }));
+
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const cats = await fetchCategoriesApi("flat");
+      const cats = await fetchCategoriesApi();
       setCategories(cats.filter((c) => !c.deletedAt));
-      if (!isNew && productId !== "new") {
-        const p = await fetchProductApi(productId);
-        const d = fromProduct(p);
-        setId(p.id);
-        setVersion(p.version);
-        setStatus(p.status);
-        setDraft(d);
-        setBaseline(JSON.stringify(d));
-      } else {
+      if (isNew) {
         const d = emptyDraft();
         setDraft(d);
         setBaseline(JSON.stringify(d));
+        return;
       }
+      const product = await fetchProductApi(productId);
+      const d = fromProduct(product);
+      setDraft(d);
+      setBaseline(JSON.stringify(d));
+      setVersion(product.version);
+      setStatus(product.status);
+      setId(product.id);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to load");
     } finally {
@@ -144,10 +255,6 @@ export function CatalogueProductEditor({
   useEffect(() => {
     void load();
   }, [load]);
-
-  function patch(partial: Partial<Draft>) {
-    setDraft((d) => ({ ...d, ...partial }));
-  }
 
   function ensureSku(slug: string, existing: string) {
     if (existing.trim()) return existing.trim();
@@ -161,11 +268,41 @@ export function CatalogueProductEditor({
       sku: ensureSku(slug, draft.sku),
       name: { en: draft.nameEn.trim() },
       slug,
-      description: draft.description,
+      description: draft.description.trim() || undefined,
       categoryIds: draft.categoryId ? [draft.categoryId] : [],
       imageUrl: draft.imageUrl || undefined,
       imageMediaId: draft.imageMediaId,
       isUpcoming: draft.isUpcoming,
+      formType: draft.formType,
+      alloyGrades: csvToList(draft.alloyGrades),
+      tempers: csvToList(draft.tempers),
+      surfaceFinishes: csvToList(draft.surfaceFinishes),
+      anodizingColors: csvToList(draft.anodizingColors),
+      ralColors: csvToList(draft.ralColors),
+      toleranceStandards: csvToList(draft.toleranceStandards),
+      packaging: csvToList(draft.packaging),
+      applications: draft.applications
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      highlights: draft.highlights
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      chemicalComposition: draft.chemicalComposition
+        .filter((r) => r.element.trim())
+        .map((r) => ({
+          element: r.element.trim(),
+          range: r.range.trim(),
+        })),
+      maxLengthMm: numOrUndef(draft.maxLengthMm),
+      minLengthMm: numOrUndef(draft.minLengthMm),
+      maxWidthMm: numOrUndef(draft.maxWidthMm),
+      weightPerMeterKg: numOrUndef(draft.weightPerMeterKg),
+      typicalDiameterMm: numOrUndef(draft.typicalDiameterMm),
+      typicalPieceWeightKg: numOrUndef(draft.typicalPieceWeightKg),
+      standardsNote: draft.standardsNote.trim() || undefined,
+      moqNote: draft.moqNote.trim() || undefined,
       seo: {},
     };
   }
@@ -195,7 +332,7 @@ export function CatalogueProductEditor({
         const d = fromProduct(updated);
         setDraft(d);
         setBaseline(JSON.stringify(d));
-        setMessage("Draft saved.");
+        setMessage("Draft saved — specs sync to the public PDP.");
       }
     } catch (err) {
       if (err instanceof ApiClientError && err.code === "CONFLICT") {
@@ -264,7 +401,8 @@ export function CatalogueProductEditor({
           {isNew && !id ? "New product" : draft.nameEn || "Product"}
         </h1>
         <p className="text-muted-foreground text-[0.8125rem]">
-          Name, one category, photo and short description. That’s all you need.
+          Identity, industrial specs and chemistry — all fields sync to the
+          public product page on publish.
         </p>
       </header>
 
@@ -306,6 +444,29 @@ export function CatalogueProductEditor({
               value={draft.slug}
               onChange={(e) => patch({ slug: e.target.value })}
             />
+          </Field>
+          <Field label="SKU">
+            <input
+              className={inputClass}
+              value={draft.sku}
+              onChange={(e) => patch({ sku: e.target.value })}
+              placeholder="Auto from slug if empty"
+            />
+          </Field>
+          <Field label="Form type">
+            <select
+              className={inputClass}
+              value={draft.formType}
+              onChange={(e) =>
+                patch({ formType: e.target.value as ProductFormType })
+              }
+            >
+              {FORM_TYPES.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
           </Field>
           <Field label="Category">
             <select
@@ -351,6 +512,203 @@ export function CatalogueProductEditor({
                 })
               }
             />
+          </div>
+
+          <SectionLabel>Specification dictionaries (comma-separated)</SectionLabel>
+          <Field label="Alloy grades" hint="e.g. 6063, 6061, ADC12">
+            <input
+              className={inputClass}
+              value={draft.alloyGrades}
+              onChange={(e) => patch({ alloyGrades: e.target.value })}
+            />
+          </Field>
+          <Field label="Tempers" hint="e.g. T5, T6, F">
+            <input
+              className={inputClass}
+              value={draft.tempers}
+              onChange={(e) => patch({ tempers: e.target.value })}
+            />
+          </Field>
+          <Field label="Surface finishes">
+            <input
+              className={inputClass}
+              value={draft.surfaceFinishes}
+              onChange={(e) => patch({ surfaceFinishes: e.target.value })}
+              placeholder="mill, anodized, powder_coated"
+            />
+          </Field>
+          <Field label="Anodizing colours">
+            <input
+              className={inputClass}
+              value={draft.anodizingColors}
+              onChange={(e) => patch({ anodizingColors: e.target.value })}
+            />
+          </Field>
+          <Field label="RAL / powder colours">
+            <input
+              className={inputClass}
+              value={draft.ralColors}
+              onChange={(e) => patch({ ralColors: e.target.value })}
+            />
+          </Field>
+          <Field label="Tolerance standards">
+            <input
+              className={inputClass}
+              value={draft.toleranceStandards}
+              onChange={(e) => patch({ toleranceStandards: e.target.value })}
+              placeholder="EN, IS, ASTM"
+            />
+          </Field>
+          <Field label="Packaging" className="sm:col-span-2">
+            <input
+              className={inputClass}
+              value={draft.packaging}
+              onChange={(e) => patch({ packaging: e.target.value })}
+              placeholder="bundle, pallet, bag, crate"
+            />
+          </Field>
+
+          <SectionLabel>Dimensions & supply</SectionLabel>
+          <Field label="Min length (mm)">
+            <input
+              className={inputClass}
+              inputMode="decimal"
+              value={draft.minLengthMm}
+              onChange={(e) => patch({ minLengthMm: e.target.value })}
+            />
+          </Field>
+          <Field label="Max length (mm)">
+            <input
+              className={inputClass}
+              inputMode="decimal"
+              value={draft.maxLengthMm}
+              onChange={(e) => patch({ maxLengthMm: e.target.value })}
+            />
+          </Field>
+          <Field label="Max width / CCD (mm)">
+            <input
+              className={inputClass}
+              inputMode="decimal"
+              value={draft.maxWidthMm}
+              onChange={(e) => patch({ maxWidthMm: e.target.value })}
+            />
+          </Field>
+          <Field label="Typical diameter (mm)">
+            <input
+              className={inputClass}
+              inputMode="decimal"
+              value={draft.typicalDiameterMm}
+              onChange={(e) => patch({ typicalDiameterMm: e.target.value })}
+            />
+          </Field>
+          <Field label="Weight per metre (kg/m)">
+            <input
+              className={inputClass}
+              inputMode="decimal"
+              value={draft.weightPerMeterKg}
+              onChange={(e) => patch({ weightPerMeterKg: e.target.value })}
+            />
+          </Field>
+          <Field label="Typical piece weight (kg)">
+            <input
+              className={inputClass}
+              inputMode="decimal"
+              value={draft.typicalPieceWeightKg}
+              onChange={(e) => patch({ typicalPieceWeightKg: e.target.value })}
+            />
+          </Field>
+          <Field label="Standards note" className="sm:col-span-2">
+            <input
+              className={inputClass}
+              value={draft.standardsNote}
+              onChange={(e) => patch({ standardsNote: e.target.value })}
+            />
+          </Field>
+          <Field label="MOQ / supply note" className="sm:col-span-2">
+            <input
+              className={inputClass}
+              value={draft.moqNote}
+              onChange={(e) => patch({ moqNote: e.target.value })}
+            />
+          </Field>
+
+          <SectionLabel>Applications & highlights (one per line)</SectionLabel>
+          <Field label="Applications" className="sm:col-span-2">
+            <textarea
+              className={cn(inputClass, "h-auto min-h-[64px] resize-y py-2")}
+              value={draft.applications}
+              onChange={(e) => patch({ applications: e.target.value })}
+              rows={3}
+            />
+          </Field>
+          <Field label="Highlights (Why HG)" className="sm:col-span-2">
+            <textarea
+              className={cn(inputClass, "h-auto min-h-[64px] resize-y py-2")}
+              value={draft.highlights}
+              onChange={(e) => patch({ highlights: e.target.value })}
+              rows={3}
+            />
+          </Field>
+
+          <SectionLabel>Chemical composition</SectionLabel>
+          <div className="col-span-full flex flex-col gap-2">
+            {draft.chemicalComposition.map((row, i) => (
+              <div
+                key={i}
+                className="grid grid-cols-[1fr_1fr_auto] gap-2 rounded-[8px] border border-[#e8e8ed] bg-[#fafafa] p-2"
+              >
+                <input
+                  className={inputClass}
+                  placeholder="Element"
+                  value={row.element}
+                  onChange={(e) => {
+                    const next = [...draft.chemicalComposition];
+                    next[i] = { ...row, element: e.target.value };
+                    patch({ chemicalComposition: next });
+                  }}
+                />
+                <input
+                  className={inputClass}
+                  placeholder="Range"
+                  value={row.range}
+                  onChange={(e) => {
+                    const next = [...draft.chemicalComposition];
+                    next[i] = { ...row, range: e.target.value };
+                    patch({ chemicalComposition: next });
+                  }}
+                />
+                <button
+                  type="button"
+                  className="inline-flex size-8 items-center justify-center rounded text-[#ff3b30] hover:bg-[#ff3b30]/10"
+                  aria-label="Remove row"
+                  onClick={() =>
+                    patch({
+                      chemicalComposition: draft.chemicalComposition.filter(
+                        (_, idx) => idx !== i,
+                      ),
+                    })
+                  }
+                >
+                  <X className="size-3.5" />
+                </button>
+              </div>
+            ))}
+            <Button
+              type="button"
+              variant="ghost"
+              className="h-8 justify-start px-2 text-[12px] font-medium text-[#0071e3] hover:bg-[#0071e3]/08 hover:text-[#0071e3]"
+              onClick={() =>
+                patch({
+                  chemicalComposition: [
+                    ...draft.chemicalComposition,
+                    { element: "", range: "" },
+                  ],
+                })
+              }
+            >
+              <Plus className="size-3.5" />
+              Add composition row
+            </Button>
           </div>
         </div>
       </div>

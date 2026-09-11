@@ -1,13 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Check } from "lucide-react";
-import type { ReactNode } from "react";
 
 import { Container } from "@/components/atoms/container";
-import { Reveal } from "@/components/atoms/reveal";
-import { Section } from "@/components/atoms/section";
-import { buttonVariants } from "@/components/ui/button";
 import { CatalogueBreadcrumbs } from "@/features/public-catalog/components/catalogue-breadcrumbs";
 import { ProductCard } from "@/features/public-catalog/components/product-card";
 import {
@@ -15,7 +10,6 @@ import {
   productImageUrl,
 } from "@/features/public-catalog/lib/product-media";
 import { EnquiryForm } from "@/features/public-site/components/enquiry-form";
-import { InquireBand } from "@/features/public-site/components/inquire-band";
 import {
   getCachedPublishedProductBySlug,
   getCachedPublishedProducts,
@@ -30,18 +24,16 @@ type ProductDetailProps = {
 };
 
 const FORM_LABEL: Record<ProductDTO["formType"], string> = {
-  extrusion: "Extrusion profiles",
-  billet: "Homogenised billets",
-  ingot: "Ingots & alloys",
-  remelt: "Remelt forms",
+  extrusion: "Extrusion",
+  billet: "Billet",
+  ingot: "Ingot",
+  remelt: "Remelt",
   deoxidizer: "Deoxidizer",
-  other: "Aluminium products",
+  other: "Product",
 };
 
 function prettyToken(value: string) {
-  return value
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase());
+  return value.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
 function formatMm(n: number | null | undefined) {
@@ -54,68 +46,60 @@ function formatKg(n: number | null | undefined, suffix = "kg") {
   return `${n.toLocaleString("en-IN", { maximumFractionDigits: 2 })} ${suffix}`;
 }
 
-function SpecRow({ label, children }: { label: string; children: ReactNode }) {
-  if (!children) return null;
+/** DigiKey-style dense label|value rows. */
+function SpecTable({ rows }: { rows: { label: string; value: string }[] }) {
+  if (!rows.length) return null;
   return (
-    <div className="grid grid-cols-[minmax(7rem,11rem)_1fr] gap-3 border-b border-black/[0.06] py-3 last:border-b-0">
-      <dt className="text-text-faint text-[0.75rem] font-semibold tracking-wide uppercase">
-        {label}
-      </dt>
-      <dd className="text-sm leading-relaxed text-ink">{children}</dd>
-    </div>
+    <table className="w-full border-collapse text-left text-[0.8125rem]">
+      <tbody>
+        {rows.map((row, i) => (
+          <tr
+            key={row.label}
+            className={cn(
+              "border-b border-black/[0.06]",
+              i % 2 === 0 ? "bg-bg-alt/50" : "bg-surface",
+            )}
+          >
+            <th
+              scope="row"
+              className="w-[36%] max-w-[10.5rem] px-3 py-2 align-top font-medium text-ink sm:w-[10.5rem]"
+            >
+              {row.label}
+            </th>
+            <td className="text-muted-foreground px-3 py-2 align-top">
+              {row.value}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
   );
 }
 
-function ChipList({ values }: { values: string[] }) {
-  if (!values.length) return null;
-  return (
-    <ul className="flex flex-wrap gap-1.5">
-      {values.map((v) => (
-        <li
-          key={v}
-          className="rounded-full border border-line bg-bg-alt px-2.5 py-0.5 text-[0.75rem] font-medium text-ink"
-        >
-          {prettyToken(v)}
-        </li>
-      ))}
-    </ul>
-  );
-}
-
-function buildSpecRows(product: ProductDTO) {
-  const rows: { label: string; node: ReactNode }[] = [];
-
+function buildSpecRows(product: ProductDTO): { label: string; value: string }[] {
+  const rows: { label: string; value: string }[] = [];
+  if (product.sku) rows.push({ label: "SKU", value: product.sku });
   if (product.alloyGrades.length) {
-    rows.push({
-      label: "Alloy grades",
-      node: <ChipList values={product.alloyGrades} />,
-    });
+    rows.push({ label: "Alloy grades", value: product.alloyGrades.join(", ") });
   }
   if (product.tempers.length) {
-    rows.push({
-      label: "Tempers",
-      node: <ChipList values={product.tempers} />,
-    });
+    rows.push({ label: "Tempers", value: product.tempers.join(", ") });
   }
   if (product.surfaceFinishes.length) {
     rows.push({
       label: "Surface",
-      node: <ChipList values={product.surfaceFinishes} />,
+      value: product.surfaceFinishes.map(prettyToken).join(", "),
     });
   }
   if (product.anodizingColors.length) {
     rows.push({
       label: "Anodizing",
-      node: <ChipList values={product.anodizingColors} />,
+      value: product.anodizingColors.map(prettyToken).join(", "),
     });
   }
   if (product.ralColors.length) {
-    rows.push({
-      label: "Powder colours",
-      node: <ChipList values={product.ralColors} />,
-    });
+    rows.push({ label: "Powder colours", value: product.ralColors.join(", ") });
   }
-
   const lengthParts = [
     product.minLengthMm != null ? formatMm(product.minLengthMm) : null,
     product.maxLengthMm != null ? formatMm(product.maxLengthMm) : null,
@@ -123,61 +107,47 @@ function buildSpecRows(product: ProductDTO) {
   if (lengthParts.length) {
     rows.push({
       label: "Length",
-      node:
+      value:
         lengthParts.length === 2
           ? `${lengthParts[0]} – ${lengthParts[1]}`
-          : lengthParts[0],
+          : String(lengthParts[0]),
     });
   }
-
   const diameter = formatMm(product.typicalDiameterMm);
-  if (diameter) {
-    rows.push({ label: "Typical diameter", node: diameter });
-  }
-
+  if (diameter) rows.push({ label: "Diameter", value: diameter });
   const width = formatMm(product.maxWidthMm);
-  if (width) {
-    rows.push({ label: "CCD / max width", node: width });
-  }
-
+  if (width) rows.push({ label: "CCD / max width", value: width });
   const wpm = formatKg(product.weightPerMeterKg, "kg/m");
-  if (wpm) {
-    rows.push({ label: "Mass (indicative)", node: wpm });
-  }
-
+  if (wpm) rows.push({ label: "Mass", value: wpm });
   const piece = formatKg(product.typicalPieceWeightKg);
-  if (piece) {
-    rows.push({ label: "Piece weight", node: `~ ${piece}` });
-  }
-
+  if (piece) rows.push({ label: "Piece weight", value: `~ ${piece}` });
   if (product.toleranceStandards.length) {
     rows.push({
       label: "Tolerances",
-      node: product.toleranceStandards.map(prettyToken).join(" · "),
+      value: product.toleranceStandards.map(prettyToken).join(", "),
     });
   }
   if (product.packaging.length) {
     rows.push({
       label: "Packaging",
-      node: product.packaging.map(prettyToken).join(" · "),
+      value: product.packaging.map(prettyToken).join(", "),
     });
   }
   if (product.standardsNote?.trim()) {
-    rows.push({ label: "Standards", node: product.standardsNote.trim() });
+    rows.push({ label: "Standards", value: product.standardsNote.trim() });
   }
   if (product.moqNote?.trim()) {
-    rows.push({ label: "Supply", node: product.moqNote.trim() });
+    rows.push({ label: "Supply", value: product.moqNote.trim() });
   }
-  if (product.sku) {
-    rows.push({ label: "SKU", node: product.sku });
-  }
-
   return rows;
 }
 
 /**
- * Industrial PDP — alloy / temper / dimensions / chemistry / applications.
- * Data from CMS Product; empty groups stay hidden.
+ * Strict enterprise PDP (DigiKey / McMaster procurement pattern):
+ * - Tiny identification thumb — not a hero collage
+ * - Dense specs left; ONE conversion surface (sticky RFQ rail)
+ * - No second form, no “enquire” button cluster, no page-level inquire band
+ * Site header “Enquire” stays as global chrome only.
  */
 export async function ProductDetail({ locale, slug }: ProductDetailProps) {
   const product = await getCachedPublishedProductBySlug(slug);
@@ -185,8 +155,6 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
 
   const upcoming = Boolean(product.isUpcoming);
   const image = productImageUrl(product);
-  const enquireHref = `#enquire`;
-  const contactHref = `contact?product=${encodeURIComponent(product.name.en)}`;
 
   const categories = await listCategoriesFlat();
   const primaryCategory = categories.find((c) =>
@@ -203,10 +171,7 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
         upcoming: upcoming ? true : false,
         categoryId: relatedCategoryId,
       })
-    : await getCachedPublishedProducts({
-        limit: 8,
-        upcoming: false,
-      });
+    : await getCachedPublishedProducts({ limit: 8, upcoming: false });
   const related = relatedPool.filter((p) => p.id !== product.id).slice(0, 3);
 
   const crumbs = [
@@ -219,278 +184,221 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
 
   const specRows = buildSpecRows(product);
   const formLabel = FORM_LABEL[product.formType] || FORM_LABEL.other;
+  const rfqTitle = upcoming ? "Register interest" : "Request quote";
 
   return (
-    <>
-      <section className="border-line border-b bg-bg">
-        <Container className="py-[clamp(1.35rem,3vw,2rem)]">
-          <CatalogueBreadcrumbs
-            locale={locale}
-            items={crumbs}
-            className="mb-4"
-          />
-          <div className="grid gap-8 min-[900px]:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] min-[900px]:items-start min-[900px]:gap-10 min-[1100px]:gap-14">
-            <Reveal className="relative aspect-[5/4] overflow-hidden rounded-[var(--radius-lg)] bg-bg-alt shadow-[var(--shadow-sm)] min-[900px]:aspect-[4/3] min-[900px]:min-h-[22rem]">
-              <Image
-                src={image}
-                alt={product.name.en}
-                fill
-                className="object-cover"
-                sizes="(min-width: 900px) 40rem, 100vw"
-                priority
-              />
-              {upcoming ? (
-                <span className="absolute top-4 left-4 rounded-full bg-ink/90 px-3 py-1 text-xs font-bold tracking-wide text-brand-red uppercase">
-                  Coming soon
+    <div className="bg-bg pb-[4.25rem] min-[900px]:pb-0">
+      <Container className="py-4 sm:py-5">
+        <CatalogueBreadcrumbs locale={locale} items={crumbs} className="mb-3" />
+
+        {/* Compact identity — thumb + copy. Zero enquire buttons here. */}
+        <header className="border-line flex gap-3.5 border-b pb-4 min-[640px]:gap-5">
+          <div className="relative aspect-square w-[4.75rem] shrink-0 overflow-hidden rounded-[var(--radius-md)] bg-bg-alt ring-1 ring-black/[0.06] min-[640px]:w-[5.5rem]">
+            <Image
+              src={image}
+              alt=""
+              fill
+              className="object-cover"
+              sizes="88px"
+              priority
+            />
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+              <span className="text-[0.65rem] font-bold tracking-[0.12em] text-brand-blue uppercase">
+                {upcoming ? "Coming soon" : formLabel}
+              </span>
+              {product.sku ? (
+                <span className="text-text-faint font-mono text-[0.7rem]">
+                  {product.sku}
                 </span>
               ) : null}
-            </Reveal>
-
-            <Reveal>
-              <p className="text-[0.7rem] font-bold tracking-[0.14em] text-brand-red uppercase">
-                {upcoming ? "Coming soon" : formLabel}
-              </p>
-              <h1 className="font-display mt-2 text-[clamp(1.65rem,1.25rem+1.6vw,2.5rem)] font-semibold leading-[1.1] tracking-tight text-balance text-ink">
-                {product.name.en}
-              </h1>
-              {product.description ? (
-                <p className="text-muted-foreground mt-3 max-w-[42rem] text-[0.975rem] leading-relaxed">
-                  {product.description}
-                </p>
-              ) : null}
-
-              {product.alloyGrades.length ? (
-                <div className="mt-5">
-                  <p className="text-text-faint mb-2 text-[0.65rem] font-bold tracking-[0.12em] uppercase">
-                    Available alloys
-                  </p>
-                  <ChipList values={product.alloyGrades} />
-                </div>
-              ) : null}
-
-              <div className="mt-7 flex flex-wrap gap-3">
-                <Link
-                  href={enquireHref}
-                  className={cn(buttonVariants({ variant: "default" }), "min-h-11")}
-                >
-                  {upcoming ? "Register interest" : "Enquire on this line"}
-                </Link>
-                <Link
-                  href={localePath(locale, contactHref)}
-                  className={cn(buttonVariants({ variant: "outline" }), "min-h-11")}
-                >
-                  Full RFQ form
-                </Link>
-              </div>
-
-              {product.moqNote ? (
-                <p className="text-muted-foreground mt-4 text-xs leading-relaxed">
-                  {product.moqNote}
-                </p>
-              ) : null}
-            </Reveal>
-          </div>
-        </Container>
-      </section>
-
-      <Section appearance="compact">
-        <Container>
-          <div className="grid gap-10 min-[900px]:grid-cols-[minmax(0,1.15fr)_minmax(16rem,0.85fr)] min-[900px]:gap-12">
-            <div className="space-y-10">
-              {specRows.length ? (
-                <Reveal>
-                  <h2 className="font-display text-lg font-semibold text-ink">
-                    Technical specifications
-                  </h2>
-                  <p className="text-muted-foreground mt-1.5 text-sm">
-                    Indicative plant capability — confirm alloy, temper and
-                    packing on enquiry.
-                  </p>
-                  <dl className="border-line mt-5 rounded-[var(--radius-lg)] border bg-surface px-4 sm:px-5">
-                    {specRows.map((row) => (
-                      <SpecRow key={row.label} label={row.label}>
-                        {row.node}
-                      </SpecRow>
-                    ))}
-                  </dl>
-                </Reveal>
-              ) : null}
-
-              {product.chemicalComposition.length ? (
-                <Reveal>
-                  <h2 className="font-display text-lg font-semibold text-ink">
-                    Chemical composition
-                  </h2>
-                  <p className="text-muted-foreground mt-1.5 text-sm">
-                    Typical / agreed ranges (wt%). Final lot chemistry on mill
-                    certificate.
-                  </p>
-                  <div className="border-line mt-5 overflow-hidden rounded-[var(--radius-lg)] border">
-                    <table className="w-full text-left text-sm">
-                      <thead className="bg-bg-alt text-text-faint text-[0.7rem] tracking-wide uppercase">
-                        <tr>
-                          <th className="px-4 py-2.5 font-semibold">Element</th>
-                          <th className="px-4 py-2.5 font-semibold">Range</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {product.chemicalComposition.map((row) => (
-                          <tr
-                            key={row.element}
-                            className="border-t border-black/[0.06]"
-                          >
-                            <td className="px-4 py-2.5 font-medium text-ink">
-                              {row.element}
-                            </td>
-                            <td className="text-muted-foreground px-4 py-2.5">
-                              {row.range || "—"}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </Reveal>
-              ) : null}
-
-              {product.applications.length ? (
-                <Reveal>
-                  <h2 className="font-display text-lg font-semibold text-ink">
-                    Typical applications
-                  </h2>
-                  <ul className="mt-4 grid gap-2 min-[560px]:grid-cols-2">
-                    {product.applications.map((app) => (
-                      <li
-                        key={app}
-                        className="border-line flex items-start gap-2.5 rounded-[var(--radius-md)] border bg-bg-alt/40 px-3 py-2.5 text-sm text-ink"
-                      >
-                        <Check
-                          className="text-brand-blue mt-0.5 size-4 shrink-0"
-                          aria-hidden
-                        />
-                        {app}
-                      </li>
-                    ))}
-                  </ul>
-                </Reveal>
-              ) : null}
-
-              <div
-                id="enquire"
-                className="border-line bg-surface scroll-mt-24 rounded-[var(--radius-lg)] border p-5 shadow-[var(--shadow-sm)] sm:p-6"
-              >
-                <h2 className="font-display text-[clamp(1.2rem,1.05rem+0.5vw,1.4rem)] font-semibold text-ink">
-                  {upcoming ? "Register interest" : "Enquire about this product"}
-                </h2>
-                <p className="text-muted-foreground mt-2 max-w-[48ch] text-sm leading-relaxed">
-                  Share alloy preference, monthly tonnage and destination —
-                  sales confirms feasibility and lead time.
-                </p>
-                <EnquiryForm
-                  locale={locale}
-                  defaultProduct={product.name.en}
-                  productSlug={product.slug}
-                  source="product"
-                  className="mt-5"
-                />
-              </div>
-            </div>
-
-            <aside className="min-[900px]:sticky min-[900px]:top-24 min-[900px]:self-start">
-              <Reveal className="border-line space-y-5 rounded-[var(--radius-lg)] border bg-bg-alt/50 p-4 sm:p-5">
-                {product.highlights.length ? (
-                  <div>
-                    <p className="text-text-faint mb-2.5 text-[0.7rem] font-bold tracking-[0.1em] uppercase">
-                      Why HG
-                    </p>
-                    <ul className="space-y-2.5">
-                      {product.highlights.map((h) => (
-                        <li
-                          key={h}
-                          className="flex gap-2 text-sm leading-relaxed text-ink"
-                        >
-                          <Check
-                            className="text-brand-red mt-0.5 size-4 shrink-0"
-                            aria-hidden
-                          />
-                          {h}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                ) : null}
-
-                <div className={product.highlights.length ? "border-line border-t pt-4" : undefined}>
-                  <p className="text-text-faint mb-2 text-[0.7rem] font-bold tracking-[0.1em] uppercase">
-                    Programme next step
-                  </p>
-                  <p className="text-muted-foreground text-sm leading-relaxed">
-                    Feasibility first — die / casting fit and lead time before a
-                    commercial offer.
-                  </p>
+              {categoryHref && primaryCategory ? (
+                <>
+                  <span className="text-text-faint text-[0.7rem]" aria-hidden>
+                    ·
+                  </span>
                   <Link
-                    href={enquireHref}
-                    className={cn(
-                      buttonVariants({ variant: "default", size: "sm" }),
-                      "mt-4 w-full",
-                    )}
+                    href={localePath(locale, categoryHref)}
+                    className="text-muted-foreground hover:text-brand-blue text-[0.75rem] font-medium hover:underline"
                   >
-                    {upcoming ? "Register interest" : "Start enquiry"}
+                    {primaryCategory.name.en}
                   </Link>
-                  {primaryCategory && categoryHref ? (
-                    <Link
-                      href={localePath(locale, categoryHref)}
-                      className="text-brand-blue mt-3 inline-flex text-sm font-semibold hover:underline"
-                    >
-                      More in {primaryCategory.name.en} →
-                    </Link>
-                  ) : (
-                    <Link
-                      href={localePath(locale, "products")}
-                      className="text-brand-blue mt-3 inline-flex text-sm font-semibold hover:underline"
-                    >
-                      Full catalogue →
-                    </Link>
-                  )}
+                </>
+              ) : null}
+            </div>
+            <h1 className="font-display mt-1 text-[clamp(1.25rem,1.1rem+0.7vw,1.65rem)] font-semibold leading-tight tracking-tight text-ink">
+              {product.name.en}
+            </h1>
+            {product.description ? (
+              <p className="text-muted-foreground mt-1.5 max-w-[36rem] text-[0.8125rem] leading-relaxed">
+                {product.description}
+              </p>
+            ) : null}
+            {product.alloyGrades.length ? (
+              <p className="text-muted-foreground mt-2 text-[0.75rem] leading-snug">
+                <span className="font-semibold text-ink">Grades </span>
+                {product.alloyGrades.join(" · ")}
+              </p>
+            ) : null}
+          </div>
+        </header>
+
+        {/* Specs + single RFQ rail — the only conversion surface on this page */}
+        <div className="mt-4 grid gap-5 min-[900px]:grid-cols-[minmax(0,1fr)_minmax(15.5rem,17.5rem)] min-[900px]:items-start min-[900px]:gap-6">
+          <div className="min-w-0 space-y-5">
+            {specRows.length ? (
+              <section aria-labelledby="specs-heading">
+                <h2
+                  id="specs-heading"
+                  className="font-display text-[0.9rem] font-semibold text-ink"
+                >
+                  Specifications
+                </h2>
+                <div className="border-line mt-1.5 overflow-hidden rounded-[var(--radius-md)] border">
+                  <SpecTable rows={specRows} />
                 </div>
-              </Reveal>
-            </aside>
+              </section>
+            ) : null}
+
+            {product.chemicalComposition.length ? (
+              <section aria-labelledby="chem-heading">
+                <h2
+                  id="chem-heading"
+                  className="font-display text-[0.9rem] font-semibold text-ink"
+                >
+                  Chemical composition
+                </h2>
+                <p className="text-text-faint mt-0.5 text-[0.7rem]">
+                  Typical / agreed ranges (wt%). Lot values on mill certificate.
+                </p>
+                <div className="border-line mt-1.5 overflow-x-auto rounded-[var(--radius-md)] border">
+                  <table className="w-full min-w-[14rem] border-collapse text-left text-[0.8125rem]">
+                    <thead>
+                      <tr className="bg-bg-alt text-text-faint text-[0.65rem] tracking-wide uppercase">
+                        <th className="px-3 py-1.5 font-semibold">Element</th>
+                        <th className="px-3 py-1.5 font-semibold">Range</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {product.chemicalComposition.map((row, i) => (
+                        <tr
+                          key={row.element}
+                          className={cn(
+                            "border-t border-black/[0.06]",
+                            i % 2 === 0 ? "bg-surface" : "bg-bg-alt/40",
+                          )}
+                        >
+                          <td className="px-3 py-1.5 font-medium text-ink">
+                            {row.element}
+                          </td>
+                          <td className="text-muted-foreground px-3 py-1.5">
+                            {row.range || "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </section>
+            ) : null}
+
+            {product.applications.length ? (
+              <section aria-labelledby="apps-heading">
+                <h2
+                  id="apps-heading"
+                  className="font-display text-[0.9rem] font-semibold text-ink"
+                >
+                  Applications
+                </h2>
+                <ul className="mt-1.5 flex flex-wrap gap-1.5">
+                  {product.applications.map((app) => (
+                    <li
+                      key={app}
+                      className="border-line rounded-full border bg-bg-alt px-2.5 py-1 text-[0.75rem] text-ink"
+                    >
+                      {app}
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
+
+            {product.highlights.length ? (
+              <section aria-labelledby="why-heading">
+                <h2
+                  id="why-heading"
+                  className="font-display text-[0.9rem] font-semibold text-ink"
+                >
+                  Programme notes
+                </h2>
+                <ul className="text-muted-foreground mt-1.5 list-disc space-y-1 pl-4 text-[0.8125rem] leading-relaxed">
+                  {product.highlights.map((h) => (
+                    <li key={h}>{h}</li>
+                  ))}
+                </ul>
+              </section>
+            ) : null}
           </div>
 
-          {related.length ? (
-            <div className="mt-14">
-              <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-                <h2 className="font-display text-xl font-semibold text-ink">
-                  Related lines
-                </h2>
-                <Link
-                  href={localePath(
-                    locale,
-                    categoryHref ??
-                      (upcoming ? "products#upcoming" : "products"),
-                  )}
-                  className="text-brand-blue text-sm font-semibold hover:underline"
-                >
-                  View category →
-                </Link>
-              </div>
-              <ul className="grid gap-4 min-[640px]:grid-cols-2 min-[640px]:gap-5 min-[1024px]:grid-cols-3">
-                {related.map((item) => (
-                  <li key={item.id}>
-                    <ProductCard locale={locale} product={item} />
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ) : null}
-        </Container>
-      </Section>
+          <aside
+            id="rfq"
+            className="border-line scroll-mt-24 rounded-[var(--radius-md)] border bg-surface p-3.5 shadow-[var(--shadow-sm)] min-[900px]:sticky min-[900px]:top-20"
+          >
+            <h2 className="font-display text-[0.875rem] font-semibold text-ink">
+              {rfqTitle}
+            </h2>
+            <p className="text-muted-foreground mt-1 text-[0.72rem] leading-snug">
+              Alloy, tonnage, destination — sales confirms lead time.
+            </p>
+            <EnquiryForm
+              locale={locale}
+              defaultProduct={product.name.en}
+              productSlug={product.slug}
+              source="product"
+              density="compact"
+              className="mt-3"
+            />
+          </aside>
+        </div>
 
-      <InquireBand
-        locale={locale}
-        title="Need a related alloy, billet size or custom profile?"
-        ctaHref={contactHref}
-      />
-    </>
+        {related.length ? (
+          <section className="border-line mt-7 border-t pt-5">
+            <div className="mb-3 flex items-baseline justify-between gap-3">
+              <h2 className="font-display text-[0.9rem] font-semibold text-ink">
+                Related
+              </h2>
+              <Link
+                href={localePath(
+                  locale,
+                  categoryHref ?? (upcoming ? "products#upcoming" : "products"),
+                )}
+                className="text-brand-blue text-[0.75rem] font-semibold hover:underline"
+              >
+                Catalogue →
+              </Link>
+            </div>
+            <ul className="grid gap-3 min-[560px]:grid-cols-2 min-[900px]:grid-cols-3">
+              {related.map((item) => (
+                <li key={item.id}>
+                  <ProductCard locale={locale} product={item} />
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+      </Container>
+
+      {/* Mobile only: jump to the one RFQ rail — not a second form */}
+      <div className="border-line bg-surface/95 fixed inset-x-0 bottom-0 z-40 border-t p-2.5 backdrop-blur-md min-[900px]:hidden">
+        <a
+          href="#rfq"
+          className="bg-brand-red text-brand-red-fg flex min-h-10 w-full items-center justify-center rounded-[var(--radius-md)] text-[0.8125rem] font-semibold"
+        >
+          {rfqTitle}
+        </a>
+      </div>
+    </div>
   );
 }
