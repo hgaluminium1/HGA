@@ -163,8 +163,6 @@ export function CatalogueProductEditor({
       slug,
       description: draft.description,
       categoryIds: draft.categoryId ? [draft.categoryId] : [],
-      alloyGrades: [] as string[],
-      tempers: [] as string[],
       imageUrl: draft.imageUrl || undefined,
       imageMediaId: draft.imageMediaId,
       isUpcoming: draft.isUpcoming,

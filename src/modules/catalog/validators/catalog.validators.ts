@@ -58,11 +58,26 @@ export const moveCategorySchema = z.object({
   version: z.number().int(),
 });
 
+export const productFormTypeSchema = z.enum([
+  "extrusion",
+  "billet",
+  "ingot",
+  "remelt",
+  "deoxidizer",
+  "other",
+]);
+
+export const chemicalCompositionRowSchema = z.object({
+  element: z.string().min(1),
+  range: z.string().default(""),
+});
+
 export const createProductSchema = z.object({
   sku: z.string().min(1),
   name: localizedStringSchema,
   slug: z.string().min(1),
   categoryIds: z.array(z.string()).default([]),
+  formType: productFormTypeSchema.optional().default("other"),
   alloyGrades: z.array(z.string()).default([]),
   tempers: z.array(z.string()).default([]),
   surfaceFinishes: z.array(z.string()).default([]),
@@ -70,10 +85,17 @@ export const createProductSchema = z.object({
   ralColors: z.array(z.string()).default([]),
   toleranceStandards: z.array(z.string()).default([]),
   packaging: z.array(z.string()).default([]),
+  applications: z.array(z.string()).default([]),
+  highlights: z.array(z.string()).default([]),
+  chemicalComposition: z.array(chemicalCompositionRowSchema).default([]),
   maxLengthMm: z.number().optional(),
   minLengthMm: z.number().optional(),
   maxWidthMm: z.number().optional(),
   weightPerMeterKg: z.number().optional(),
+  typicalDiameterMm: z.number().optional(),
+  typicalPieceWeightKg: z.number().optional(),
+  standardsNote: z.string().optional(),
+  moqNote: z.string().optional(),
   description: z.string().optional(),
   imageUrl: z.string().optional(),
   imageMediaId: z.string().nullable().optional(),
@@ -92,6 +114,7 @@ export const updateProductSchema = createProductSchema
   .omit({
     // Defaults on create must not apply during partial updates (publish wipe bug).
     categoryIds: true,
+    formType: true,
     alloyGrades: true,
     tempers: true,
     surfaceFinishes: true,
@@ -99,9 +122,13 @@ export const updateProductSchema = createProductSchema
     ralColors: true,
     toleranceStandards: true,
     packaging: true,
+    applications: true,
+    highlights: true,
+    chemicalComposition: true,
   })
   .extend({
     categoryIds: z.array(z.string()).optional(),
+    formType: productFormTypeSchema.optional(),
     alloyGrades: z.array(z.string()).optional(),
     tempers: z.array(z.string()).optional(),
     surfaceFinishes: z.array(z.string()).optional(),
@@ -109,6 +136,9 @@ export const updateProductSchema = createProductSchema
     ralColors: z.array(z.string()).optional(),
     toleranceStandards: z.array(z.string()).optional(),
     packaging: z.array(z.string()).optional(),
+    applications: z.array(z.string()).optional(),
+    highlights: z.array(z.string()).optional(),
+    chemicalComposition: z.array(chemicalCompositionRowSchema).optional(),
   })
   .partial()
   .extend({

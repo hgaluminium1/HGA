@@ -30,6 +30,7 @@ function toDTO(doc: Record<string, unknown>): ProductDTO {
     name: mapToObj(doc.name),
     slug: String(doc.slug),
     categoryIds: ((doc.categoryIds as unknown[]) ?? []).map(String),
+    formType: (doc.formType as ProductDTO["formType"]) || "other",
     alloyGrades: (doc.alloyGrades as string[]) ?? [],
     tempers: (doc.tempers as string[]) ?? [],
     surfaceFinishes: (doc.surfaceFinishes as string[]) ?? [],
@@ -37,10 +38,24 @@ function toDTO(doc: Record<string, unknown>): ProductDTO {
     ralColors: (doc.ralColors as string[]) ?? [],
     toleranceStandards: (doc.toleranceStandards as string[]) ?? [],
     packaging: (doc.packaging as string[]) ?? [],
+    applications: (doc.applications as string[]) ?? [],
+    highlights: (doc.highlights as string[]) ?? [],
+    chemicalComposition: (
+      (doc.chemicalComposition as { element?: string; range?: string }[]) ?? []
+    )
+      .filter((r) => r.element?.trim())
+      .map((r) => ({
+        element: String(r.element).trim(),
+        range: String(r.range ?? "").trim(),
+      })),
     maxLengthMm: (doc.maxLengthMm as number | null) ?? null,
     minLengthMm: (doc.minLengthMm as number | null) ?? null,
     maxWidthMm: (doc.maxWidthMm as number | null) ?? null,
     weightPerMeterKg: (doc.weightPerMeterKg as number | null) ?? null,
+    typicalDiameterMm: (doc.typicalDiameterMm as number | null) ?? null,
+    typicalPieceWeightKg: (doc.typicalPieceWeightKg as number | null) ?? null,
+    standardsNote: (doc.standardsNote as string | null) ?? null,
+    moqNote: (doc.moqNote as string | null) ?? null,
     description: (doc.description as string | null) ?? null,
     imageUrl: (doc.imageUrl as string | null) ?? null,
     imageMediaId: (doc.imageMediaId as string | null) ?? null,
@@ -181,7 +196,7 @@ export async function getPublishedProductBySlug(slug: string) {
 }
 
 export async function createProduct(
-  input: z.infer<typeof createProductSchema>,
+  input: z.input<typeof createProductSchema>,
 ) {
   const data = createProductSchema.parse(input);
   await requireDb();

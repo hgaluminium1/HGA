@@ -9,6 +9,7 @@ const sample: ProductDTO = {
   name: { en: "Aluminium Billets" },
   slug: "billets",
   categoryIds: [],
+  formType: "billet",
   alloyGrades: ["6063", "6061", "6082"],
   tempers: [],
   surfaceFinishes: [],
@@ -16,6 +17,9 @@ const sample: ProductDTO = {
   ralColors: [],
   toleranceStandards: [],
   packaging: [],
+  applications: [],
+  highlights: [],
+  chemicalComposition: [],
   description:
     "Homogenised billets for architectural and industrial extrusion programmes.",
   imageUrl: "https://picsum.photos/seed/hg-billets/700/525",

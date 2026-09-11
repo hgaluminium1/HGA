@@ -20,12 +20,27 @@ export type CategoryDTO = {
   productCount?: number;
 };
 
+export type ProductFormType =
+  | "extrusion"
+  | "billet"
+  | "ingot"
+  | "remelt"
+  | "deoxidizer"
+  | "other";
+
+export type ChemicalCompositionRow = {
+  element: string;
+  range: string;
+};
+
 export type ProductDTO = {
   id: string;
   sku: string;
   name: LocalizedString;
   slug: string;
   categoryIds: string[];
+  /** Product family — drives which dimension fields matter on the PDP. */
+  formType: ProductFormType;
   alloyGrades: string[];
   tempers: string[];
   surfaceFinishes: string[];
@@ -33,10 +48,17 @@ export type ProductDTO = {
   ralColors: string[];
   toleranceStandards: string[];
   packaging: string[];
+  applications: string[];
+  highlights: string[];
+  chemicalComposition: ChemicalCompositionRow[];
   maxLengthMm?: number | null;
   minLengthMm?: number | null;
   maxWidthMm?: number | null;
   weightPerMeterKg?: number | null;
+  typicalDiameterMm?: number | null;
+  typicalPieceWeightKg?: number | null;
+  standardsNote?: string | null;
+  moqNote?: string | null;
   description?: string | null;
   imageUrl?: string | null;
   imageMediaId?: string | null;
