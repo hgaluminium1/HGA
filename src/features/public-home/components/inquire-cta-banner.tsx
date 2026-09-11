@@ -32,10 +32,10 @@ export function InquireCtaBanner({ locale, content }: InquireCtaBannerProps) {
           </h3>
           <Link
             href={localePath(locale, content.ctaHref)}
-            className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] bg-white px-5 text-[0.875rem] font-semibold tracking-tight text-ink transition-[transform,background] hover:bg-white/95 hover:scale-[1.01]"
+            className="inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-6 text-[0.875rem] font-semibold tracking-tight text-ink transition-[transform,background] hover:bg-white/95 hover:scale-[1.01]"
           >
             {content.ctaLabel}
-            <ArrowRight className="size-4" />
+            <ArrowRight className="size-4" aria-hidden />
           </Link>
         </Reveal>
       </Container>

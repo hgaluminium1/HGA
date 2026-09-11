@@ -23,7 +23,7 @@ import {
 } from "react";
 
 import { BrandLockup } from "@/components/molecules/brand-lockup";
-import { SocialLinks } from "@/components/molecules/social-links";
+import { SocialLinks, type SocialLinkItem } from "@/components/molecules/social-links";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -55,7 +55,6 @@ import {
 } from "@/config/nav.config";
 import { siteConfig } from "@/config/site.config";
 import { cn } from "@/lib/utils";
-import type { SocialLinkDTO } from "@/modules/corporate/types";
 
 type SiteHeaderProps = {
   locale: string;
@@ -67,7 +66,7 @@ type SiteHeaderProps = {
   /** Injected by app/features (e.g. PWA Install) — keeps organisms free of feature imports. */
   toolbarExtra?: ReactNode;
   drawerExtra?: ReactNode;
-  socialLinks?: Pick<SocialLinkDTO, "id" | "platform" | "url" | "label">[];
+  socialLinks?: SocialLinkItem[];
 };
 
 type MenuKey = "products" | "company";

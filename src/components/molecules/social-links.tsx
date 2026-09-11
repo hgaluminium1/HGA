@@ -1,7 +1,23 @@
 import { ExternalLink } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import type { SocialLinkDTO, SocialPlatform } from "@/modules/corporate/types";
+
+/** Public social link shape — kept in components to avoid modules boundary imports. */
+export type SocialPlatform =
+  | "linkedin"
+  | "facebook"
+  | "instagram"
+  | "youtube"
+  | "x"
+  | "whatsapp"
+  | "other";
+
+export type SocialLinkItem = {
+  id: string;
+  platform: SocialPlatform;
+  url: string;
+  label?: string;
+};
 
 const PLATFORM_LABELS: Record<SocialPlatform, string> = {
   linkedin: "LinkedIn",
@@ -73,7 +89,7 @@ function PlatformIcon({
 }
 
 export type SocialLinksProps = {
-  links: Pick<SocialLinkDTO, "id" | "platform" | "url" | "label">[];
+  links: SocialLinkItem[];
   variant?: "onDark" | "onLight";
   className?: string;
   /** Accessible name for the list (e.g. "Social media"). */
