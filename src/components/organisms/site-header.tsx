@@ -11,7 +11,6 @@ import {
   Menu,
   Recycle,
   Search,
-  X,
 } from "lucide-react";
 import {
   useCallback,
@@ -31,12 +30,6 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import {
   Accordion,
   AccordionContent,
@@ -67,6 +60,8 @@ type SiteHeaderProps = {
   toolbarExtra?: ReactNode;
   drawerExtra?: ReactNode;
   socialLinks?: SocialLinkItem[];
+  /** Opens site search palette (wired from SiteSearchProvider). */
+  onSearchOpen?: () => void;
 };
 
 type MenuKey = "products" | "company";
@@ -543,11 +538,11 @@ export function SiteHeader({
   toolbarExtra,
   drawerExtra,
   socialLinks = [],
+  onSearchOpen,
 }: SiteHeaderProps) {
   const navId = useId();
   const [openMenu, setOpenMenu] = useState<MenuKey | null>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const [searchOpen, setSearchOpen] = useState(false);
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const clearCloseTimer = useCallback(() => {
@@ -688,7 +683,8 @@ export function SiteHeader({
                 size="icon"
                 className="size-9 min-[400px]:size-10"
                 aria-label="Open search"
-                onClick={() => setSearchOpen(true)}
+                aria-keyshortcuts="Meta+K Control+K"
+                onClick={() => onSearchOpen?.()}
               >
                 <Search className="size-[18px] min-[400px]:size-[19px]" />
               </Button>
@@ -874,6 +870,18 @@ export function SiteHeader({
                 />
               ) : null}
               <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  setDrawerOpen(false);
+                  onSearchOpen?.();
+                }}
+              >
+                <Search className="size-4" aria-hidden />
+                Search
+              </Button>
+              <Button
                 className="w-full"
                 render={<Link href={localePath(locale, "contact")} />}
                 onClick={() => setDrawerOpen(false)}
@@ -884,38 +892,6 @@ export function SiteHeader({
           </div>
         </SheetContent>
       </Sheet>
-
-      <Dialog open={searchOpen} onOpenChange={setSearchOpen}>
-        <DialogContent className="top-[20%] max-w-xl translate-y-0 sm:max-w-xl">
-          <DialogHeader>
-            <DialogTitle>Search</DialogTitle>
-          </DialogHeader>
-          <form
-            role="search"
-            onSubmit={(e) => e.preventDefault()}
-            className="flex items-center gap-3 border-b border-line pb-3"
-          >
-            <Search className="text-muted-foreground size-5 shrink-0" />
-            <input
-              type="search"
-              placeholder="Search products, plants, careers…"
-              aria-label="Search"
-              className="w-full bg-transparent text-base outline-none"
-              autoFocus
-            />
-            <button
-              type="button"
-              aria-label="Close search"
-              onClick={() => setSearchOpen(false)}
-            >
-              <X className="size-5" />
-            </button>
-          </form>
-          <p className="text-muted-foreground text-sm">
-            Press Esc to close. Full search arrives in a later phase.
-          </p>
-        </DialogContent>
-      </Dialog>
     </>
   );
 }
