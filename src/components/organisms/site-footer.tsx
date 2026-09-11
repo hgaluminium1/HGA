@@ -101,7 +101,6 @@ export function SiteFooter({
             heightPx={brandLogoHeightPx}
           />
           <p className="text-on-dark-muted text-sm leading-relaxed">{blurb}</p>
-          <SocialLinks links={socialLinks} variant="onDark" />
         </div>
 
         <FooterColumn title="Products" links={productLinks} locale={locale} />
@@ -143,10 +142,20 @@ export function SiteFooter({
           </div>
         </div>
       </Container>
-      <div className="border-t border-white/10 py-4 text-center text-xs text-on-dark-muted">
-        <span className="text-white/90">HG Aluminium Smelters Limited</span>
-        {" · "}
-        Copyright © {year}
+
+      <div className="border-t border-white/10">
+        <Container className="flex flex-col gap-3 py-4 min-[640px]:flex-row min-[640px]:items-center min-[640px]:justify-between">
+          <p className="text-center text-xs text-on-dark-muted min-[640px]:text-left">
+            <span className="text-white/90">HG Aluminium Smelters Limited</span>
+            {" · "}
+            Copyright © {year}
+          </p>
+          <SocialLinks
+            links={socialLinks}
+            variant="footer"
+            className="justify-center min-[640px]:justify-end"
+          />
+        </Container>
       </div>
     </footer>
   );

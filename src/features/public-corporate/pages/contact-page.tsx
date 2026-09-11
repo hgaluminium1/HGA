@@ -3,7 +3,6 @@ import { Mail, MapPin, Phone } from "lucide-react";
 import { Container } from "@/components/atoms/container";
 import { Reveal } from "@/components/atoms/reveal";
 import { Section } from "@/components/atoms/section";
-import { SocialLinks } from "@/components/molecules/social-links";
 import { getCachedCompanyProfile } from "@/features/public-corporate/lib/public-cache";
 import { EnquiryForm } from "@/features/public-site/components/enquiry-form";
 
@@ -35,7 +34,6 @@ export async function ContactPage({
   defaultProduct?: string;
 }) {
   const profile = await getCachedCompanyProfile();
-  const socialLinks = profile?.socialLinks ?? [];
   const salesEmail = profile?.emails?.sales?.trim() || "";
   const exportEmail = profile?.emails?.export?.trim() || "";
   const phones = profile?.phones?.filter((p) => p.number?.trim()) ?? [];
@@ -175,15 +173,6 @@ export async function ContactPage({
                     </li>
                   ) : null}
                 </ul>
-
-                {socialLinks.length > 0 ? (
-                  <div className="border-line border-t pt-4">
-                    <p className="text-text-faint mb-2.5 text-[0.7rem] font-semibold tracking-[0.1em] uppercase">
-                      Follow
-                    </p>
-                    <SocialLinks links={socialLinks} variant="onLight" />
-                  </div>
-                ) : null}
 
                 {primaryLocation.embedUrl ? (
                   <div className="border-line border-t pt-4">

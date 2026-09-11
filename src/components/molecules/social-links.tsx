@@ -90,7 +90,11 @@ function PlatformIcon({
 
 export type SocialLinksProps = {
   links: SocialLinkItem[];
-  variant?: "onDark" | "onLight";
+  /**
+   * `onDark` / `onLight` — circular chips (e.g. mobile drawer).
+   * `footer` — quiet icon marks for the legal bar (enterprise pattern).
+   */
+  variant?: "onDark" | "onLight" | "footer";
   className?: string;
   /** Accessible name for the list (e.g. "Social media"). */
   label?: string;
@@ -105,9 +109,15 @@ export function SocialLinks({
   const visible = links.filter((l) => l.url?.trim());
   if (!visible.length) return null;
 
+  const isFooter = variant === "footer";
+
   return (
     <ul
-      className={cn("flex flex-wrap gap-2.5", className)}
+      className={cn(
+        "flex flex-wrap items-center",
+        isFooter ? "gap-0.5" : "gap-2.5",
+        className,
+      )}
       aria-label={label}
     >
       {visible.map((link) => {
@@ -123,13 +133,21 @@ export function SocialLinks({
               rel="noopener noreferrer"
               aria-label={name}
               className={cn(
-                "inline-flex size-[38px] items-center justify-center rounded-full transition-colors",
-                variant === "onDark"
-                  ? "bg-white/10 text-white hover:bg-white/24"
-                  : "bg-bg-alt text-ink hover:bg-line/80",
+                "inline-flex items-center justify-center transition-colors",
+                isFooter
+                  ? "size-9 rounded-md text-white/45 hover:bg-white/[0.06] hover:text-white"
+                  : cn(
+                      "size-[38px] rounded-full",
+                      variant === "onDark"
+                        ? "bg-white/10 text-white hover:bg-white/24"
+                        : "bg-bg-alt text-ink hover:bg-line/80",
+                    ),
               )}
             >
-              <PlatformIcon platform={link.platform} />
+              <PlatformIcon
+                platform={link.platform}
+                className={isFooter ? "size-[15px]" : undefined}
+              />
             </a>
           </li>
         );
