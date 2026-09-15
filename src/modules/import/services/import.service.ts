@@ -119,14 +119,30 @@ export async function commitImportRows(
             slug: string;
             status?: "draft" | "published";
             description?: string;
+            category_slug?: string;
           };
+          const cats = await listCategoriesFlat({});
+          const category =
+            (d.category_slug
+              ? cats.find((c) => c.slug === d.category_slug)
+              : null) ?? cats.find((c) => c.slug === "aluminium");
+          if (!category) {
+            failed.push({
+              row: r.row,
+              ok: false,
+              errors: [
+                "category_slug required (or seed Aluminium category first)",
+              ],
+            });
+            break;
+          }
           await createProduct({
             sku: d.sku,
             name: { en: d.name_en },
             slug: d.slug,
             status: d.status,
             description: d.description,
-            categoryIds: [],
+            categoryIds: [category.id],
             alloyGrades: [],
             tempers: [],
             surfaceFinishes: [],

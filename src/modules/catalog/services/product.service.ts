@@ -143,6 +143,8 @@ export async function listPublishedProducts(opts: {
   const filter: Record<string, unknown> = {
     deletedAt: null,
     status: "published",
+    // Uncategorized products never appear on the public catalogue.
+    "categoryIds.0": { $exists: true },
   };
   if (opts.upcoming === true) {
     filter.isUpcoming = true;
@@ -190,6 +192,7 @@ export async function getPublishedProductBySlug(slug: string) {
     slug,
     status: "published",
     deletedAt: null,
+    "categoryIds.0": { $exists: true },
   }).lean();
   if (!doc) return null;
   return toDTO(doc as Record<string, unknown>);
@@ -244,6 +247,14 @@ export async function updateProduct(
   }
 
   if (data.status === "published") {
+    const cats = (existing.categoryIds as unknown[] | undefined) ?? [];
+    if (!cats.length) {
+      return {
+        error: "CATEGORY_REQUIRED" as const,
+        message:
+          "Assign a category before publishing. Uncategorized products cannot go live.",
+      };
+    }
     const upcoming = Boolean(existing.isUpcoming);
     const hasImage = Boolean(
       (typeof existing.imageUrl === "string" && existing.imageUrl.trim()) ||

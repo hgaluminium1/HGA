@@ -76,7 +76,10 @@ export const createProductSchema = z.object({
   sku: z.string().min(1),
   name: localizedStringSchema,
   slug: z.string().min(1),
-  categoryIds: z.array(z.string()).default([]),
+  /** Every product must belong to at least one published category. */
+  categoryIds: z
+    .array(z.string().min(1))
+    .min(1, "Select a category before saving the product"),
   formType: productFormTypeSchema.optional().default("other"),
   alloyGrades: z.array(z.string()).default([]),
   tempers: z.array(z.string()).default([]),
@@ -127,7 +130,10 @@ export const updateProductSchema = createProductSchema
     chemicalComposition: true,
   })
   .extend({
-    categoryIds: z.array(z.string()).optional(),
+    categoryIds: z
+      .array(z.string().min(1))
+      .min(1, "Select a category before saving the product")
+      .optional(),
     formType: productFormTypeSchema.optional(),
     alloyGrades: z.array(z.string()).optional(),
     tempers: z.array(z.string()).optional(),

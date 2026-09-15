@@ -5,18 +5,21 @@ export type CategoryWithProducts = {
   products: ProductDTO[];
 };
 
-/** Flat catalogue: each published category owns its products (Category → N). */
+/** Flat catalogue: each published category owns its products (Category → N).
+ * Products without a category are excluded (they must not appear publicly).
+ */
 export function groupProductsByCategory(
   categories: CategoryDTO[],
   products: ProductDTO[],
 ): CategoryWithProducts[] {
+  const categorized = products.filter((p) => p.categoryIds.length > 0);
   const published = categories
     .filter((c) => c.status === "published" && !c.deletedAt)
     .sort((a, b) => a.order - b.order || a.name.en.localeCompare(b.name.en));
 
   return published.map((category) => ({
     category,
-    products: products.filter((p) => p.categoryIds.includes(category.id)),
+    products: categorized.filter((p) => p.categoryIds.includes(category.id)),
   }));
 }
 

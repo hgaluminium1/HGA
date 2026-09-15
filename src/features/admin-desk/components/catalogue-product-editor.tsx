@@ -231,9 +231,12 @@ export function CatalogueProductEditor({
     setError(null);
     try {
       const cats = await fetchCategoriesApi();
-      setCategories(cats.filter((c) => !c.deletedAt));
+      const live = cats.filter((c) => !c.deletedAt);
+      setCategories(live);
       if (isNew) {
         const d = emptyDraft();
+        // Single-category catalogues (e.g. Aluminium) — preselect so products aren't orphaned.
+        if (live.length === 1) d.categoryId = live[0]!.id;
         setDraft(d);
         setBaseline(JSON.stringify(d));
         return;
@@ -308,6 +311,10 @@ export function CatalogueProductEditor({
   }
 
   async function onSave() {
+    if (!draft.categoryId) {
+      setError("Select a category before saving. Products cannot be uncategorized.");
+      return;
+    }
     setSaving(true);
     setMessage(null);
     setError(null);
@@ -468,10 +475,11 @@ export function CatalogueProductEditor({
               ))}
             </select>
           </Field>
-          <Field label="Category">
+          <Field label="Category *" hint="Required — products without a category cannot be saved or published.">
             <select
               className={inputClass}
               value={draft.categoryId}
+              required
               onChange={(e) => patch({ categoryId: e.target.value })}
             >
               <option value="">Select category…</option>

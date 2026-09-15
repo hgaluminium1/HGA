@@ -38,6 +38,15 @@ export async function PATCH(req: Request, ctx: Ctx) {
           400,
         );
       }
+      if (result.error === "CATEGORY_REQUIRED") {
+        return respondError(
+          "CATEGORY_REQUIRED",
+          "message" in result && typeof result.message === "string"
+            ? result.message
+            : "Assign a category before publishing.",
+          400,
+        );
+      }
       return respondError("NOT_FOUND", "Product not found", 404);
     }
     revalidateProducts();
