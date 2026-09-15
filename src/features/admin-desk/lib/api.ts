@@ -99,23 +99,12 @@ export async function uploadMediaApi(file: File, alt?: string) {
   return parse<{ media: MediaUploadResult; reused: boolean }>(res);
 }
 
-/** Find by slug or create from PAGE_TEMPLATES + syncBlocksToTemplate. */
+/** Find by slug or create from PAGE_TEMPLATES. Never auto-persists template sync. */
 export async function ensurePageBySlug(slug: string): Promise<PageDTO> {
   const { items } = await fetchPages();
   const existing = items.find((p) => p.slug === slug && !p.deletedAt);
   if (existing) {
-    const full = await fetchPage(existing.id);
-    const synced = syncBlocksToTemplate(slug, full.blocks);
-    if (
-      synced.length !== full.blocks.length ||
-      synced.some((b, i) => b.id !== full.blocks[i]?.id)
-    ) {
-      return updatePageApi(full.id, {
-        blocks: synced,
-        version: full.version,
-      });
-    }
-    return full;
+    return fetchPage(existing.id);
   }
 
   const template = getPageTemplate(slug);

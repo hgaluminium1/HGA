@@ -6,6 +6,7 @@ export const EDITABLE_CMS_BLOCK_TYPES = new Set<BlockType>([
   "capability",
   "products",
   "upcoming-products",
+  "markets",
   "mission",
   "cta-banner",
   "testimonials",

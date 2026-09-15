@@ -60,7 +60,7 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
         id: "markets",
         type: "markets",
         title: "Markets we serve",
-        help: "Industry segments — filled from site data automatically.",
+        help: "Section headline; industry cards come from the Industries page list.",
       },
       {
         id: "mission",
@@ -78,13 +78,13 @@ export const PAGE_TEMPLATES: PageTemplate[] = [
         id: "testimonials",
         type: "testimonials",
         title: "Testimonials",
-        help: "Partner or customer quotes you can add and reorder.",
+        help: "Section headline; quotes come from published Corporate testimonials.",
       },
       {
         id: "customers",
         type: "customers",
         title: "Customers",
-        help: "Logo strip headings; published logos override names when set.",
+        help: "Section headline; logos come from published Corporate customer logos.",
       },
       {
         id: "joint-ventures",
@@ -412,7 +412,10 @@ export function isTemplatedSlug(slug: string): boolean {
   return PAGE_TEMPLATES.some((t) => t.slug === slug);
 }
 
-/** Merge existing page blocks onto the locked template order (fill missing). */
+/** Merge existing page blocks onto the locked template order (fill missing).
+ * Preserves orphan blocks (not in template) so opening/saving a section never
+ * silently drops editor data.
+ */
 export function syncBlocksToTemplate(
   slug: string,
   existing: Array<{
@@ -438,10 +441,20 @@ export function syncBlocksToTemplate(
     }));
   }
 
-  return template.sections.map((section, order) => {
-    const found =
-      existing.find((b) => b.id === section.id) ??
-      existing.find((b) => b.type === section.type);
+  const templateIds = new Set(template.sections.map((s) => s.id));
+  const claimed = new Set<string>();
+
+  const ordered = template.sections.map((section, order) => {
+    let found = existing.find((b) => b.id === section.id);
+    if (!found) {
+      found = existing.find(
+        (b) =>
+          b.type === section.type &&
+          !templateIds.has(b.id) &&
+          !claimed.has(b.id),
+      );
+    }
+    if (found) claimed.add(found.id);
     return {
       id: section.id,
       type: section.type,
@@ -450,4 +463,16 @@ export function syncBlocksToTemplate(
       data: found?.data ?? defaultBlockData(section.type),
     };
   });
+
+  const orphans = existing
+    .filter((b) => !claimed.has(b.id) && !templateIds.has(b.id))
+    .map((b, i) => ({
+      id: b.id,
+      type: b.type as BlockType,
+      order: ordered.length + i,
+      appearance: b.appearance,
+      data: b.data,
+    }));
+
+  return [...ordered, ...orphans];
 }

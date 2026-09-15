@@ -38,11 +38,19 @@ import {
   type CategoryWithProducts,
 } from "@/features/public-catalog/lib/catalogue-groups";
 import {
+  getCachedPublishedPage,
   getCachedPublishedProducts,
 } from "@/features/public-site/lib/public-cache";
-import { getCachedPublishedLogos } from "@/features/public-corporate/lib/public-cache";
+import {
+  getCachedPublishedLogos,
+  getCachedPublishedTestimonials,
+} from "@/features/public-corporate/lib/public-cache";
 import { listCategoriesFlat } from "@/modules/catalog";
 import { PublicEmptyState } from "@/features/public-site/components/cms-empty-state";
+import {
+  loadIndustrySegments,
+  type IndustrySegment,
+} from "@/features/public-site/components/markets-section";
 
 export type CmsBlock = {
   id: string;
@@ -115,19 +123,17 @@ async function hydrateCustomersBlock(
   const logos = await getCachedPublishedLogos();
   if (!logos.length) {
     return {
-      content,
-      items: (content.logos ?? []).map((name, i) => ({
-        id: `fallback-${i}`,
-        name,
-        imageUrl: null,
-      })),
+      content: {
+        eyebrow: content.eyebrow || "Customers",
+        title: content.title || "Organisations we serve",
+        description:
+          content.description ||
+          "Approved partners appear here once logos are published in Admin.",
+        logos: [],
+      },
+      items: [],
     };
   }
-  const items = logos.map((l) => ({
-    id: l.id,
-    name: l.name,
-    imageUrl: l.imageUrl,
-  }));
   return {
     content: {
       eyebrow: content.eyebrow || "Customers",
@@ -137,7 +143,99 @@ async function hydrateCustomersBlock(
         "Approved partners — brand marks when permission is on file; names otherwise.",
       logos: logos.map((l) => l.name),
     },
-    items,
+    items: logos.map((l) => ({
+      id: l.id,
+      name: l.name,
+      imageUrl: l.imageUrl,
+    })),
+  };
+}
+
+function initialsFromName(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+async function hydrateTestimonialsBlock(
+  content: HomeContent["testimonials"],
+): Promise<HomeContent["testimonials"]> {
+  const published = await getCachedPublishedTestimonials();
+  if (!published.length) {
+    return {
+      eyebrow: content.eyebrow || "Testimonials",
+      title: content.title || "What partners say",
+      items: [],
+    };
+  }
+  return {
+    eyebrow: content.eyebrow || "Testimonials",
+    title: content.title || "What partners say",
+    items: published.map((t) => ({
+      initials: initialsFromName(t.authorName) || "HG",
+      name: t.authorName,
+      role: t.authorTitle || t.company || "",
+      quote: t.quote.en || Object.values(t.quote)[0] || "",
+    })),
+  };
+}
+
+async function hydrateMarketsSegments(): Promise<IndustrySegment[]> {
+  try {
+    const page = await getCachedPublishedPage("industries", "en");
+    const block = page?.blocks?.find((b) => b.type === "industry-list");
+    const data =
+      block?.data && typeof block.data === "object"
+        ? (block.data as Record<string, unknown>)
+        : null;
+    const items = Array.isArray(data?.items) ? data.items : [];
+    const mapped = items
+      .map((raw, i) => {
+        const row =
+          raw && typeof raw === "object"
+            ? (raw as Record<string, unknown>)
+            : {};
+        const label = typeof row.label === "string" ? row.label.trim() : "";
+        if (!label) return null;
+        const applications = Array.isArray(row.applications)
+          ? row.applications.map(String).filter(Boolean)
+          : [];
+        return {
+          key: `cms-${i}-${label.toLowerCase().replace(/\s+/g, "-")}`,
+          label,
+          description:
+            typeof row.description === "string" ? row.description : "",
+          productFocus: [] as string[],
+          applications,
+        } satisfies IndustrySegment;
+      })
+      .filter(Boolean) as IndustrySegment[];
+    if (mapped.length) return mapped;
+  } catch {
+    /* fall through to seed */
+  }
+  return loadIndustrySegments();
+}
+
+function parseMarketsCopy(data: unknown): {
+  eyebrow: string;
+  title: string;
+  description: string;
+} {
+  const d =
+    data && typeof data === "object"
+      ? (data as Record<string, unknown>)
+      : {};
+  return {
+    eyebrow: typeof d.eyebrow === "string" ? d.eyebrow : "Markets",
+    title: typeof d.title === "string" ? d.title : "Markets we serve",
+    description:
+      typeof d.description === "string"
+        ? d.description
+        : "Application sectors shaped by extrusion, billet and remelt demand.",
   };
 }
 
@@ -203,8 +301,20 @@ export async function renderCmsBlock(
           />,
         );
       }
-      case "markets":
-        return wrap(<MarketsSection locale={locale} limit={8} />);
+      case "markets": {
+        const copy = parseMarketsCopy(block.data);
+        const segments = await hydrateMarketsSegments();
+        return wrap(
+          <MarketsSection
+            locale={locale}
+            eyebrow={copy.eyebrow}
+            title={copy.title}
+            description={copy.description}
+            segments={segments}
+            limit={8}
+          />,
+        );
+      }
       case "mission": {
         const data = block.data as HomeContent["mission"] & {
           videoSrc?: string;
@@ -234,12 +344,12 @@ export async function renderCmsBlock(
           />,
         );
       }
-      case "testimonials":
-        return wrap(
-          <TestimonialsCarousel
-            content={block.data as HomeContent["testimonials"]}
-          />,
+      case "testimonials": {
+        const hydrated = await hydrateTestimonialsBlock(
+          block.data as HomeContent["testimonials"],
         );
+        return wrap(<TestimonialsCarousel content={hydrated} />);
+      }
       case "cta-banner":
         return wrap(
           <InquireCtaBanner

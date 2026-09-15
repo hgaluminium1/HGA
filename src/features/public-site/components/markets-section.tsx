@@ -29,6 +29,8 @@ type MarketsSectionProps = {
   eyebrow?: string;
   title?: string;
   description?: string;
+  /** Prefer Industries CMS list; seed is fallback only. */
+  segments?: IndustrySegment[];
   limit?: number;
 };
 
@@ -37,10 +39,14 @@ export function MarketsSection({
   eyebrow = "Markets",
   title = "Markets we serve",
   description = "Application sectors shaped by extrusion, billet and remelt demand.",
+  segments,
   limit = 8,
 }: MarketsSectionProps) {
-  const segments = loadIndustrySegments().slice(0, limit);
-  if (!segments.length) {
+  const rows = (segments?.length ? segments : loadIndustrySegments()).slice(
+    0,
+    limit,
+  );
+  if (!rows.length) {
     return (
       <Section data-block="markets">
         <Container>
@@ -48,7 +54,7 @@ export function MarketsSection({
             locale={locale}
             density="section"
             title="No market segments configured yet."
-            description="Industry seed data appears here once published."
+            description="Publish industry rows on the Industries page to fill this band."
             primary={{ label: "Industries", href: "industries" }}
           />
         </Container>
@@ -82,7 +88,7 @@ export function MarketsSection({
 
         <Reveal>
           <ul className="divide-y divide-black/[0.08] border-y border-black/[0.08]">
-            {segments.map((s) => (
+            {rows.map((s) => (
               <li
                 key={s.key}
                 className="flex flex-wrap items-baseline justify-between gap-3 py-4"

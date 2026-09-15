@@ -142,7 +142,6 @@ export function ContentBlockForm({ type, value, onChange }: Props) {
   }
 
   if (type === "testimonials") {
-    const items = asArray(d.items).map((s) => asRecord(s));
     return (
       <div className="flex flex-col gap-4">
         <Field label="Eyebrow">
@@ -159,66 +158,15 @@ export function ContentBlockForm({ type, value, onChange }: Props) {
             onChange={(e) => patch({ title: e.target.value })}
           />
         </Field>
-        <ArrayEditor
-          label="Quotes"
-          items={items}
-          onChange={(next) => patch({ items: next })}
-          emptyItem={() => ({
-            initials: "",
-            name: "",
-            role: "",
-            quote: "",
-          })}
-          renderItem={(item, i, update) => (
-            <div className="flex flex-col gap-3">
-              <div className="grid gap-3 min-[640px]:grid-cols-3">
-                <Field label="Initials">
-                  <input
-                    className={inputClass}
-                    value={str(item.initials)}
-                    onChange={(e) =>
-                      update(i, { ...item, initials: e.target.value })
-                    }
-                  />
-                </Field>
-                <Field label="Name">
-                  <input
-                    className={inputClass}
-                    value={str(item.name)}
-                    onChange={(e) =>
-                      update(i, { ...item, name: e.target.value })
-                    }
-                  />
-                </Field>
-                <Field label="Role">
-                  <input
-                    className={inputClass}
-                    value={str(item.role)}
-                    onChange={(e) =>
-                      update(i, { ...item, role: e.target.value })
-                    }
-                  />
-                </Field>
-              </div>
-              <Field label="Quote">
-                <textarea
-                  className={cn(inputClass, "min-h-24 py-3")}
-                  value={str(item.quote)}
-                  onChange={(e) =>
-                    update(i, { ...item, quote: e.target.value })
-                  }
-                  rows={3}
-                />
-              </Field>
-            </div>
-          )}
-        />
+        <p className="text-muted-foreground text-[0.8125rem] leading-snug">
+          Quotes come from published Corporate testimonials — same source as
+          the Customers page. Edit them under Corporate → Testimonials.
+        </p>
       </div>
     );
   }
 
   if (type === "customers") {
-    const logos = asArray(d.logos).map(String);
     return (
       <div className="flex flex-col gap-4">
         <Field label="Eyebrow">
@@ -243,24 +191,10 @@ export function ContentBlockForm({ type, value, onChange }: Props) {
             rows={3}
           />
         </Field>
-        <ArrayEditor
-          label="Fallback logo names"
-          help="Used when published logo assets are empty"
-          items={logos.map((name) => ({ name }))}
-          onChange={(next) =>
-            patch({ logos: next.map((n) => str(n.name)) })
-          }
-          emptyItem={() => ({ name: "" })}
-          renderItem={(item, i, update) => (
-            <Field label="Name">
-              <input
-                className={inputClass}
-                value={str(item.name)}
-                onChange={(e) => update(i, { name: e.target.value })}
-              />
-            </Field>
-          )}
-        />
+        <p className="text-muted-foreground text-[0.8125rem] leading-snug">
+          Logos come from published Corporate customer logos — edit them under
+          Corporate → Logos (same source as the Customers page).
+        </p>
       </div>
     );
   }

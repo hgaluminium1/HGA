@@ -5,11 +5,11 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/atoms/container";
 import { CatalogueBreadcrumbs } from "@/features/public-catalog/components/catalogue-breadcrumbs";
 import { ProductCard } from "@/features/public-catalog/components/product-card";
+import { ProductRfqDialog } from "@/features/public-catalog/components/product-rfq-dialog";
 import {
   categoryLandingHref,
   productImageUrl,
 } from "@/features/public-catalog/lib/product-media";
-import { EnquiryForm } from "@/features/public-site/components/enquiry-form";
 import {
   getCachedPublishedProductBySlug,
   getCachedPublishedProducts,
@@ -154,10 +154,7 @@ function Panel({
 }) {
   return (
     <section aria-labelledby={id} className="min-w-0">
-      <h2
-        id={id}
-        className="font-display pdp-section-title font-semibold text-ink"
-      >
+      <h2 id={id} className="font-display pdp-section-title font-semibold text-ink">
         {title}
       </h2>
       {hint ? (
@@ -171,8 +168,8 @@ function Panel({
 }
 
 /**
- * Industrial datasheet PDP — McMaster utility + DigiKey supporting pane.
- * Layout owned by @container (available width), not device breakpoints.
+ * Industrial datasheet PDP — McMaster density + Linear/Stripe RFQ dialog.
+ * Full-width specs; one primary CTA opens a focused quote modal (no sticky rail).
  */
 export async function ProductDetail({ locale, slug }: ProductDetailProps) {
   const product = await getCachedPublishedProductBySlug(slug);
@@ -217,7 +214,7 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
   return (
     <div className="bg-bg">
       <Container className="py-[clamp(0.85rem,0.6rem+1vw,1.35rem)]">
-        <div className="pdp has-dock">
+        <div className="pdp">
           <CatalogueBreadcrumbs
             locale={locale}
             items={crumbs}
@@ -225,7 +222,6 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
           />
 
           <div className="pdp-shell">
-            {/* Identity — continuous thumb/type resize via cqw */}
             <header className="pdp-identity border-line border-b pb-[clamp(0.85rem,0.6rem+0.8cqw,1.25rem)]">
               <div className="pdp-identity__row">
                 <div className="pdp-identity__media">
@@ -276,15 +272,20 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
                       {product.alloyGrades.join(" · ")}
                     </p>
                   ) : null}
+                  <div className="mt-3">
+                    <ProductRfqDialog
+                      locale={locale}
+                      productName={product.name.en}
+                      productSlug={product.slug}
+                      label={rfqTitle}
+                    />
+                  </div>
                 </div>
               </div>
             </header>
 
-            {/* Specs body — pairs when pdp-body container ≥ 40rem */}
             <div className="pdp-body space-y-[var(--pdp-gap)]">
-              <div
-                className={cn("pdp-docs", pairDocs && "pdp-docs--pair")}
-              >
+              <div className={cn("pdp-docs", pairDocs && "pdp-docs--pair")}>
                 {hasSpecs ? (
                   <Panel title="Specifications" id="specs-heading">
                     <SpecTable rows={specRows} />
@@ -301,8 +302,12 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
                       <table className="pdp-spec-table w-full min-w-[12rem] border-collapse text-left">
                         <thead>
                           <tr className="bg-bg-alt text-text-faint text-[0.65rem] tracking-wide uppercase">
-                            <th className="px-3 py-1.5 font-semibold">Element</th>
-                            <th className="px-3 py-1.5 font-semibold">Range</th>
+                            <th className="pdp-spec-table__label font-semibold">
+                              Element
+                            </th>
+                            <th className="pdp-spec-table__value font-semibold">
+                              Range
+                            </th>
                           </tr>
                         </thead>
                         <tbody>
@@ -314,10 +319,10 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
                                 i % 2 === 0 ? "bg-surface" : "bg-bg-alt/40",
                               )}
                             >
-                              <td className="px-3 py-1.5 font-medium text-ink">
+                              <td className="pdp-spec-table__label font-medium text-ink">
                                 {row.element}
                               </td>
-                              <td className="text-muted-foreground px-3 py-1.5">
+                              <td className="pdp-spec-table__value text-muted-foreground">
                                 {row.range || "—"}
                               </td>
                             </tr>
@@ -367,27 +372,6 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
               ) : null}
             </div>
 
-            {/* Single conversion surface — sticky rail when pane expands */}
-            <aside
-              id="rfq"
-              className="pdp-rfq border-line scroll-mt-24 rounded-[var(--radius-md)] border bg-surface p-[clamp(0.85rem,0.7rem+0.5cqw,1.1rem)] shadow-[var(--shadow-sm)]"
-            >
-              <h2 className="font-display text-[0.875rem] font-semibold text-ink">
-                {rfqTitle}
-              </h2>
-              <p className="text-muted-foreground mt-1 text-[0.72rem] leading-snug">
-                Alloy, tonnage, destination — sales confirms lead time.
-              </p>
-              <EnquiryForm
-                locale={locale}
-                defaultProduct={product.name.en}
-                productSlug={product.slug}
-                source="product"
-                density="compact"
-                className="mt-3 @container"
-              />
-            </aside>
-
             {related.length ? (
               <section className="pdp-related border-line border-t pt-[clamp(1rem,0.75rem+0.8cqw,1.5rem)]">
                 <div className="mb-3 flex items-baseline justify-between gap-3">
@@ -414,16 +398,6 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
                 </ul>
               </section>
             ) : null}
-          </div>
-
-          {/* Compact only: replace sticky rail with dock jump (hidden via @container) */}
-          <div className="pdp-dock">
-            <a
-              href="#rfq"
-              className="bg-brand-red text-primary-foreground flex min-h-11 w-full items-center justify-center rounded-[var(--radius-md)] text-[0.8125rem] font-semibold"
-            >
-              {rfqTitle}
-            </a>
           </div>
         </div>
       </Container>

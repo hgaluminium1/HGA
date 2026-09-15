@@ -116,7 +116,18 @@ export const customersBlockDataSchema = z.object({
   eyebrow: z.string(),
   title: z.string(),
   description: z.string(),
-  logos: z.array(z.string()),
+  /** Legacy fallback names when no published CustomerLogo records exist. */
+  logos: z.array(z.string()).default([]),
+});
+
+export const marketsBlockDataSchema = z.object({
+  eyebrow: z.string().default("Markets"),
+  title: z.string().default("Markets we serve"),
+  description: z
+    .string()
+    .default(
+      "Application sectors shaped by extrusion, billet and remelt demand.",
+    ),
 });
 
 export const jointVenturesBlockDataSchema = z.object({
@@ -282,7 +293,7 @@ const blockDataByType = {
   gallery: corporateBlockDataSchema,
   "expansion-roadmap": corporateBlockDataSchema,
   "upcoming-products": upcomingProductsBlockDataSchema,
-  markets: corporateBlockDataSchema,
+  markets: marketsBlockDataSchema,
 } as const;
 
 export const pageBlockSchema = z
@@ -678,6 +689,13 @@ export function defaultBlockData(type: BlockType): unknown {
           },
         ],
       };
+    case "markets":
+      return {
+        eyebrow: "Markets",
+        title: "Markets we serve",
+        description:
+          "Application sectors shaped by extrusion, billet and remelt demand.",
+      };
     case "stats":
     case "leadership-grid":
     case "company-facts":
@@ -686,7 +704,6 @@ export function defaultBlockData(type: BlockType): unknown {
     case "logo-strip":
     case "gallery":
     case "expansion-roadmap":
-    case "markets":
       return { seeded: true };
     case "upcoming-products":
       return {

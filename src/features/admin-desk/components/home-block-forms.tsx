@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import { Plus, Trash2, X } from "lucide-react";
 
@@ -171,14 +172,9 @@ export function TestimonialsSectionForm({
   onChange: (next: unknown) => void;
 }) {
   const { d, patch } = useDraft(value, onChange);
-  const items = asArray(d.items).map((s) => asRecord(s));
-
-  function setItems(next: Record<string, unknown>[]) {
-    patch({ items: next });
-  }
 
   return (
-    <Shell>
+    <Shell footer="Quotes come from published Corporate testimonials — same source as the Customers page.">
       <div className="grid gap-2.5 p-3 sm:grid-cols-2">
         <Field label="Eyebrow">
           <input
@@ -195,104 +191,17 @@ export function TestimonialsSectionForm({
           />
         </Field>
       </div>
-      <div className="border-t border-[#e8e8ed]">
-        <div className="flex items-center justify-between px-3 py-2">
-          <p className="text-[11px] font-medium text-[#86868b]">Quotes</p>
-          <span className="rounded-full bg-[#f5f5f7] px-2 py-0.5 text-[10px] font-semibold tabular-nums text-[#86868b]">
-            {items.length}
-          </span>
-        </div>
-        <div className="flex flex-col gap-2 px-3 pb-3">
-          {items.map((item, i) => (
-            <div
-              key={i}
-              className="rounded-[8px] border border-[#e8e8ed] bg-[#fafafa] p-2.5"
-            >
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-[10px] font-semibold tracking-wide text-[#aeaeb2] uppercase">
-                  Quote {i + 1}
-                </span>
-                <button
-                  type="button"
-                  className="inline-flex size-6 items-center justify-center rounded text-[#ff3b30] hover:bg-[#ff3b30]/10"
-                  aria-label="Remove quote"
-                  onClick={() => setItems(items.filter((_, idx) => idx !== i))}
-                >
-                  <X className="size-3.5 stroke-[2.5]" />
-                </button>
-              </div>
-              <div className="grid gap-2 sm:grid-cols-[4rem_1fr_1fr]">
-                <Field label="Initials">
-                  <input
-                    className={inputClass}
-                    value={str(item.initials)}
-                    onChange={(e) =>
-                      setItems(
-                        items.map((row, idx) =>
-                          idx === i ? { ...row, initials: e.target.value } : row,
-                        ),
-                      )
-                    }
-                  />
-                </Field>
-                <Field label="Name">
-                  <input
-                    className={inputClass}
-                    value={str(item.name)}
-                    onChange={(e) =>
-                      setItems(
-                        items.map((row, idx) =>
-                          idx === i ? { ...row, name: e.target.value } : row,
-                        ),
-                      )
-                    }
-                  />
-                </Field>
-                <Field label="Role">
-                  <input
-                    className={inputClass}
-                    value={str(item.role)}
-                    onChange={(e) =>
-                      setItems(
-                        items.map((row, idx) =>
-                          idx === i ? { ...row, role: e.target.value } : row,
-                        ),
-                      )
-                    }
-                  />
-                </Field>
-                <Field label="Quote" className="sm:col-span-3">
-                  <textarea
-                    className={cn(inputClass, "h-auto min-h-[56px] resize-y py-2")}
-                    value={str(item.quote)}
-                    onChange={(e) =>
-                      setItems(
-                        items.map((row, idx) =>
-                          idx === i ? { ...row, quote: e.target.value } : row,
-                        ),
-                      )
-                    }
-                    rows={2}
-                  />
-                </Field>
-              </div>
-            </div>
-          ))}
-          <Button
-            type="button"
-            variant="ghost"
-            className="h-8 justify-start px-2 text-[12px] font-medium text-[#0071e3] hover:bg-[#0071e3]/08 hover:text-[#0071e3]"
-            onClick={() =>
-              setItems([
-                ...items,
-                { initials: "", name: "", role: "", quote: "" },
-              ])
-            }
-          >
-            <Plus className="size-3.5" />
-            Add quote
-          </Button>
-        </div>
+      <div className="border-t border-[#e8e8ed] bg-[#fafafa] px-3 py-2.5">
+        <p className="text-[12px] leading-snug text-[#1d1d1f]">
+          Do not maintain a separate quote list here. Edit the shared
+          testimonial records once — Home and Customers both use them.
+        </p>
+        <Link
+          href="/admin/corporate/testimonials"
+          className="mt-2 inline-block text-[12px] font-semibold text-[#0071e3] hover:underline"
+        >
+          Edit testimonials →
+        </Link>
       </div>
     </Shell>
   );
@@ -306,22 +215,9 @@ export function CustomersSectionForm({
   onChange: (next: unknown) => void;
 }) {
   const { d, patch } = useDraft(value, onChange);
-  const logos = asArray(d.logos).map(String);
-  const [chipDraft, setChipDraft] = useState("");
-
-  function addLogo() {
-    const w = chipDraft.trim();
-    if (!w) return;
-    if (logos.some((h) => h.toLowerCase() === w.toLowerCase())) {
-      setChipDraft("");
-      return;
-    }
-    patch({ logos: [...logos, w] });
-    setChipDraft("");
-  }
 
   return (
-    <Shell footer="Published logo assets override these names when set in corporate data.">
+    <Shell footer="Logos come from published Corporate customer logos — same source as the Customers page.">
       <div className="grid gap-2.5 p-3 sm:grid-cols-2">
         <Field label="Eyebrow">
           <input
@@ -346,45 +242,24 @@ export function CustomersSectionForm({
           />
         </Field>
       </div>
-      <div className="border-t border-[#e8e8ed] px-3 py-2.5">
-        <p className="text-[11px] font-medium text-[#86868b]">
-          Customer names
-          <span className="ml-1.5 font-normal text-[#aeaeb2]">
-            shown as a quiet strip on the site
-          </span>
+      <div className="border-t border-[#e8e8ed] bg-[#fafafa] px-3 py-2.5">
+        <p className="text-[12px] leading-snug text-[#1d1d1f]">
+          Logo assets are edited once in Corporate. This section only controls
+          the Home band headlines — nothing is stripped or overridden.
         </p>
-        <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
-          {logos.map((name) => (
-            <span
-              key={name}
-              className="inline-flex h-7 items-center gap-1 rounded-full bg-[#f5f5f7] py-0 pl-2.5 pr-1 text-[12px] font-medium text-[#1d1d1f]"
-            >
-              {name}
-              <button
-                type="button"
-                className="flex size-5 items-center justify-center rounded-full text-[#86868b] hover:bg-black/5"
-                aria-label={`Remove ${name}`}
-                onClick={() =>
-                  patch({ logos: logos.filter((h) => h !== name) })
-                }
-              >
-                <X className="size-3 stroke-[2.5]" />
-              </button>
-            </span>
-          ))}
-          <input
-            className="h-7 min-w-[8rem] flex-1 rounded-[6px] border border-transparent bg-transparent px-2 text-[12px] outline-none placeholder:text-[#aeaeb2] focus:border-[#d2d2d7] focus:bg-white"
-            value={chipDraft}
-            placeholder="Add name · Enter"
-            onChange={(e) => setChipDraft(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === ",") {
-                e.preventDefault();
-                addLogo();
-              }
-            }}
-            onBlur={addLogo}
-          />
+        <div className="mt-2 flex flex-wrap gap-3">
+          <Link
+            href="/admin/corporate/logos"
+            className="text-[12px] font-semibold text-[#0071e3] hover:underline"
+          >
+            Edit logos →
+          </Link>
+          <Link
+            href="/admin/pages/customers/sources"
+            className="text-[12px] font-semibold text-[#0071e3] hover:underline"
+          >
+            Customers sources →
+          </Link>
         </div>
       </div>
     </Shell>

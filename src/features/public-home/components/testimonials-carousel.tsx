@@ -46,6 +46,10 @@ export function TestimonialsCarousel({ content }: TestimonialsCarouselProps) {
 
   const slideBasis = `${100 / perView}%`;
 
+  if (!total) {
+    return null;
+  }
+
   return (
     <Section data-block="testimonials" id="testimonials">
       <Container>

@@ -155,3 +155,65 @@ export function UpcomingProductsSectionForm({
     </div>
   );
 }
+
+/** Home markets band — headlines in CMS; rows from Industries page. */
+export function MarketsSectionForm({
+  value,
+  onChange,
+}: {
+  value: unknown;
+  onChange: (next: unknown) => void;
+}) {
+  const d = asRecord(value);
+
+  function patch(partial: Record<string, unknown>) {
+    onChange({ ...d, ...partial });
+  }
+
+  return (
+    <div className="overflow-hidden rounded-[10px] border border-[#d2d2d7] bg-white">
+      <div className="grid gap-2.5 p-3 sm:grid-cols-2">
+        <Field label="Eyebrow">
+          <input
+            className={inputClass}
+            value={typeof d.eyebrow === "string" ? d.eyebrow : ""}
+            onChange={(e) => patch({ eyebrow: e.target.value })}
+            placeholder="Markets"
+          />
+        </Field>
+        <Field label="Headline">
+          <input
+            className={inputClass}
+            value={typeof d.title === "string" ? d.title : ""}
+            onChange={(e) => patch({ title: e.target.value })}
+            placeholder="Markets we serve"
+          />
+        </Field>
+        <Field label="Description" className="sm:col-span-2">
+          <textarea
+            className={cn(
+              inputClass,
+              "h-auto min-h-[64px] resize-y py-2 leading-snug",
+            )}
+            value={typeof d.description === "string" ? d.description : ""}
+            onChange={(e) => patch({ description: e.target.value })}
+            rows={2}
+          />
+        </Field>
+      </div>
+      <div className="border-t border-[#e8e8ed] bg-[#fafafa] px-3 py-2.5">
+        <p className="text-[12px] leading-snug text-[#1d1d1f]">
+          Industry rows load from the published{" "}
+          <strong className="font-semibold">Industries</strong> page list
+          (same source as /industries). Seed data is only a fallback.
+        </p>
+        <Link
+          href="/admin/pages/industries"
+          className="mt-2 inline-block text-[12px] font-semibold text-[#0071e3] hover:underline"
+        >
+          Edit industries ?
+        </Link>
+      </div>
+    </div>
+  );
+}

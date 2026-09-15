@@ -54,7 +54,7 @@ export function CustomersLogoStrip({
               locale={locale}
               density="section"
               title="No customer logos yet."
-              description="Upload approved logos in Admin → Customers. Names show until a logo file is attached."
+              description="Publish approved logos in Admin → Corporate → Logos. Same records power the Customers page."
               primary={{ label: "Contact / RFQ", href: "contact" }}
             />
           </div>

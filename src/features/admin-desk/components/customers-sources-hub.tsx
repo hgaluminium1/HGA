@@ -10,17 +10,22 @@ const SOURCES = [
   {
     href: "/admin/corporate/logos",
     title: "Customer logos",
-    body: "Names shown in the logo strip on the Customers page and Home.",
+    body: "Shared logo strip on Customers and Home.",
   },
   {
     href: "/admin/corporate/case-studies",
     title: "Case studies",
-    body: "Project stories that appear under customer proof.",
+    body: "Project stories on the Customers page.",
   },
   {
     href: "/admin/corporate/testimonials",
     title: "Testimonials",
-    body: "Quotes shown on the Customers page and Home testimonial band.",
+    body: "Shared quotes on Customers and the Home testimonial band.",
+  },
+  {
+    href: "/admin/pages/home/customers",
+    title: "Home customers headlines",
+    body: "Eyebrow / title / description for the Home logo band only.",
   },
 ] as const;
 
@@ -36,12 +41,9 @@ export function CustomersSourcesHub() {
           Customers — edit sources
         </h1>
         <p className="text-muted-foreground max-w-prose text-[0.8125rem] leading-snug">
-          The public Customers page combines logos, case studies and
-          testimonials. Edit each source below, then check{" "}
-          <Link href="/en/customers" className="font-semibold underline" target="_blank">
-            /customers
-          </Link>
-          .
+          Logos, case studies and testimonials are shared across Home and the
+          public Customers page. Edit each source once — Home section headlines
+          stay under Pages → Home.
         </p>
       </header>
 

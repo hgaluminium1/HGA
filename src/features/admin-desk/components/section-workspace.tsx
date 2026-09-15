@@ -13,6 +13,7 @@ import {
   heroCanPublish,
 } from "@/features/admin-desk/components/hero-section-form";
 import {
+  MarketsSectionForm,
   ProductsSectionForm,
   UpcomingProductsSectionForm,
 } from "@/features/admin-desk/components/products-section-form";
@@ -55,11 +56,14 @@ const EDITOR_BLURBS: Record<string, string> = {
   products: "Section headline for the products strip. Cards come from published catalogue products.",
   "upcoming-products":
     "Section headline for upcoming lines. Cards come from catalogue products marked coming soon.",
-  markets: "Industry markets grid — filled from site data automatically.",
+  markets:
+    "Section headline for markets. Industry rows come from the Industries page list.",
   mission: "A strong statement over a large photo, with an optional video.",
   "cta-banner": "A simple call-to-action band mid-page.",
-  testimonials: "Quotes from partners or customers.",
-  customers: "Customer names or logos shown in a strip.",
+  testimonials:
+    "Section headline for quotes. Quotes come from published Corporate testimonials.",
+  customers:
+    "Section headline for the logo strip. Logos come from published Corporate customer logos.",
   "joint-ventures": "Partnership highlights with a supporting photo.",
   "careers-teaser": "A short careers invite with photos and a button.",
   faq: "Common questions and answers visitors ask.",
@@ -287,6 +291,8 @@ export function SectionWorkspace({
         <ProductsSectionForm value={draft} onChange={setDraft} />
       ) : blockType === "upcoming-products" ? (
         <UpcomingProductsSectionForm value={draft} onChange={setDraft} />
+      ) : blockType === "markets" ? (
+        <MarketsSectionForm value={draft} onChange={setDraft} />
       ) : blockType === "mission" ? (
         <MissionSectionForm value={draft} onChange={setDraft} />
       ) : blockType === "cta-banner" ? (
