@@ -21,8 +21,8 @@ type ProductRfqDialogProps = {
 };
 
 /**
- * FAANG / Linear-style conversion: one primary CTA opens a focused RFQ dialog.
- * Keeps the datasheet full-width — no sticky sidebar form.
+ * FAANG / Linear-style conversion for desktop + mobile:
+ * one primary CTA → modal form. Never a sticky sidebar rail.
  */
 export function ProductRfqDialog({
   locale,
@@ -34,15 +34,19 @@ export function ProductRfqDialog({
   return (
     <Dialog>
       <DialogTrigger
-        className={cn(buttonVariants({ size: "sm" }), "min-h-9", className)}
+        className={cn(
+          buttonVariants({ size: "default" }),
+          "min-h-10 px-5",
+          className,
+        )}
       >
         {label}
       </DialogTrigger>
       <DialogContent
-        className="max-h-[min(90dvh,40rem)] gap-3 overflow-y-auto sm:max-w-md"
+        className="max-h-[min(90dvh,42rem)] w-[min(100%,28rem)] gap-3 overflow-y-auto sm:max-w-md"
         showCloseButton
       >
-        <DialogHeader className="gap-1 text-left">
+        <DialogHeader className="gap-1 pr-8 text-left">
           <DialogTitle className="font-display text-base font-semibold text-ink">
             {label}
           </DialogTitle>

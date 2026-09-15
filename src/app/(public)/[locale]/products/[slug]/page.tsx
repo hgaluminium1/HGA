@@ -3,6 +3,9 @@ import type { Metadata } from "next";
 import { ProductDetail } from "@/features/public-catalog";
 import { getCachedPublishedProductBySlug } from "@/features/public-site/lib/public-cache";
 
+/** Always render from current build — avoid stale sticky-RFQ shells. */
+export const dynamic = "force-dynamic";
+
 type PageProps = {
   params: Promise<{ locale: string; slug: string }>;
 };

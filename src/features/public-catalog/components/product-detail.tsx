@@ -214,7 +214,7 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
   return (
     <div className="bg-bg">
       <Container className="py-[clamp(0.85rem,0.6rem+1vw,1.35rem)]">
-        <div className="pdp">
+        <div className="pdp" data-rfq="dialog">
           <CatalogueBreadcrumbs
             locale={locale}
             items={crumbs}

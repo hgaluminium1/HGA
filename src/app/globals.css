@@ -174,10 +174,7 @@
 
   /**
    * Product datasheet (PDP) — McMaster / DigiKey utility pattern.
-   * Macro: supporting-pane re-architects at container width (not device name).
-   * Micro: identity / docs / form reflow via nested containers + clamp.
-   * Techniques: reposition (stack↔pane), resize (thumb/gaps), reflow (docs),
-   * replace (dock ↔ sticky rail).
+   * Full-width specs; RFQ is a dialog trigger only (never a sticky sidebar).
    */
   .pdp {
     --pdp-gap: clamp(0.875rem, 0.55rem + 1.2cqw, 1.5rem);
@@ -185,6 +182,15 @@
     --pdp-title: clamp(1.2rem, 1.05rem + 0.85cqw, 1.75rem);
     container-type: inline-size;
     container-name: pdp;
+  }
+
+  /* Kill-switch: legacy sticky RFQ rail / mobile dock must never stick. */
+  .pdp-rfq {
+    position: static !important;
+    top: auto !important;
+  }
+  .pdp-dock {
+    display: none !important;
   }
 
   .pdp-shell {
