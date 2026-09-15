@@ -173,73 +173,35 @@
   }
 
   /**
-   * Product datasheet (PDP) — McMaster / DigiKey utility pattern.
-   * Full-width specs; RFQ is a dialog trigger only (never a sticky sidebar).
+   * Product datasheet — NVIDIA/DigiKey-style single column.
+   * Quote form is a controlled modal only; never sticky, never in-flow rail.
    */
-  .pdp {
-    --pdp-gap: clamp(0.875rem, 0.55rem + 1.2cqw, 1.5rem);
-    --pdp-thumb: clamp(3.75rem, 2.8rem + 4cqw, 6.25rem);
-    --pdp-title: clamp(1.2rem, 1.05rem + 0.85cqw, 1.75rem);
+  .ds {
+    --ds-gap: clamp(1.25rem, 1rem + 1vw, 2rem);
+    --ds-title: clamp(1.35rem, 1.15rem + 0.9vw, 1.85rem);
     container-type: inline-size;
-    container-name: pdp;
+    container-name: ds;
   }
 
-  /* Kill-switch: legacy sticky RFQ rail / mobile dock must never stick. */
-  .pdp-rfq {
-    position: static !important;
-    top: auto !important;
-  }
-  .pdp-dock {
-    display: none !important;
+  .ds__pad {
+    padding-block: clamp(1rem, 0.75rem + 1vw, 1.75rem);
   }
 
-  .pdp-shell {
-    display: grid;
-    gap: var(--pdp-gap);
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas:
-      "identity"
-      "body"
-      "related";
-    align-items: start;
+  .ds__crumbs {
+    margin-bottom: clamp(0.75rem, 0.5rem + 0.6cqw, 1.1rem);
   }
 
-  .pdp-identity {
-    grid-area: identity;
-  }
-  .pdp-body {
-    grid-area: body;
-    container-type: inline-size;
-    container-name: pdp-body;
-    min-width: 0;
-  }
-  .pdp-related {
-    grid-area: related;
-  }
-
-  /* Extra-wide body: pair specs + chemistry when the *main column* allows */
-  .pdp-docs {
-    display: grid;
-    gap: var(--pdp-gap);
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  @container pdp-body (min-width: 40rem) {
-    .pdp-docs--pair {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      align-items: start;
-    }
-  }
-
-  .pdp-identity__row {
+  .ds__subheader {
     display: flex;
-    gap: clamp(0.75rem, 0.5rem + 1.2cqw, 1.35rem);
+    gap: clamp(0.85rem, 0.6rem + 1cqw, 1.35rem);
     align-items: flex-start;
+    padding-bottom: clamp(1rem, 0.75rem + 0.8cqw, 1.5rem);
+    border-bottom: 1px solid var(--line);
   }
 
-  .pdp-identity__media {
+  .ds__media {
     position: relative;
-    width: var(--pdp-thumb);
+    width: clamp(4rem, 3.25rem + 2.5cqw, 5.5rem);
     aspect-ratio: 1;
     flex-shrink: 0;
     overflow: hidden;
@@ -248,34 +210,220 @@
     box-shadow: inset 0 0 0 1px rgb(0 0 0 / 6%);
   }
 
-  .pdp-identity__title {
-    font-size: var(--pdp-title);
+  .ds__subheader-main {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .ds__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem 0.65rem;
+  }
+
+  .ds__eyebrow {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--brand-blue);
+  }
+
+  .ds__sku {
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.7rem;
+    color: var(--text-faint);
+  }
+
+  .ds__cat {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+  .ds__cat:hover {
+    color: var(--brand-blue);
+    text-decoration: underline;
+  }
+
+  .ds__title {
+    margin-top: 0.35rem;
+    font-size: var(--ds-title);
+    font-weight: 600;
     line-height: 1.15;
     letter-spacing: -0.02em;
+    color: var(--ink);
   }
 
-  .pdp-lede {
-    font-size: clamp(0.8rem, 0.75rem + 0.2cqw, 0.875rem);
+  .ds__lede {
+    margin-top: 0.5rem;
+    max-width: 42rem;
+    font-size: clamp(0.8125rem, 0.78rem + 0.15cqw, 0.9rem);
+    line-height: 1.55;
+    color: var(--text-muted);
   }
 
-  .pdp-section-title {
-    font-size: clamp(0.85rem, 0.8rem + 0.25cqw, 0.95rem);
+  .ds__grades {
+    margin-top: 0.65rem;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    color: var(--text-muted);
   }
 
-  .pdp-spec-table {
-    font-size: clamp(0.75rem, 0.7rem + 0.2cqw, 0.8125rem);
+  .ds__actions {
+    margin-top: 0.85rem;
   }
 
-  .pdp-spec-table__label,
-  .pdp-spec-table__value {
-    padding-inline: clamp(0.55rem, 0.4rem + 0.4cqw, 0.85rem);
-    padding-block: clamp(0.4rem, 0.3rem + 0.25cqw, 0.55rem);
+  .ds__main {
+    display: grid;
+    gap: var(--ds-gap);
+    margin-top: var(--ds-gap);
+    grid-template-columns: minmax(0, 1fr);
   }
 
-  .pdp-related__grid {
+  @container ds (min-width: 48rem) {
+    .ds__main {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+    .ds__main > .ds__section:nth-child(n + 3) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .ds__h2 {
+    font-size: clamp(0.875rem, 0.82rem + 0.2cqw, 0.95rem);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .ds__hint {
+    margin-top: 0.25rem;
+    font-size: 0.7rem;
+    line-height: 1.35;
+    color: var(--text-faint);
+  }
+
+  .ds__table-wrap {
+    margin-top: 0.5rem;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+  }
+
+  .ds__table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+    font-size: clamp(0.75rem, 0.72rem + 0.15cqw, 0.8125rem);
+  }
+
+  .ds__table th,
+  .ds__table td {
+    padding: 0.45rem 0.85rem;
+    vertical-align: top;
+    border-bottom: 1px solid rgb(0 0 0 / 6%);
+  }
+
+  .ds__table thead th {
+    background: var(--bg-alt);
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .ds__table tbody th {
+    width: min(38%, 10rem);
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .ds__table tbody td {
+    color: var(--text-muted);
+  }
+
+  .ds__table tr:last-child th,
+  .ds__table tr:last-child td {
+    border-bottom: 0;
+  }
+
+  .ds__table-row-alt {
+    background: color-mix(in srgb, var(--bg-alt) 45%, transparent);
+  }
+
+  .ds__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+    list-style: none;
+    padding: 0;
+  }
+
+  .ds__chips li {
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    background: var(--bg-alt);
+    padding: 0.25rem 0.65rem;
+    font-size: 0.75rem;
+    color: var(--ink);
+  }
+
+  .ds__bullets {
+    margin-top: 0.5rem;
+    padding-left: 1.1rem;
+    list-style: disc;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    color: var(--text-muted);
+  }
+
+  .ds__bullets li + li {
+    margin-top: 0.25rem;
+  }
+
+  .ds__related {
+    margin-top: clamp(1.5rem, 1.1rem + 1.2cqw, 2.25rem);
+    padding-top: clamp(1rem, 0.75rem + 0.8cqw, 1.5rem);
+    border-top: 1px solid var(--line);
+  }
+
+  .ds__related-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .ds__related-link {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--brand-blue);
+    text-decoration: none;
+  }
+  .ds__related-link:hover {
+    text-decoration: underline;
+  }
+
+  .ds__related-grid {
     display: grid;
     gap: clamp(0.75rem, 0.5rem + 1cqw, 1.15rem);
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 14.5rem), 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  /* Legacy sticky RFQ classes — never show / never stick if old HTML caches */
+  .pdp-rfq,
+  .pdp-dock,
+  aside#rfq {
+    display: none !important;
   }
 }
 
