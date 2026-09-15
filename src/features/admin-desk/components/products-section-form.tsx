@@ -83,20 +83,20 @@ export function ProductsSectionForm({
         </p>
         <p className="mt-1.5 text-[11px] text-[#86868b]">
           On phones the band scrolls horizontally; from tablet up it becomes a
-          2â€“3 column grid.
+          2â??3 column grid.
         </p>
         <Link
           href="/admin/catalogue/products"
           className="mt-2 inline-block text-[12px] font-semibold text-[#0071e3] hover:underline"
         >
-          Open catalogue â†’
+          Open catalogue â??
         </Link>
       </div>
     </div>
   );
 }
 
-/** Upcoming strip headings â€” product cards come from isUpcoming catalogue rows. */
+/** Upcoming strip headings â?? product cards come from isUpcoming catalogue rows. */
 export function UpcomingProductsSectionForm({
   value,
   onChange,
@@ -135,7 +135,7 @@ export function UpcomingProductsSectionForm({
             value={typeof d.description === "string" ? d.description : ""}
             onChange={(e) => patch({ description: e.target.value })}
             rows={2}
-            placeholder="Coming soon â€” register interest for early allocation"
+            placeholder="Coming soon â?? register interest for early allocation"
           />
         </Field>
       </div>
@@ -149,7 +149,7 @@ export function UpcomingProductsSectionForm({
           href="/admin/catalogue/products"
           className="mt-2 inline-block text-[12px] font-semibold text-[#0071e3] hover:underline"
         >
-          Open catalogue â†’
+          Open catalogue â??
         </Link>
       </div>
     </div>
