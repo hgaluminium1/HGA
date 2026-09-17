@@ -25,7 +25,6 @@ const APP_DESCRIPTION =
 
 export async function generateMetadata(): Promise<Metadata> {
   const logoSrc = (await resolveBrandLogoSrc()) || FALLBACK_BRAND_ICON;
-  const isSvg = /\.svg(\?|$)/i.test(logoSrc);
 
   return {
     applicationName: siteConfig.shortName,
@@ -44,12 +43,11 @@ export async function generateMetadata(): Promise<Metadata> {
       telephone: false,
     },
     icons: {
-      icon: [
-        { url: "/icon", type: isSvg ? "image/svg+xml" : undefined },
-        { url: logoSrc, type: isSvg ? "image/svg+xml" : "image/png" },
-      ],
-      shortcut: [{ url: "/icon" }],
-      apple: [{ url: "/apple-icon", sizes: "180x180" }],
+      // File-based /icon + /apple-icon routes are primary; also expose the
+      // same asset URL browsers/bookmarks can cache independently.
+      icon: [{ url: "/icon", type: "image/png", sizes: "32x32" }],
+      shortcut: [{ url: "/icon", type: "image/png" }],
+      apple: [{ url: "/apple-icon", type: "image/png", sizes: "180x180" }],
     },
     openGraph: {
       type: "website",
@@ -59,9 +57,12 @@ export async function generateMetadata(): Promise<Metadata> {
         template: `%s | ${siteConfig.name}`,
       },
       description: APP_DESCRIPTION,
-      ...(logoSrc.startsWith("http")
-        ? { images: [{ url: logoSrc, alt: siteConfig.name }] }
-        : {}),
+      images: [
+        {
+          url: logoSrc.startsWith("http") ? logoSrc : FALLBACK_BRAND_ICON,
+          alt: siteConfig.name,
+        },
+      ],
     },
   };
 }

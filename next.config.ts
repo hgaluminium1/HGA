@@ -44,7 +44,7 @@ const withSerwist = withSerwistInit({
 const nextConfig: NextConfig = {
   outputFileTracingRoot: path.join(__dirname),
   async rewrites() {
-    // Browsers hard-request /favicon.ico — serve the dynamic brand icon route.
+    // Browsers hard-request /favicon.ico — serve generated brand icon.
     return [{ source: "/favicon.ico", destination: "/icon" }];
   },
   images: {

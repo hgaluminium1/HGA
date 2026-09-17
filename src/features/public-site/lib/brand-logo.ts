@@ -1,6 +1,9 @@
 import { getCachedCompanyProfile } from "@/features/public-corporate/lib/public-cache";
 
-/** Same resolution order as header / footer brand lockup. */
+/**
+ * Same resolution as header / footer BrandLockup:
+ * company PNG → company SVG → packaged HG mark (caller applies fallback).
+ */
 export function brandLogoSrcFromProfile(
   company:
     | {
@@ -19,10 +22,10 @@ export function brandLogoSrcFromProfile(
   return null;
 }
 
+/** Packaged mark used by BrandLockup when CMS logo is empty. */
+export const FALLBACK_BRAND_ICON = "/HGLogo.jpeg";
+
 export async function resolveBrandLogoSrc(): Promise<string | null> {
   const company = await getCachedCompanyProfile();
   return brandLogoSrcFromProfile(company);
 }
-
-/** Static fallback when CMS logo is not set. */
-export const FALLBACK_BRAND_ICON = "/icons/icon-192x192.png";
