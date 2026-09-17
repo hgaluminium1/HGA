@@ -3,6 +3,10 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 
 import { siteConfig } from "@/config/site.config";
+import {
+  FALLBACK_BRAND_ICON,
+  resolveBrandLogoSrc,
+} from "@/features/public-site/lib/brand-logo";
 
 const inter = Inter({
   variable: "--font-body",
@@ -19,39 +23,48 @@ const spaceGrotesk = Space_Grotesk({
 const APP_DESCRIPTION =
   "HG Aluminium Smelters Ltd. — extrusion profiles, homogenised billets and remelt alloys from Kadi, Gujarat.";
 
-export const metadata: Metadata = {
-  applicationName: siteConfig.shortName,
-  title: {
-    default: siteConfig.name,
-    template: `%s | ${siteConfig.name}`,
-  },
-  description: APP_DESCRIPTION,
-  manifest: "/manifest.webmanifest",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: siteConfig.shortName,
-  },
-  formatDetection: {
-    telephone: false,
-  },
-  icons: {
-    icon: [
-      { url: "/icons/icon-192x192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icons/icon-512x512.png", sizes: "512x512", type: "image/png" },
-    ],
-    apple: [{ url: "/icons/icon-192x192.png", sizes: "192x192" }],
-  },
-  openGraph: {
-    type: "website",
-    siteName: siteConfig.name,
+export async function generateMetadata(): Promise<Metadata> {
+  const logoSrc = (await resolveBrandLogoSrc()) || FALLBACK_BRAND_ICON;
+  const isSvg = /\.svg(\?|$)/i.test(logoSrc);
+
+  return {
+    applicationName: siteConfig.shortName,
     title: {
       default: siteConfig.name,
       template: `%s | ${siteConfig.name}`,
     },
     description: APP_DESCRIPTION,
-  },
-};
+    manifest: "/manifest.webmanifest",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: siteConfig.shortName,
+    },
+    formatDetection: {
+      telephone: false,
+    },
+    icons: {
+      icon: [
+        { url: "/icon", type: isSvg ? "image/svg+xml" : undefined },
+        { url: logoSrc, type: isSvg ? "image/svg+xml" : "image/png" },
+      ],
+      shortcut: [{ url: "/icon" }],
+      apple: [{ url: "/apple-icon", sizes: "180x180" }],
+    },
+    openGraph: {
+      type: "website",
+      siteName: siteConfig.name,
+      title: {
+        default: siteConfig.name,
+        template: `%s | ${siteConfig.name}`,
+      },
+      description: APP_DESCRIPTION,
+      ...(logoSrc.startsWith("http")
+        ? { images: [{ url: logoSrc, alt: siteConfig.name }] }
+        : {}),
+    },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [

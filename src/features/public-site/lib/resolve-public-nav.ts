@@ -14,6 +14,7 @@ import {
 import { categoryLandingHref } from "@/features/public-catalog/lib/product-media";
 import { getCachedPublishedPage } from "@/features/public-site/lib/public-cache";
 import { getCachedCompanyProfile } from "@/features/public-corporate/lib/public-cache";
+import { brandLogoSrcFromProfile } from "@/features/public-site/lib/brand-logo";
 import { getCachedPublishedProducts } from "@/features/public-site/lib/public-cache";
 import { getPublishedNavMenu } from "@/modules/navigation";
 import { listCategoriesFlat } from "@/modules/catalog";
@@ -330,10 +331,7 @@ export async function resolvePublicNav(
     primaryNavLinks,
     footer,
     brand: {
-      logoSrc:
-        company?.logo?.png?.trim() ||
-        company?.logo?.svg?.trim() ||
-        null,
+      logoSrc: brandLogoSrcFromProfile(company),
       logoHeightPx: clampLogoHeight(company?.logoDisplayHeightPx),
     },
     organizationName:
