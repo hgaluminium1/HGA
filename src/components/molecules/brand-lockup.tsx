@@ -9,7 +9,7 @@ const DEFAULT_HEIGHT = 40;
 type BrandLockupProps = {
   href: string;
   className?: string;
-  /** Footer / dark chrome — light plate behind the mark for contrast. */
+  /** @deprecated Kept for call sites; no longer paints a background plate. */
   inverted?: boolean;
   /** CMS logo URL; falls back to packaged mark. */
   src?: string | null;
@@ -22,17 +22,29 @@ function clampHeight(n: number | undefined): number {
   return Math.min(72, Math.max(28, Math.round(n)));
 }
 
-/** Fluid-width lockup — height from CMS so it never crowds header actions. */
+/** Prefer a transparent PNG delivery for Cloudinary uploads (no baked plate). */
+function displayLogoSrc(src: string): string {
+  const m =
+    /^(https:\/\/res\.cloudinary\.com\/[^/]+\/image\/upload\/)(.*)$/i.exec(src);
+  if (!m) return src;
+  const [, prefix, rest] = m;
+  if (/e_make_transparent|e_background_removal|b_transparent/i.test(src)) {
+    return src;
+  }
+  // Top-left corner color (usually studio black/white) → alpha; keep mark only.
+  return `${prefix}e_make_transparent:25,f_png,q_auto/${rest}`;
+}
+
+/** Fluid-width lockup — logo only, no background plate. */
 export function BrandLockup({
   href,
   className,
-  inverted = false,
   src,
   heightPx,
 }: BrandLockupProps) {
   const h = clampHeight(heightPx);
-  const imageSrc = src?.trim() || FALLBACK_BRAND_ICON;
-  // Wordmarks / stacked logos need horizontal room (was 2.75 — too tight).
+  const raw = src?.trim() || FALLBACK_BRAND_ICON;
+  const imageSrc = displayLogoSrc(raw);
   const maxW = Math.round(h * 4.25);
 
   return (
@@ -42,14 +54,8 @@ export function BrandLockup({
       aria-label="HG Aluminium Smelters Limited home"
     >
       <span
-        className={cn(
-          "relative inline-flex items-center justify-center overflow-hidden",
-          // Always give the mark a light plate so dark-background uploads stay legible.
-          "rounded-[var(--radius-md)] bg-white px-2 py-1",
-          inverted &&
-            "shadow-[inset_0_0_0_1px_rgb(255_255_255_/_0.12)]",
-        )}
-        style={{ height: h + 8 }}
+        className="relative inline-flex items-center justify-center overflow-hidden bg-transparent"
+        style={{ height: h }}
       >
         <Image
           src={imageSrc}
@@ -57,7 +63,8 @@ export function BrandLockup({
           width={maxW * 2}
           height={h * 2}
           priority
-          className="h-full w-auto object-contain"
+          unoptimized={imageSrc.includes("res.cloudinary.com")}
+          className="h-full w-auto bg-transparent object-contain"
           style={{
             maxWidth: `min(${maxW}px, 52vw)`,
             height: h,

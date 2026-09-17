@@ -18,7 +18,7 @@ function iconFetchUrl(src: string, size: number): string {
     const [, prefix, rest] = cloudinary;
     // Avoid double-transform if already transformed.
     if (/\/upload\/(?:[^/]+,)+/.test(src)) return src;
-    return `${prefix}w_${size},h_${size},c_fit,b_white,f_png,q_auto/${rest}`;
+    return `${prefix}w_${size},h_${size},c_fit,b_transparent,f_png,q_auto/${rest}`;
   }
   if (src.startsWith("/")) return `${siteOrigin()}${src}`;
   return src;
