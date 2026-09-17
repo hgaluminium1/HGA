@@ -611,7 +611,7 @@ export function CorporateCompanyEditor() {
             </p>
             <p className="text-muted-foreground mb-3 text-[0.75rem]">
               Used in the site header and footer. Upload anytime; height adjusts
-              the public lockup (28–64px).
+              the public lockup (28–72px).
             </p>
             <div className="grid gap-4 sm:grid-cols-2">
               <CloudinaryPicker
@@ -630,7 +630,7 @@ export function CorporateCompanyEditor() {
                   <input
                     type="range"
                     min={28}
-                    max={64}
+                    max={72}
                     step={1}
                     className="w-full accent-[#0342ab]"
                     value={logoDisplayHeightPx}

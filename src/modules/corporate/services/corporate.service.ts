@@ -116,7 +116,7 @@ function toCompanyDTO(doc: Record<string, unknown>): CompanyProfileDTO {
     logoDisplayHeightPx: (() => {
       const n = Number(doc.logoDisplayHeightPx ?? 40);
       if (!Number.isFinite(n)) return 40;
-      return Math.min(64, Math.max(28, Math.round(n)));
+      return Math.min(72, Math.max(28, Math.round(n)));
     })(),
     brandColors: {
       primary: colors.primary,

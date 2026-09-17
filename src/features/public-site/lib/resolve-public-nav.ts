@@ -70,7 +70,7 @@ const DEFAULT_LOGO_HEIGHT = 40;
 function clampLogoHeight(n: unknown): number {
   const v = Number(n);
   if (!Number.isFinite(v)) return DEFAULT_LOGO_HEIGHT;
-  return Math.min(64, Math.max(28, Math.round(v)));
+  return Math.min(72, Math.max(28, Math.round(v)));
 }
 
 async function publishedSlugs(slugs: string[], locale: string) {
