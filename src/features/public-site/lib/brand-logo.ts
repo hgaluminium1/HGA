@@ -2,7 +2,7 @@ import { getCachedCompanyProfile } from "@/features/public-corporate/lib/public-
 import {
   brandLogoSrcFromProfile,
   FALLBACK_BRAND_ICON,
-} from "@/features/public-site/lib/brand-logo-shared";
+} from "@/lib/brand";
 
 export { brandLogoSrcFromProfile, FALLBACK_BRAND_ICON };
 

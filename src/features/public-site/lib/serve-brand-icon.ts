@@ -1,5 +1,5 @@
 import { resolveBrandLogoSrc } from "@/features/public-site/lib/brand-logo";
-import { FALLBACK_BRAND_ICON } from "@/features/public-site/lib/brand-logo-shared";
+import { FALLBACK_BRAND_ICON } from "@/lib/brand";
 
 function siteOrigin(): string {
   const raw =

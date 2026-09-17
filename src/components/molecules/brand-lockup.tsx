@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { FALLBACK_BRAND_ICON } from "@/features/public-site/lib/brand-logo-shared";
+import { FALLBACK_BRAND_ICON } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 const DEFAULT_HEIGHT = 40;

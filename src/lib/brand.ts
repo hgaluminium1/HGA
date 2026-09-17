@@ -1,9 +1,8 @@
 /**
- * Shared brand-logo constants / pure helpers — safe for client components.
- * Do NOT import DB/cache from this file.
+ * Brand asset constants — safe for components + features (no DB).
  */
 
-/** Packaged mark used by BrandLockup when CMS logo is empty. */
+/** Packaged mark when CMS logo is empty (header / footer / favicon fallback). */
 export const FALLBACK_BRAND_ICON = "/HGLogo.jpeg";
 
 /**
