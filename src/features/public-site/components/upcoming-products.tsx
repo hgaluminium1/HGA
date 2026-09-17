@@ -34,9 +34,9 @@ type UpcomingProductsStripProps = {
 
 export async function UpcomingProductsStrip({
   locale,
-  eyebrow = "Pipeline",
+  eyebrow = "Steel & Deoxidation Solutions",
   title = "Upcoming products",
-  description = "Coming soon from HG — register interest for early allocation.",
+  description = "Aluminium Cubes, Shots, Notch Bars and Deoxidizer Products for steelmaking — register interest for early allocation.",
   showCatalogueLink = true,
   showEmpty = false,
 }: UpcomingProductsStripProps) {

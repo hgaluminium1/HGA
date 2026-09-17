@@ -35,10 +35,10 @@ function blocksFromHomeContent() {
       order: 3,
       appearance: "default" as const,
       data: {
-        eyebrow: "Pipeline",
+        eyebrow: "Steel & Deoxidation Solutions",
         title: "Upcoming products",
         description:
-          "Coming soon from HG — register interest for early allocation.",
+          "Aluminium Cubes, Aluminium Shots, Aluminium Notch Bars and Aluminium Deoxidizer Products — specialized forms for steelmaking and metallurgical applications. Register interest for early allocation.",
       },
     },
     {

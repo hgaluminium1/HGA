@@ -25,6 +25,7 @@ type Draft = {
   name: string;
   logoId: string;
   imageUrl: string;
+  listingKind: "confirmed" | "potential";
   approvedForWebsite: boolean;
   permissionNote: string;
   sortOrder: number;
@@ -35,6 +36,7 @@ function fromLogo(l: CustomerLogoDTO): Draft {
     name: l.name,
     logoId: l.logoId ?? "",
     imageUrl: l.imageUrl ?? "",
+    listingKind: l.listingKind ?? "confirmed",
     approvedForWebsite: l.approvedForWebsite,
     permissionNote: l.permissionNote,
     sortOrder: l.sortOrder,
@@ -45,6 +47,7 @@ const emptyDraft = (): Draft => ({
   name: "",
   logoId: "",
   imageUrl: "",
+  listingKind: "confirmed",
   approvedForWebsite: false,
   permissionNote: "",
   sortOrder: 0,
@@ -106,6 +109,7 @@ export function CorporateLogosEditor({ logoId }: { logoId: string | "new" }) {
       name: draft.name.trim(),
       logoId: draft.logoId.trim() || null,
       imageUrl: draft.imageUrl.trim() || null,
+      listingKind: draft.listingKind,
       approvedForWebsite: draft.approvedForWebsite,
       permissionNote: draft.permissionNote.trim(),
       sortOrder: draft.sortOrder,
@@ -206,6 +210,22 @@ export function CorporateLogosEditor({ logoId }: { logoId: string | "new" }) {
               }
             />
           </div>
+          <CorporateField label="Listing">
+            <select
+              className={corporateInputClass}
+              value={draft.listingKind}
+              onChange={(e) =>
+                patch({
+                  listingKind: e.target.value as "confirmed" | "potential",
+                })
+              }
+            >
+              <option value="confirmed">Our Customers (confirmed)</option>
+              <option value="potential">
+                Potential / Future Business Opportunities
+              </option>
+            </select>
+          </CorporateField>
           <CorporateField label="Sort order">
             <input
               type="number"

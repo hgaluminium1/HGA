@@ -157,7 +157,7 @@ export const homeContentEn: HomeContent = {
     eyebrow: "Our Products",
     title: "Present catalogue lines",
     description:
-      "Extrusion profiles, homogenised billets and remelt alloys from our Kadi plant — published and ready for enquiry.",
+      "Aluminium Extrusion Profiles, Aluminium Homogenized Billets and Aluminium Ingots — published and ready for enquiry.",
     items: [],
   },
   mission: {
@@ -174,49 +174,13 @@ export const homeContentEn: HomeContent = {
   testimonials: {
     eyebrow: "Testimonials",
     title: "What our partners say",
-    items: [
-      {
-        initials: "AS",
-        name: "Ankur Singh",
-        role: "Procurement Head, Velocity Auto Components",
-        quote:
-          "Consistent alloy quality and reliable turnaround for our production lines, batch after batch.",
-      },
-      {
-        initials: "BN",
-        name: "Bhaliya Nitin",
-        role: "Plant Manager, Apex Cast Works",
-        quote:
-          "Their remelt lots meet spec every time, which keeps our foundry line running without surprises.",
-      },
-      {
-        initials: "KC",
-        name: "Kishore Chettiar",
-        role: "Supply Chain Lead, Nordic Auto Forge",
-        quote:
-          "Responsive team, clear certificates — exactly what we need from an aluminium partner.",
-      },
-      {
-        initials: "RM",
-        name: "Riya Mehta",
-        role: "Quality Lead, Meridian Engineering",
-        quote:
-          "Documentation and traceability on every consignment make our audits painless.",
-      },
-      {
-        initials: "PV",
-        name: "Pratik Vora",
-        role: "Projects, Horizon Solar Structures",
-        quote:
-          "Frame and rail sections arrive cut-to-length with packing that survives site handling.",
-      },
-    ],
+    items: [],
   },
   customers: {
     eyebrow: "Our Customers",
-    title: "Organisations we serve",
+    title: "Confirmed existing customers",
     description:
-      "Approved name tiles from customer records. Brand logos appear only with explicit permission.",
+      "Confirmed customers only. Potential accounts are listed separately on the Customers page.",
     logos: [
       "Cosmos Construction",
       "Technocraft Industries",
@@ -226,10 +190,11 @@ export const homeContentEn: HomeContent = {
       "Grasim Industries",
       "Knest Manufacturers",
       "SB Scaffolding",
-      "Horizon Solar",
-      "Meridian Engineering",
-      "Apex Cast Works",
-      "Velocity Auto",
+      "Aditya Metal",
+      "Alrod Industries",
+      "Palco Recycle",
+      "Sakar Industries",
+      "Wincab Industries",
     ],
   },
   jointVentures: {

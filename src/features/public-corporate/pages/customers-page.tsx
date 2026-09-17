@@ -16,20 +16,25 @@ import {
 } from "@/features/public-corporate/lib/public-cache";
 
 export async function CustomersPage({ locale }: { locale: string }) {
-  const [logos, cases, testimonials] = await Promise.all([
-    getCachedPublishedLogos(),
+  const [confirmed, potential, cases, testimonials] = await Promise.all([
+    getCachedPublishedLogos("confirmed"),
+    getCachedPublishedLogos("potential"),
     getCachedPublishedCaseStudies(),
     getCachedPublishedTestimonials(),
   ]);
 
-  const empty = !logos.length && !cases.length && !testimonials.length;
+  const empty =
+    !confirmed.length &&
+    !potential.length &&
+    !cases.length &&
+    !testimonials.length;
 
   return (
     <>
       <PageHero
         locale={locale}
-        title="Proof, not name-dropping"
-        description="Approved organisation tiles and anonymised programme stories. Brand marks appear only with explicit permission."
+        title="Our Customers"
+        description="Confirmed customers shown separately from future business opportunities. Brand marks appear only with explicit permission."
         secondaryLabel="Industries"
         secondaryHref="industries"
       />
@@ -43,17 +48,17 @@ export async function CustomersPage({ locale }: { locale: string }) {
         />
       ) : (
         <>
-          {logos.length ? (
+          {confirmed.length ? (
             <Section alt>
               <Container>
                 <SectionIntro
-                  eyebrow="Organisations"
-                  title="Teams we supply"
-                  body="Brand marks when permission is on file — names until then. Pause the strip on hover."
+                  eyebrow="Our Customers"
+                  title="Confirmed existing customers"
+                  body="Organisations we currently supply. Brand marks when permission is on file — names until then."
                 />
                 <div className="mt-10">
                   <LogoMarquee
-                    items={logos.map((l) => ({
+                    items={confirmed.map((l) => ({
                       id: l.id,
                       name: l.name,
                       imageUrl: l.imageUrl,
@@ -64,8 +69,30 @@ export async function CustomersPage({ locale }: { locale: string }) {
             </Section>
           ) : null}
 
-          {cases.length ? (
+          {potential.length ? (
             <Section className="bg-bg-alt/40">
+              <Container>
+                <SectionIntro
+                  eyebrow="Potential Customers / Future Business Opportunities"
+                  title="Target accounts — not current supply claims"
+                  body="Companies listed in HG business-development materials as future prospective customers. These are not presented as existing customers."
+                />
+                <ul className="mt-8 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {potential.map((l) => (
+                    <li
+                      key={l.id}
+                      className="rounded-[8px] border border-line bg-surface px-3 py-2.5 text-[0.875rem] text-ink"
+                    >
+                      {l.name}
+                    </li>
+                  ))}
+                </ul>
+              </Container>
+            </Section>
+          ) : null}
+
+          {cases.length ? (
+            <Section>
               <Container>
                 <SectionIntro
                   eyebrow="Case studies"
@@ -96,12 +123,9 @@ export async function CustomersPage({ locale }: { locale: string }) {
           ) : null}
 
           {testimonials.length ? (
-            <Section>
+            <Section alt>
               <Container>
-                <SectionIntro
-                  eyebrow="Voices"
-                  title="What partners say"
-                />
+                <SectionIntro eyebrow="Voices" title="What partners say" />
                 <FluidAutoGrid min="18rem" className="mt-8">
                   {testimonials.map((t) => (
                     <Reveal key={t.id}>

@@ -149,6 +149,8 @@ export type CustomerLogoDTO = {
   name: string;
   logoId: string | null;
   imageUrl: string | null;
+  /** confirmed = Our Customers; potential = Future Business Opportunities */
+  listingKind: "confirmed" | "potential";
   approvedForWebsite: boolean;
   permissionNote: string;
   publishStatus: "draft" | "published";

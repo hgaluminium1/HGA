@@ -49,6 +49,14 @@ export type ProductDTO = {
   toleranceStandards: string[];
   packaging: string[];
   applications: string[];
+  /** Secondary applications shown under "Other Applications" (e.g. extrusion). */
+  otherApplications: string[];
+  /** Who buys this product directly (e.g. foundries for ingots). */
+  directCustomers: string[];
+  /** Downstream end-use after customer processing. */
+  endUseIndustries: string[];
+  /** Capability / potential only — not claimed as current supply. */
+  capabilityApplications: string[];
   highlights: string[];
   chemicalComposition: ChemicalCompositionRow[];
   maxLengthMm?: number | null;

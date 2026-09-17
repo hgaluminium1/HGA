@@ -102,7 +102,7 @@ function parseUpcomingCopy(data: unknown): {
       ? (data as Record<string, unknown>)
       : {};
   return {
-    eyebrow: typeof d.eyebrow === "string" && d.eyebrow ? d.eyebrow : "Pipeline",
+    eyebrow: typeof d.eyebrow === "string" && d.eyebrow ? d.eyebrow : "Steel & Deoxidation Solutions",
     title:
       typeof d.title === "string" && d.title
         ? d.title
@@ -110,7 +110,7 @@ function parseUpcomingCopy(data: unknown): {
     description:
       typeof d.description === "string"
         ? d.description
-        : "Coming soon from HG — register interest for early allocation.",
+        : "Aluminium Cubes, Shots, Notch Bars and Deoxidizer Products for steelmaking — register interest for early allocation.",
   };
 }
 
@@ -120,12 +120,12 @@ async function hydrateCustomersBlock(
   content: HomeContent["customers"];
   items: Array<{ id: string; name: string; imageUrl: string | null }>;
 }> {
-  const logos = await getCachedPublishedLogos();
+  const logos = await getCachedPublishedLogos("confirmed");
   if (!logos.length) {
     return {
       content: {
-        eyebrow: content.eyebrow || "Customers",
-        title: content.title || "Organisations we serve",
+        eyebrow: content.eyebrow || "Our Customers",
+        title: content.title || "Confirmed existing customers",
         description:
           content.description ||
           "Approved partners appear here once logos are published in Admin.",
@@ -136,11 +136,11 @@ async function hydrateCustomersBlock(
   }
   return {
     content: {
-      eyebrow: content.eyebrow || "Customers",
-      title: content.title || "Organisations we serve",
+      eyebrow: content.eyebrow || "Our Customers",
+      title: content.title || "Confirmed existing customers",
       description:
         content.description ||
-        "Approved partners — brand marks when permission is on file; names otherwise.",
+        "Confirmed customers only — potential accounts are listed separately on the Customers page.",
       logos: logos.map((l) => l.name),
     },
     items: logos.map((l) => ({

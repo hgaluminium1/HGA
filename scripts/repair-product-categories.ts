@@ -1,6 +1,7 @@
 /**
  * Repair: attach all published products to Category "aluminium"
  * and ensure public/products images are set.
+ * Does NOT rewrite isUpcoming — that is owned by seed / admin.
  */
 import { loadEnvLocal } from "./load-env-local";
 loadEnvLocal();
@@ -17,6 +18,7 @@ const IMAGE_BY_SLUG: Record<string, string> = {
   "aluminium-ingots": "/products/aluminium-ingots.jpg",
   "aluminium-cubes": "/products/aluminium-cubes.jpg",
   "aluminium-shots": "/products/aluminium-shots.jpg",
+  "aluminium-notch-bars": "/products/placeholder.svg",
   "aluminium-deoxidizer": "/products/aluminium-deoxidizer.jpg",
 };
 
@@ -32,14 +34,13 @@ async function main() {
       version: p.version,
       categoryIds: [aluminium.id],
       ...(imageUrl ? { imageUrl } : {}),
-      isUpcoming: false,
     });
     if ("error" in result) {
       console.error(`FAIL ${p.slug}`, result);
       continue;
     }
     console.log(
-      `linked ${p.slug} → aluminium (${result.product.categoryIds.join(",")}) img=${result.product.imageUrl}`,
+      `linked ${p.slug} → aluminium (${result.product.categoryIds.join(",")}) img=${result.product.imageUrl} upcoming=${result.product.isUpcoming}`,
     );
   }
 }

@@ -39,6 +39,10 @@ function toDTO(doc: Record<string, unknown>): ProductDTO {
     toleranceStandards: (doc.toleranceStandards as string[]) ?? [],
     packaging: (doc.packaging as string[]) ?? [],
     applications: (doc.applications as string[]) ?? [],
+    otherApplications: (doc.otherApplications as string[]) ?? [],
+    directCustomers: (doc.directCustomers as string[]) ?? [],
+    endUseIndustries: (doc.endUseIndustries as string[]) ?? [],
+    capabilityApplications: (doc.capabilityApplications as string[]) ?? [],
     highlights: (doc.highlights as string[]) ?? [],
     chemicalComposition: (
       (doc.chemicalComposition as { element?: string; range?: string }[]) ?? []

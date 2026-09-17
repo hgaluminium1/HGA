@@ -100,6 +100,10 @@ type Draft = {
   toleranceStandards: string;
   packaging: string;
   applications: string;
+  otherApplications: string;
+  directCustomers: string;
+  endUseIndustries: string;
+  capabilityApplications: string;
   highlights: string;
   chemicalComposition: ChemicalCompositionRow[];
   maxLengthMm: string;
@@ -131,6 +135,10 @@ function fromProduct(p: ProductDTO): Draft {
     toleranceStandards: listToCsv(p.toleranceStandards),
     packaging: listToCsv(p.packaging),
     applications: p.applications.join("\n"),
+    otherApplications: p.otherApplications.join("\n"),
+    directCustomers: p.directCustomers.join("\n"),
+    endUseIndustries: p.endUseIndustries.join("\n"),
+    capabilityApplications: p.capabilityApplications.join("\n"),
     highlights: p.highlights.join("\n"),
     chemicalComposition: p.chemicalComposition.length
       ? p.chemicalComposition.map((r) => ({ ...r }))
@@ -167,6 +175,10 @@ const emptyDraft = (): Draft => ({
   toleranceStandards: "",
   packaging: "",
   applications: "",
+  otherApplications: "",
+  directCustomers: "",
+  endUseIndustries: "",
+  capabilityApplications: "",
   highlights: "",
   chemicalComposition: [],
   maxLengthMm: "",
@@ -285,6 +297,22 @@ export function CatalogueProductEditor({
       toleranceStandards: csvToList(draft.toleranceStandards),
       packaging: csvToList(draft.packaging),
       applications: draft.applications
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      otherApplications: draft.otherApplications
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      directCustomers: draft.directCustomers
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      endUseIndustries: draft.endUseIndustries
+        .split("\n")
+        .map((s) => s.trim())
+        .filter(Boolean),
+      capabilityApplications: draft.capabilityApplications
         .split("\n")
         .map((s) => s.trim())
         .filter(Boolean),
@@ -640,13 +668,50 @@ export function CatalogueProductEditor({
             />
           </Field>
 
-          <SectionLabel>Applications & highlights (one per line)</SectionLabel>
+          <SectionLabel>Applications & market structure (one per line)</SectionLabel>
           <Field label="Applications" className="sm:col-span-2">
             <textarea
               className={cn(inputClass, "h-auto min-h-[64px] resize-y py-2")}
               value={draft.applications}
               onChange={(e) => patch({ applications: e.target.value })}
               rows={3}
+            />
+          </Field>
+          <Field label="Other applications" className="sm:col-span-2">
+            <textarea
+              className={cn(inputClass, "h-auto min-h-[48px] resize-y py-2")}
+              value={draft.otherApplications}
+              onChange={(e) => patch({ otherApplications: e.target.value })}
+              rows={2}
+            />
+          </Field>
+          <Field label="Direct customers" className="sm:col-span-2">
+            <textarea
+              className={cn(inputClass, "h-auto min-h-[48px] resize-y py-2")}
+              value={draft.directCustomers}
+              onChange={(e) => patch({ directCustomers: e.target.value })}
+              rows={2}
+            />
+          </Field>
+          <Field label="End-use industries" className="sm:col-span-2">
+            <textarea
+              className={cn(inputClass, "h-auto min-h-[48px] resize-y py-2")}
+              value={draft.endUseIndustries}
+              onChange={(e) => patch({ endUseIndustries: e.target.value })}
+              rows={2}
+            />
+          </Field>
+          <Field
+            label="Capability / potential applications"
+            className="sm:col-span-2"
+          >
+            <textarea
+              className={cn(inputClass, "h-auto min-h-[48px] resize-y py-2")}
+              value={draft.capabilityApplications}
+              onChange={(e) =>
+                patch({ capabilityApplications: e.target.value })
+              }
+              rows={2}
             />
           </Field>
           <Field label="Highlights (Why HG)" className="sm:col-span-2">

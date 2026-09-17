@@ -30,10 +30,6 @@ type PageSeed = {
 
 const entity = { seeded: true };
 
-function productHref(_focus?: string): string {
-  return "products/category/aluminium";
-}
-
 const pages: PageSeed[] = [
   {
     slug: "about",
@@ -167,9 +163,9 @@ const pages: PageSeed[] = [
   },
   {
     slug: "industries",
-    title: "Industries & applications",
+    title: "Industries We Serve",
     description:
-      "Markets where HG extrusion, billets and remelt alloys are specified — sector focus, not prospective brand claims.",
+      "From renewable energy and construction to engineering, transportation, electrical systems and metal processing — mapped to HG product families.",
     blocks: [
       {
         id: "i-intro",
@@ -177,9 +173,9 @@ const pages: PageSeed[] = [
         order: 0,
         appearance: "default",
         data: {
-          eyebrow: "Markets",
-          title: "Where our metal is specified",
-          body: "Application sectors shaped by extrusion, billet and remelt demand — from solar structures to conductor alloys.",
+          eyebrow: "Industries We Serve",
+          title: "Where our products are specified",
+          body: "From renewable energy and construction to engineering, transportation, electrical systems and metal processing, HG Aluminium Smelters Limited delivers aluminium solutions designed to meet diverse industrial requirements. Through our integrated portfolio of aluminium ingots, homogenized billets, extrusion profiles and specialized aluminium products, we support manufacturers across multiple downstream sectors.",
           ctaLabel: "View products",
           ctaHref: "products",
         },
@@ -192,7 +188,7 @@ const pages: PageSeed[] = [
         data: {
           eyebrow: "Sectors",
           title: "Industries we serve",
-          body: "",
+          body: "Product-to-industry mapping: Extrusion Profiles → solar, architecture, formwork, industrial, electrical, automotive, transport, HVAC. Homogenized Billets → aluminium extrusion manufacturers. Ingots → foundry, casting, alloy manufacturing. Cubes / Shots / Notch Bars / Deoxidizer (upcoming) → Steel & Deoxidation Solutions.",
           items: [
             {
               label: "Solar Energy",
@@ -203,7 +199,7 @@ const pages: PageSeed[] = [
                 "Mounting rails",
                 "Rooftop & utility structures",
               ],
-              productHref: productHref(),
+              productHref: "products/aluminium-extrusion-profiles",
             },
             {
               label: "Architecture & Construction",
@@ -214,7 +210,7 @@ const pages: PageSeed[] = [
                 "Fenestration",
                 "Building trims",
               ],
-              productHref: productHref(),
+              productHref: "products/aluminium-extrusion-profiles",
             },
             {
               label: "Aluminium Formwork",
@@ -225,7 +221,7 @@ const pages: PageSeed[] = [
                 "Beam sections",
                 "Mass housing systems",
               ],
-              productHref: productHref(),
+              productHref: "products/aluminium-extrusion-profiles",
             },
             {
               label: "Industrial Engineering",
@@ -236,18 +232,7 @@ const pages: PageSeed[] = [
                 "Automation",
                 "Conveyor systems",
               ],
-              productHref: productHref(),
-            },
-            {
-              label: "Automotive & EV",
-              description:
-                "Lightweight structural and mobility-related aluminium — subject to customer technical requirements.",
-              applications: [
-                "Structural profiles",
-                "EV-related sections",
-                "Casting alloys",
-              ],
-              productHref: productHref(),
+              productHref: "products/aluminium-extrusion-profiles",
             },
             {
               label: "Electrical & Power",
@@ -258,40 +243,73 @@ const pages: PageSeed[] = [
                 "Electrical enclosures",
                 "Conductor feed",
               ],
-              productHref: productHref(),
+              productHref: "products/aluminium-extrusion-profiles",
             },
             {
-              label: "Foundry & Die-Casting",
+              label: "Automotive & Transportation",
               description:
-                "Aluminium alloy ingots for pressure, gravity and sand casting of engineering components.",
+                "Lightweight structural and mobility-related aluminium — subject to customer technical requirements.",
               applications: [
-                "Die casting",
-                "Gravity casting",
-                "Engineering castings",
+                "Structural profiles",
+                "EV-related sections",
+                "Transport sections",
               ],
-              productHref: "products/aluminium-ingots",
+              productHref: "products/aluminium-extrusion-profiles",
             },
             {
-              label: "Steel & Metallurgy",
+              label: "Railways & Transport",
               description:
-                "Cubes, shots and deoxidizer forms for melt additions and steel-plant deoxidation programmes.",
+                "Lightweight aluminium extrusion profiles for railway, transportation and mobility applications.",
               applications: [
-                "Deoxidizer",
-                "Aluminium shots",
-                "Melt additions",
+                "Railway profiles",
+                "Transport sections",
+                "Interior rail sections",
               ],
-              productHref: productHref(),
+              productHref: "products/aluminium-extrusion-profiles",
             },
             {
-              label: "Extrusion Manufacturers",
+              label: "HVAC & Cryogenic",
               description:
-                "Homogenised billets as feedstock for architectural, solar, industrial and electrical profile producers.",
+                "Profiles for heat dissipation, HVAC, thermal management and specialized cryogenic engineering where grade allows.",
+              applications: [
+                "Heat sinks",
+                "HVAC sections",
+                "Thermal management",
+              ],
+              productHref: "products/aluminium-extrusion-profiles",
+            },
+            {
+              label: "Aluminium Extrusion Manufacturers",
+              description:
+                "Homogenized aluminium billets engineered as raw material for extrusion manufacturers producing profiles for solar, architecture, industrial, automotive, electrical and transport applications.",
               applications: [
                 "Extrusion billets",
                 "6xxx series programmes",
                 "Merchant press feed",
               ],
               productHref: "products/aluminium-homogenized-billets",
+            },
+            {
+              label: "Foundry & Alloy Manufacturing",
+              description:
+                "Aluminium ingots and alloy products for foundries, die-casting, remelting units and secondary aluminium processors.",
+              applications: [
+                "Die casting",
+                "Gravity casting",
+                "Alloy remelting",
+              ],
+              productHref: "products/aluminium-ingots",
+            },
+            {
+              label: "Steel & Deoxidation Solutions",
+              description:
+                "Upcoming specialized forms — Aluminium Cubes, Aluminium Shots, Aluminium Notch Bars and Deoxidizer Products — for steelmaking deoxidation and metallurgical treatment.",
+              applications: [
+                "Steel deoxidation",
+                "Metallurgical treatment",
+                "Melt chemistry adjustment",
+              ],
+              productHref: "products#upcoming",
             },
           ],
         },

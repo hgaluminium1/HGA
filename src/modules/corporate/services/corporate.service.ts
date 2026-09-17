@@ -686,11 +686,13 @@ export async function softDeleteSustainabilityMetric(id: string) {
 }
 
 function toLogoDTO(doc: Record<string, unknown>): CustomerLogoDTO {
+  const kind = doc.listingKind === "potential" ? "potential" : "confirmed";
   return {
     id: String(doc._id),
     name: String(doc.name),
     logoId: (doc.logoId as string | null) ?? null,
     imageUrl: (doc.imageUrl as string | null) ?? null,
+    listingKind: kind,
     approvedForWebsite: Boolean(doc.approvedForWebsite),
     permissionNote: String(doc.permissionNote ?? ""),
     publishStatus:
@@ -714,13 +716,20 @@ export async function listCustomerLogos(
   });
 }
 
-export async function listPublishedCustomerLogos() {
+export async function listPublishedCustomerLogos(
+  opts: { listingKind?: "confirmed" | "potential" } = {},
+) {
   await requireDb();
-  const rows = await CustomerLogo.find({
+  const filter: Record<string, unknown> = {
     deletedAt: null,
     publishStatus: "published",
     approvedForWebsite: true,
-  })
+  };
+  if (opts.listingKind) {
+    filter.listingKind =
+      opts.listingKind === "potential" ? "potential" : { $ne: "potential" };
+  }
+  const rows = await CustomerLogo.find(filter)
     .sort({ sortOrder: 1 })
     .lean();
   return rows.map((r) => toLogoDTO(r as Record<string, unknown>));

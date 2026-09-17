@@ -285,6 +285,61 @@ export async function ProductDetail({ locale, slug }: ProductDetailProps) {
             </section>
           ) : null}
 
+          {product.otherApplications.length ? (
+            <section className="ds__section" aria-labelledby="ds-other-apps">
+              <h2 id="ds-other-apps" className="ds__h2">
+                Other applications
+              </h2>
+              <ul className="ds__chips">
+                {product.otherApplications.map((app) => (
+                  <li key={app}>{app}</li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          {product.directCustomers.length ? (
+            <section className="ds__section" aria-labelledby="ds-direct">
+              <h2 id="ds-direct" className="ds__h2">
+                Direct customers
+              </h2>
+              <ul className="ds__chips">
+                {product.directCustomers.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          {product.endUseIndustries.length ? (
+            <section className="ds__section" aria-labelledby="ds-enduse">
+              <h2 id="ds-enduse" className="ds__h2">
+                End-use industries
+              </h2>
+              <ul className="ds__chips">
+                {product.endUseIndustries.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
+          {product.capabilityApplications.length ? (
+            <section className="ds__section" aria-labelledby="ds-capability">
+              <h2 id="ds-capability" className="ds__h2">
+                Capability / potential applications
+              </h2>
+              <p className="ds__hint">
+                Not claimed as current supply without certification or approval.
+              </p>
+              <ul className="ds__chips">
+                {product.capabilityApplications.map((item) => (
+                  <li key={item}>{item}</li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
+
           {product.highlights.length ? (
             <section className="ds__section" aria-labelledby="ds-notes">
               <h2 id="ds-notes" className="ds__h2">

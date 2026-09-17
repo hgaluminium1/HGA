@@ -18,6 +18,10 @@ const sample: ProductDTO = {
   toleranceStandards: [],
   packaging: [],
   applications: [],
+  otherApplications: [],
+  directCustomers: [],
+  endUseIndustries: [],
+  capabilityApplications: [],
   highlights: [],
   chemicalComposition: [],
   description:

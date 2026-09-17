@@ -536,7 +536,7 @@ export async function CustomerLogoStripBlock({
 }: {
   locale?: string;
 } = {}) {
-  const logos = await getCachedPublishedLogos();
+  const logos = await getCachedPublishedLogos("confirmed");
   if (!logos.length) {
     return (
       <Section>

@@ -46,6 +46,7 @@ import {
   listSustainabilityMetrics,
   listTestimonials,
   updateCapacityMetric,
+  updateCustomerLogo,
   updateSustainabilityMetric,
   upsertCompanyProfile,
 } from "@/modules/corporate";
@@ -628,7 +629,7 @@ async function seedSustainability() {
 
 async function seedCustomers() {
   // Existing customers from client DOCX — name tiles only until logo permission
-  const logos = [
+  const confirmed = [
     { name: "Cosmos Construction", sortOrder: 1 },
     { name: "Technocraft Industries", sortOrder: 2 },
     { name: "Waaree Energies", sortOrder: 3 },
@@ -643,14 +644,53 @@ async function seedCustomers() {
     { name: "Sakar Industries", sortOrder: 12 },
     { name: "Wincab Industries", sortOrder: 13 },
   ];
+  // Future prospective customers from client DOCX — never mixed with confirmed
+  const potential = [
+    { name: "Adani Solar", sortOrder: 101 },
+    { name: "Tata Power Solar", sortOrder: 102 },
+    { name: "Vikram Solar", sortOrder: 103 },
+    { name: "Premier Energies", sortOrder: 104 },
+    { name: "Larsen & Toubro", sortOrder: 105 },
+    { name: "Jindal Shadeed", sortOrder: 106 },
+    { name: "Aludecor Lamination Pvt. Ltd.", sortOrder: 107 },
+    { name: "Fenesta Building Systems", sortOrder: 108 },
+    { name: "Tata Motors", sortOrder: 109 },
+    { name: "Mahindra Electric", sortOrder: 110 },
+    { name: "Ola Electric", sortOrder: 111 },
+    { name: "Godrej & Boyce", sortOrder: 112 },
+    { name: "Schneider Electric", sortOrder: 113 },
+    { name: "ABB India", sortOrder: 114 },
+    { name: "Alstom India", sortOrder: 115 },
+    { name: "Polycab India Limited", sortOrder: 116 },
+    { name: "KEI Industries Limited", sortOrder: 117 },
+    { name: "Finolex Cables Limited", sortOrder: 118 },
+    { name: "Sterlite Power", sortOrder: 119 },
+    { name: "Bharat Forge", sortOrder: 120 },
+    { name: "Sundaram Clayton Limited", sortOrder: 121 },
+    { name: "Endurance Technologies Limited", sortOrder: 122 },
+    { name: "Rockman Industries", sortOrder: 123 },
+    { name: "Tata Steel", sortOrder: 124 },
+    { name: "JSW Steel", sortOrder: 125 },
+    { name: "AMNS India", sortOrder: 126 },
+    { name: "Hindustan Aeronautics Limited", sortOrder: 127 },
+    { name: "Bharat Electronics Limited", sortOrder: 128 },
+  ];
   const existing = await listCustomerLogos();
-  for (const l of logos) {
-    if (existing.items.some((x) => x.name === l.name)) {
+  for (const l of confirmed) {
+    const found = existing.items.find((x) => x.name === l.name);
+    if (found) {
+      if (found.listingKind !== "confirmed") {
+        await updateCustomerLogo(found.id, {
+          version: found.version,
+          listingKind: "confirmed",
+        });
+      }
       console.log(`  = customer ${l.name}`);
       continue;
     }
     await createCustomerLogo({
       name: l.name,
+      listingKind: "confirmed",
       approvedForWebsite: true,
       permissionNote:
         "Name-only until logo permission — seeded from client customer lists",
@@ -658,6 +698,29 @@ async function seedCustomers() {
       sortOrder: l.sortOrder,
     });
     console.log(`  + customer ${l.name}`);
+  }
+  for (const l of potential) {
+    const found = existing.items.find((x) => x.name === l.name);
+    if (found) {
+      if (found.listingKind !== "potential") {
+        await updateCustomerLogo(found.id, {
+          version: found.version,
+          listingKind: "potential",
+        });
+      }
+      console.log(`  = potential ${l.name}`);
+      continue;
+    }
+    await createCustomerLogo({
+      name: l.name,
+      listingKind: "potential",
+      approvedForWebsite: true,
+      permissionNote:
+        "Potential / future business opportunity — from client DOCX lists",
+      publishStatus: "published",
+      sortOrder: l.sortOrder,
+    });
+    console.log(`  + potential ${l.name}`);
   }
 }
 
@@ -1062,16 +1125,45 @@ async function seedProducts() {
       toleranceStandards: ["EN", "IS"],
       packaging: ["bundle", "stretch_wrap", "crate"],
       applications: [
-        "Solar module frames & mounting structures",
-        "Architectural façades, doors & windows",
-        "Industrial machinery frames",
-        "Heat sinks & electrical housings",
-        "Lightweight mobility sections",
+        "Solar Energy",
+        "Architecture & Construction",
+        "Aluminium Formwork",
+        "Industrial Engineering",
+        "Automotive & EV",
+        "Electrical & Electronics",
+        "Railways & Transportation",
+        "HVAC & Thermal Management",
+      ],
+      otherApplications: [
+        "Furniture",
+        "Cryogenic",
+        "Consumer Durables",
+        "Specialized Engineering",
+      ],
+      directCustomers: [
+        "Solar module manufacturers",
+        "Solar structure manufacturers",
+        "Aluminium system houses",
+        "Architectural fabricators",
+        "Formwork manufacturers",
+        "Industrial equipment manufacturers",
+        "Automotive component manufacturers",
+        "Electrical equipment manufacturers",
+        "HVAC manufacturers",
+        "Railway and transport companies",
+        "Furniture manufacturers",
+        "General engineering companies",
+      ],
+      endUseIndustries: [] as string[],
+      capabilityApplications: [
+        "Defence equipment (capability / potential)",
+        "Aerospace-related structural parts (capability / potential)",
+        "High-performance engineering profiles (capability / potential)",
       ],
       highlights: [
-        "Press capacity for architectural and solar sections",
+        "Custom sections to customer drawings and technical specifications",
         "Mill, anodized and powder-coated finishes",
-        "Supplied to customer drawings with lot identity",
+        "Press capacity for architectural, solar and industrial sections",
       ],
       chemicalComposition: [
         { element: "Si", range: "0.20–0.60%" },
@@ -1092,11 +1184,11 @@ async function seedProducts() {
       moqNote: "Typical programmes from ~3–5 MT / month — confirm die & packing on RFQ.",
       isUpcoming: false,
       description:
-        "Custom aluminium extrusion profiles for solar module frames and mounting, architectural façades, doors and windows, reusable formwork, industrial machinery frames, electrical heat-sinks and lightweight mobility sections. Supplied to customer drawings with dimensional consistency, corrosion resistance and surface quality for demanding downstream programmes.",
+        "HG Aluminium Smelters Limited manufactures precision aluminium extrusion profiles for diverse industrial and commercial applications. Our extrusion capabilities support standard as well as customized profiles manufactured as per customer drawings, technical specifications and application requirements.",
     },
     {
       sku: "HG-BIL-HOMO",
-      name: { en: "Homogenised Aluminium Billets" },
+      name: { en: "Aluminium Homogenized Billets" },
       slug: "aluminium-homogenized-billets",
       imageUrl: "/products/aluminium-billets.jpg",
       formType: "billet" as const,
@@ -1107,15 +1199,32 @@ async function seedProducts() {
       ralColors: [] as string[],
       toleranceStandards: ["IS", "ASTM"],
       packaging: ["bundle"],
-      applications: [
-        "Architectural extrusion feedstock",
-        "Solar frame extrusion",
-        "Industrial & automotive profiles",
-        "Electrical conductor sections",
+      applications: [] as string[],
+      otherApplications: [] as string[],
+      directCustomers: [
+        "Aluminium Extrusion Profile Manufacturers",
+        "Architectural Extrusion Manufacturers",
+        "Solar Profile Manufacturers",
+        "Industrial Extrusion Manufacturers",
+        "Automotive Extrusion Manufacturers",
+        "Electrical Profile Manufacturers",
+        "General Engineering Extrusion Companies",
       ],
+      endUseIndustries: [
+        "Solar Energy",
+        "Architecture & Construction",
+        "Automotive & EV",
+        "Electrical & Electronics",
+        "Transport",
+        "Industrial Engineering",
+        "HVAC",
+        "Furniture",
+        "Other engineering applications",
+      ],
+      capabilityApplications: [] as string[],
       highlights: [
-        "Homogenised for consistent extrusion performance",
-        "6xxx series focus for architectural & solar",
+        "Primary focus: feedstock for aluminium extrusion manufacturers",
+        "Homogenized for consistent extrusion performance and surface quality",
         "Diameter and cut lengths to press programme",
       ],
       chemicalComposition: [
@@ -1138,7 +1247,7 @@ async function seedProducts() {
       moqNote: "Billet lots typically scheduled in truck / container lots — enquire for diameter.",
       isUpcoming: false,
       description:
-        "High-quality homogenised aluminium billets engineered for extrusion manufacturers. Cast and homogenised for consistent chemistry, extrusion performance and surface finish — the feedstock for architectural, solar, industrial, automotive and electrical profile programmes.",
+        "HG Aluminium Smelters Limited manufactures high-quality homogenized aluminium billets designed primarily for aluminium extrusion manufacturers. These billets serve as the raw material for producing precision extrusion profiles across a wide range of end-use industries. Our homogenized aluminium billets are developed to support consistent extrusion performance, surface quality and dimensional reliability for profile manufacturers serving diverse industrial sectors.",
     },
     {
       sku: "HG-ING-REMELT",
@@ -1154,16 +1263,42 @@ async function seedProducts() {
       toleranceStandards: ["IS", "ASTM"],
       packaging: ["bundle", "pallet"],
       applications: [
-        "Pressure & gravity die casting",
-        "Sand casting foundries",
-        "Automotive & engineering castings",
-        "Remelt / secondary alloy programmes",
-        "Electrical & conductor grades (specified)",
+        "Automotive & Mobility",
+        "Foundry & Die Casting",
+        "General Engineering",
+        "Electrical & Conductive Applications",
+        "Consumer Durables & Appliances",
+        "Construction & Architectural Hardware",
+        "Renewable Energy",
+        "Transportation",
+        "Alloy Manufacturing & Remelting",
       ],
+      otherApplications: [] as string[],
+      directCustomers: [
+        "Aluminium Foundries",
+        "Die-Casting Manufacturers",
+        "Aluminium Alloy Manufacturers",
+        "Remelting Units",
+        "Automotive Component Foundries",
+        "Engineering Component Manufacturers",
+        "Secondary Aluminium Processors",
+        "Metal Traders / Export Buyers",
+      ],
+      endUseIndustries: [
+        "Automotive & EV",
+        "General Engineering",
+        "Electrical",
+        "Consumer Durables",
+        "Construction Hardware",
+        "Renewable Energy",
+        "Transportation",
+        "Industrial Equipment",
+      ],
+      capabilityApplications: [] as string[],
       highlights: [
-        "Secondary aluminium & alloy ingots for foundries",
-        "Dependable chemistry with lot traceability",
-        "Packed for plant handling and melt practice",
+        "Ingots are raw material for remelting, alloying and casting",
+        "Final end-use depends on chemistry and alloy grade",
+        "Electrical / conductor applications only where grade is specified",
       ],
       chemicalComposition: [
         { element: "Si", range: "Grade dependent (e.g. ADC12 ~9.6–12%)" },
@@ -1180,7 +1315,7 @@ async function seedProducts() {
       moqNote: "Typical foundry programmes from ~5–10 MT — confirm grade & packing.",
       isUpcoming: false,
       description:
-        "Secondary aluminium and alloy ingots for foundries, remelting units and metal-processing industries. Dependable chemistry for pressure / gravity die casting, sand casting, automotive and engineering components, and suitable electrical / conductor grades when specified.",
+        "HG Aluminium Smelters Limited manufactures aluminium ingots and secondary aluminium alloy ingots for foundries, die-casting manufacturers, alloy producers, remelting units and engineering industries. Manufactured with controlled chemistry and consistent quality, our ingots serve as reliable raw material for a wide range of downstream casting and manufacturing applications.",
     },
     {
       sku: "HG-CUBE",
@@ -1196,14 +1331,19 @@ async function seedProducts() {
       toleranceStandards: ["IS"],
       packaging: ["bag", "pallet"],
       applications: [
-        "Foundry melt additions",
-        "Steel plant charge programmes",
-        "Controlled furnace dosing",
+        "Steel deoxidation",
+        "Metallurgical treatment",
+        "Alloy addition",
+        "Melt chemistry adjustment",
       ],
+      otherApplications: [] as string[],
+      directCustomers: ["Steel manufacturers", "Metallurgical process plants"],
+      endUseIndustries: ["Steel & Deoxidation Solutions"],
+      capabilityApplications: [] as string[],
       highlights: [
-        "Sized for controlled melting",
+        "Part of HG Steel & Deoxidation Solutions (upcoming)",
+        "Sized for controlled melting and furnace dosing",
         "Consistent chemistry per lot",
-        "Efficient furnace handling",
       ],
       chemicalComposition: [
         { element: "Al", range: "≥ 99.5% (1050 class)" },
@@ -1215,9 +1355,9 @@ async function seedProducts() {
       typicalPieceWeightKg: 0.5,
       standardsNote: "Commercial purity remelt forms — certify to PO chemistry",
       moqNote: "Bag / pallet lots — enquire for sizing and monthly allocation.",
-      isUpcoming: false,
+      isUpcoming: true,
       description:
-        "Aluminium cubes for foundry melt additions and steel-plant charge programmes. Sized for controlled melting, consistent chemistry and efficient furnace handling — supplied to agreed packing and lot identity.",
+        "Specialized aluminium cubes for steelmaking and metallurgical applications, including deoxidation and melt chemistry adjustment. Part of HG Steel & Deoxidation Solutions.",
     },
     {
       sku: "HG-SHOT",
@@ -1233,14 +1373,19 @@ async function seedProducts() {
       toleranceStandards: ["IS"],
       packaging: ["bag", "pallet"],
       applications: [
-        "Foundry melt additions",
-        "Metallurgical recovery programmes",
-        "Rapid dissolution furnace practice",
+        "Steel deoxidation",
+        "Metallurgical treatment",
+        "Alloy addition",
+        "Melt chemistry adjustment",
       ],
+      otherApplications: [] as string[],
+      directCustomers: ["Steel manufacturers", "Metallurgical process plants"],
+      endUseIndustries: ["Steel & Deoxidation Solutions"],
+      capabilityApplications: [] as string[],
       highlights: [
+        "Part of HG Steel & Deoxidation Solutions (upcoming)",
         "Rapid dissolution in melt",
         "Predictable metal recovery",
-        "Clean furnace practice packing",
       ],
       chemicalComposition: [
         { element: "Al", range: "≥ 99.5%" },
@@ -1251,13 +1396,51 @@ async function seedProducts() {
       typicalPieceWeightKg: 0.02,
       standardsNote: "Shot sizing to agreed mesh / sieve band",
       moqNote: "Bagged lots with lot ID — confirm sizing on RFQ.",
-      isUpcoming: false,
+      isUpcoming: true,
       description:
-        "Aluminium shots for melt additions in foundry and metallurgical applications. Designed for rapid dissolution, predictable recovery and clean furnace practice — packed for plant handling and lot traceability.",
+        "Aluminium shots for steelmaking and metallurgical deoxidation programmes. Part of HG Steel & Deoxidation Solutions.",
+    },
+    {
+      sku: "HG-NOTCH",
+      name: { en: "Aluminium Notch Bars" },
+      slug: "aluminium-notch-bars",
+      imageUrl: "/products/placeholder.svg",
+      formType: "remelt" as const,
+      alloyGrades: ["1050"],
+      tempers: ["F"],
+      surfaceFinishes: ["mill"],
+      anodizingColors: [] as string[],
+      ralColors: [] as string[],
+      toleranceStandards: ["IS"],
+      packaging: ["bundle", "pallet"],
+      applications: [
+        "Steel deoxidation",
+        "Metallurgical treatment",
+        "Alloy addition",
+        "Melt chemistry adjustment",
+      ],
+      otherApplications: [] as string[],
+      directCustomers: ["Steel manufacturers", "Metallurgical process plants"],
+      endUseIndustries: ["Steel & Deoxidation Solutions"],
+      capabilityApplications: [] as string[],
+      highlights: [
+        "Part of HG Steel & Deoxidation Solutions (upcoming)",
+        "Form for steel plant handling and addition practice",
+      ],
+      chemicalComposition: [
+        { element: "Al", range: "High purity aluminium base" },
+        { element: "Impurities", range: "Controlled to steel-mill agreement" },
+      ],
+      typicalPieceWeightKg: 1,
+      standardsNote: "Supply chemistry & form per steel plant specification",
+      moqNote: "Monthly allocation programmes — enquire for grade and sizing.",
+      isUpcoming: true,
+      description:
+        "Aluminium notch bars for steelmaking and metallurgical applications. Part of HG Steel & Deoxidation Solutions.",
     },
     {
       sku: "HG-DEOX",
-      name: { en: "Aluminium Deoxidizer" },
+      name: { en: "Aluminium Deoxidizer Products" },
       slug: "aluminium-deoxidizer",
       imageUrl: "/products/aluminium-deoxidizer.jpg",
       formType: "deoxidizer" as const,
@@ -1269,13 +1452,18 @@ async function seedProducts() {
       toleranceStandards: ["IS"],
       packaging: ["bag", "pallet"],
       applications: [
-        "Steelmaking deoxidation",
-        "Metallurgical oxygen control",
-        "Ladle / furnace additions",
+        "Steel deoxidation",
+        "Oxygen removal from molten steel",
+        "Metallurgical treatment",
+        "Steelmaking process control",
       ],
+      otherApplications: [] as string[],
+      directCustomers: ["Steel manufacturers", "Metallurgical process plants"],
+      endUseIndustries: ["Steel & Deoxidation Solutions"],
+      capabilityApplications: [] as string[],
       highlights: [
+        "Part of HG Steel & Deoxidation Solutions (upcoming)",
         "Form tuned for oxygen control",
-        "Predictable addition practice",
         "Sized and packed for steel plant handling",
       ],
       chemicalComposition: [
@@ -1285,9 +1473,9 @@ async function seedProducts() {
       typicalPieceWeightKg: 1,
       standardsNote: "Supply chemistry & form per steel plant specification",
       moqNote: "Monthly allocation programmes — enquire for grade and sizing.",
-      isUpcoming: false,
+      isUpcoming: true,
       description:
-        "Aluminium deoxidizer products for steelmaking and metallurgical deoxidation programmes. Form and chemistry tuned for predictable oxygen control — enquire for grade, sizing and monthly allocation.",
+        "Aluminium deoxidizer products for steelmaking and metallurgical deoxidation programmes. Part of HG Steel & Deoxidation Solutions.",
     },
   ];
 
@@ -1299,6 +1487,7 @@ async function seedProducts() {
     const categoryIds = [aluminiumId];
     if (found) {
       const updated = await updateProduct(found.id, {
+        name: p.name,
         isUpcoming: p.isUpcoming,
         description: p.description,
         formType: p.formType,
@@ -1310,6 +1499,10 @@ async function seedProducts() {
         toleranceStandards: p.toleranceStandards,
         packaging: p.packaging,
         applications: p.applications,
+        otherApplications: p.otherApplications,
+        directCustomers: p.directCustomers,
+        endUseIndustries: p.endUseIndustries,
+        capabilityApplications: p.capabilityApplications,
         highlights: p.highlights,
         chemicalComposition: p.chemicalComposition,
         ...(p.maxLengthMm != null ? { maxLengthMm: p.maxLengthMm } : {}),
@@ -1362,6 +1555,10 @@ async function seedProducts() {
       toleranceStandards: p.toleranceStandards,
       packaging: p.packaging,
       applications: p.applications,
+      otherApplications: p.otherApplications,
+      directCustomers: p.directCustomers,
+      endUseIndustries: p.endUseIndustries,
+      capabilityApplications: p.capabilityApplications,
       highlights: p.highlights,
       chemicalComposition: p.chemicalComposition,
       maxLengthMm: p.maxLengthMm,

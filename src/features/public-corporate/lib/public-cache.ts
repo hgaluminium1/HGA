@@ -70,11 +70,14 @@ export function getCachedPublishedSustainability() {
   )();
 }
 
-export function getCachedPublishedLogos() {
-  if (cacheDisabled) return listPublishedCustomerLogos();
+export function getCachedPublishedLogos(
+  listingKind?: "confirmed" | "potential",
+) {
+  const kind = listingKind ?? "confirmed";
+  if (cacheDisabled) return listPublishedCustomerLogos({ listingKind: kind });
   return unstable_cache(
-    () => listPublishedCustomerLogos(),
-    ["published-logos"],
+    () => listPublishedCustomerLogos({ listingKind: kind }),
+    ["published-logos", kind],
     { tags: ["corporate"], revalidate: 60 },
   )();
 }

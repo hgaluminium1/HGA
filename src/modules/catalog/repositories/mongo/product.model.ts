@@ -22,6 +22,10 @@ const productSchema = new Schema(
     toleranceStandards: [{ type: String }],
     packaging: [{ type: String }],
     applications: [{ type: String }],
+    otherApplications: [{ type: String }],
+    directCustomers: [{ type: String }],
+    endUseIndustries: [{ type: String }],
+    capabilityApplications: [{ type: String }],
     highlights: [{ type: String }],
     chemicalComposition: [
       {
